@@ -33,13 +33,9 @@
                             </div>
                             <img id="output" class="ui larger image" />
                         </div>
-
                         <button class="ui fluid large teal submit button">Submit</button>
                     </div>
-
-
                 </form>
-
             </div>
         </div>
     </div>

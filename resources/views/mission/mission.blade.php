@@ -1,14 +1,14 @@
 @extends('main')
 @section('mission')
     <div class="ui left aligned segment">
-
         <h2 style="text-align:center !important">Nhiệm vụ của bạn</h2>
-        <div class="ui list">
+        <div class="text-slate-800">
             <div class="item">
                 <p class="ui huge red text"><b>Bước 1:</b> truy cập vào <a href="/test">{{ $mission->ms_name }}</a></p>
             </div>
             <div class="item">
-                <b>Bước 2:</b> <img class="ui larger image" src="./images/{{$page->page_image}}" style="max-width: 450px"/>
+                <b>Bước 2:</b> <img class="ui larger image" src="./images/{{ $page->page_image }}"
+                    style="max-width: 450px" />
             </div>
             <div class="item">
                 <p><b>Bước 3:</b> Click nhận mã và chờ {{ $mission->ms_countdown }}s</p>
@@ -36,8 +36,35 @@
                 <a class="ui inverted red button" href="/cancel-mission">Bỏ qua nhiệm vụ</a>
             </div>
         </form>
-
-
-
+    </div>
+    @yield('startmission')
+    <div class="overflow-x-auto bg-white drop-shadow-2xl p-5 rounded-2xl">
+        <div class="flex items-center justify-between">
+            <h3 class="text-2xl font-bold text-slate-800">Nhiệm vụ đã thực hiện</h3>
+            <input type="text" placeholder="Search..." class="input input-ghost w-full max-w-xs" />
+        </div>
+        <br />
+        <table class="table w-full bg-white">
+            <!-- head -->
+            <thead class="bg-white">
+                <tr>
+                    <th class="bg-slate-200">Nhiệm vụ</th>
+                    <th class="bg-slate-200">Bắt đầu nhiệm vụ</th>
+                    <th class="bg-slate-200">Hoàn thành lúc</th>
+                    <th class="bg-slate-200">Số tiền</th>
+                    <th class="bg-slate-200">Trạng thái</th>
+                </tr>
+            <tbody>
+                @foreach ($missions as $key => $value)
+                    <tr>
+                        <td class="bg-white">{{ $value->ms_name }}</td>
+                        <td class="bg-white">{{ $value->created_at }}</td>
+                        <td class="bg-white">{{ $value->updated_at }}</td>
+                        <td class="bg-white">{{ $value->ms_price }}</td>
+                        <td class="bg-white">{{ $value->ms_status }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 @endsection

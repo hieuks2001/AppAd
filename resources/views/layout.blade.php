@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="night">
 
 <head>
     <meta charset="UTF-8">
@@ -15,20 +15,11 @@
         integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <title>Document</title>
-    <style type="text/css">
-        .column {
-            max-width: 450px;
-        }
-        .column-page{
-            max-width: 750px;
-        }
-    </style>
 </head>
 
 <body>
-
     @yield('main')
     @yield('login')
     @yield('register')
