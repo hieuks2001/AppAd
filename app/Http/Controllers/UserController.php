@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Missions;
 use App\Models\User;
+use App\Models\Page;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,12 +16,12 @@ class UserController extends Controller
     public function AuthLogin()
     {
 
-        $user = Session::get('user');
-        if (!$user) {
-            return Redirect::to('/login')->send();
-        } else {
-            return Redirect::to('/');
-        }
+        // $user = Session::get('user');
+        // if (!$user) {
+        //     return Redirect::to('/login')->send();
+        // } else {
+        //     return Redirect::to('/');
+        // }
     }
 
     public function login(Request $request)
@@ -30,7 +31,7 @@ class UserController extends Controller
             return Redirect::to('/');
         }
         if (isset($request->username)) {
-            $user = DB::table('users')->where('password', md5($request->password))->where('username', $request->username)->first();
+            $user = User::where('password', md5($request->password))->where('username', $request->username)->first();
             if ($user) {
                 Session::put('user', $user);
                 return Redirect::to('/');
@@ -41,6 +42,7 @@ class UserController extends Controller
             return view('procedure.login');
         }
     }
+
     public function register(Request $request)
     {
         if (isset($request->username)) {
@@ -63,9 +65,8 @@ class UserController extends Controller
 
     public function index()
     {
-        $this->AuthLogin();
-        $ms = DB::table('missions')->where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->first();
-        $missons = DB::table('missions')->where('ms_userUUID', Session::get('user')->user_uuid)->get();
+        $ms = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->first();
+        $missons = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->get();
         if ($ms) {
             return Redirect::to('/tu-khoa');
         } else {
@@ -76,16 +77,14 @@ class UserController extends Controller
     // ================== MISSIONS ==========================
     public function pastekey(Request $request)
     {
-        $this->AuthLogin();
-
-        $ms = DB::table('missions')->where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->first();
+        $ms = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->first();
         if ($ms->ms_code == $request->key) {
-            $user = DB::table('users')->where('user_uuid', Session::get('user')->user_uuid)->first();
+            $user = Missions::where('user_uuid', Session::get('user')->user_uuid)->first();
             print_r($user);
-            $us = DB::table('users')->where('user_uuid', Session::get('user')->user_uuid)->update(
+            $us = Missions::where('user_uuid', Session::get('user')->user_uuid)->update(
                 ['wallet' => $user->wallet + $ms->ms_price]
             );
-            $ms = DB::table('missions')->where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'done']);
+            $ms = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'done']);
 
             return Redirect::to('/');
         } else {
@@ -95,21 +94,20 @@ class UserController extends Controller
 
     public function tukhoa()
     {
-        $this->AuthLogin();
-        $ms = DB::table('missions')->where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->first();
-        $missons = DB::table('missions')->where('ms_userUUID', Session::get('user')->user_uuid)->get();
+        $ms = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->first();
+        $missons = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->get();
 
         if ($ms) {
-            $page = DB::table('pages')->where('page_name', $ms->ms_name)->first();
+            $page = Page::where('page_name', $ms->ms_name)->first();
             return view('mission.mission', ['mission' => $ms, 'missions' => $missons, 'page' => $page]);
         } else {
-            $all_missions = DB::table('missions')->where('ms_status','already')->get();
-            $pages = DB::table('pages')->get();
+            $all_missions = Missions::where('ms_status', 'already')->get();
+            // Currently get random -> Futures: Get base on prioriry
+            $pages = Page::inRandomOrder()->limit(1)->get();
             $list = [];
             foreach ($all_missions as $key => $value) {
-                    array_push($list, $value->ms_name);
+                array_push($list, $value->ms_name);
             }
-            print_r($list);
             foreach ($pages as $key => $value) {
                 if (!in_array($value->page_name, $list)) {
                     // $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -131,11 +129,11 @@ class UserController extends Controller
 
     public function cancelmission()
     {
-        $ms = DB::table('missions')->where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'cancel']);
+        $ms = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'cancel']);
         return Redirect::to('/');
     }
 
-    // ==================END MISSIONS ==========================
+    // ================== END MISSIONS ==========================
 
 
     // ====================== PAGES ============================
@@ -151,7 +149,7 @@ class UserController extends Controller
             $filename = time() . '.' . request()->image->getClientOriginalExtension();
 
             request()->image->move(public_path('images'), $filename);
-            $db =    DB::table('pages')->insert(['page_name' => $request->pagename, 'page_image' => $filename]);
+            $db = Page::insert(['page_name' => $request->pagename, 'page_image' => $filename]);
             if ($db) {
                 return redirect()->back()->with('message', 'Thêm thành công!');
             } else {

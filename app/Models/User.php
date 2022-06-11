@@ -10,4 +10,9 @@ class User extends Model
     ];
     protected $primaryKey = 'user_uuid';
     protected $table = 'users';
+
+    
+    // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
+    public $incrementing = false;
+    
 }
