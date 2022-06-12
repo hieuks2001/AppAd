@@ -4,7 +4,7 @@
         <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content flex flex-col items-center">
             <!-- Navbar -->
-            <div class="w-full navbar bg-base-300">
+            <div class="w-full navbar bg-base-300 sticky top-0 z-50">
                 <div class="flex-none lg:hidden">
                     <label for="my-drawer-3" class="btn btn-square btn-ghost">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -31,42 +31,25 @@
             </div>
             <!-- Page content here -->
             <div class="container px-5 py-5">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 text-center md:text-start">
-                    <div class="bg-blue-600 p-5 rounded-xl">
-                        <div class="ui inverted">
-                            <h2 class="text-3xl font-bold">USDT</h2>
-                            <b>Thu nhập</b>
-                        </div>
-                    </div>
-                    <div class="bg-yellow-500 p-5 rounded-xl">
-                        <div class="ui yellow inverted">
-                            <h2 class="text-3xl font-bold">USDT</h2>
-                            <b>Hoa hồng</b>
-                        </div>
-                    </div>
-                    <div class="bg-red-500 p-5 rounded-xl">
-                        <div class="ui purple inverted">
-                            <h2 class="text-3xl font-bold">USDT</h2>
-                            <b>Tổng cộng</b>
-                        </div>
-                    </div>
-                    <div class="bg-green-500 p-5 rounded-xl">
-                        <div class="ui pink inverted">
-                            <h2 class="text-3xl font-bold">USDT</h2>
-                            <b>Số dư</b>
-                        </div>
-                    </div>
-                </div>
-                <br>
+                @yield('dashboard')
                 @yield('mission')
+                @yield('regispage')
+                @yield('deposit')
+                @yield('withdraw')
             </div>
         </div>
         <div class="drawer-side">
             <label for="my-drawer-3" class="drawer-overlay"></label>
             <ul class="menu p-4 overflow-y-auto w-80 bg-base-100">
                 <!-- Sidebar content here -->
+                <li><a href="{{ URL::to('') }}">Tổng quan</a></li>
                 <li><a href="{{ URL::to('tu-khoa') }}">Nhiệm vụ từ khóa</a></li>
-                <li><a>Sidebar Item 2</a></li>
+                <li><a href="{{ URL::to('regispage') }}">Mua traffic user</a></li>
+                <li><a href="{{ URL::to('deposit') }}">Nạp tiền</a></li>
+                <li><a href="{{ URL::to('withdraw') }}">Rút tiền</a></li>
+                <li><a href="{{ URL::to('regispage') }}">Giới thiệu</a></li>
+                <li><a href="{{ URL::to('regispage') }}">Hướng dẫn</a></li>
+                <li><a href="{{ URL::to('regispage') }}">Cá nhân</a></li>
             </ul>
         </div>
     </div>

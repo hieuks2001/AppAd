@@ -24,7 +24,6 @@
     @yield('login')
     @yield('register')
     @yield('countdown')
-    @yield('regispage')
 </body>
 
 </html>
