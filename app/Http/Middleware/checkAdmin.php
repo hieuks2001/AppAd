@@ -4,9 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 
-class checkLogin
+class checkAdmin
 {
     /**
      * Handle an incoming request.
@@ -17,10 +16,17 @@ class checkLogin
      */
     public function handle($request, Closure $next)
     {
-        if (!Auth::check()) {
+        if(!Auth::check()){
             return redirect()->route('login');
+
         }
         
+        $user = Auth::user();
+        if (!$user->isAdmin){
+            Auth::logout();
+            return redirect()->route('login');
+        }
+
         return $next($request);
     }
 }

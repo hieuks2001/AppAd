@@ -24,10 +24,7 @@ Route::get('/login', 'UserController@login')->name('login');
 Route::get('/register', 'UserController@register');
 Route::post('/login', 'UserController@login');
 Route::post('/register', 'UserController@register');
-Route::get('/logout', function () {
-    Session::forget('user');
-    return Redirect::to('/login');
-});
+Route::get('/logout', 'UserController@logout');
 
 // Missions
 Route::group(['middleware' => ['checkLogin']], function () {
@@ -42,6 +39,10 @@ Route::group(['middleware' => ['checkLogin']], function () {
     Route::get('/regispage', 'UserController@regispage');
 });
 
+// Admin dashboard
+Route::group(['middleware' => ['checkAdmin']], function () {
+    Route::get('admin/dashboard', 'DashboardController@dashboard');
+});
 
 Route::post('/test1', 'MissionController@test');
 Route::get('/test', function () {
