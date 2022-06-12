@@ -20,21 +20,27 @@ use Illuminate\Support\Facades\Session;
 // INdex
 Route::get('/', 'UserController@index');
 
-Route::get('/login', 'UserController@login');
+Route::get('/login', 'UserController@login')->name('login');
 Route::get('/register', 'UserController@register');
 Route::post('/login', 'UserController@login');
 Route::post('/register', 'UserController@register');
-Route::get('/logout',function(){
+Route::get('/logout', function () {
     Session::forget('user');
     return Redirect::to('/login');
 });
+
 // Missions
-Route::post('/paste-key', 'UserController@pastekey');
-Route::get('/tu-khoa', 'UserController@tukhoa');
-Route::get('/cancel-mission','UserController@cancelmission');
-// pages
-Route::post('/add-page', 'UserController@addpage');
-Route::get('/regispage','UserController@regispage');
+Route::group(['middleware' => ['checkLogin']], function () {
+    Route::post('/paste-key', 'UserController@pastekey');
+    Route::get('/tu-khoa', 'UserController@tukhoa');
+    Route::get('/cancel-mission', 'UserController@cancelmission');
+});
+
+// Pages
+Route::group(['middleware' => ['checkLogin']], function () {
+    Route::post('/add-page', 'UserController@addpage');
+    Route::get('/regispage', 'UserController@regispage');
+});
 
 
 Route::post('/test1', 'MissionController@test');
@@ -44,9 +50,9 @@ Route::get('/test', function () {
 });
 
 Route::post('/createkw', function (Request $request) {
-    
+
     $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $randomkey = substr(str_shuffle($permitted_chars), 0, 10);
-    $mission = DB::table('missions')->where('ms_status', 'already')->where('ms_name',$request->name)->update(['ms_code'=>$randomkey]);
+    $mission = DB::table('missions')->where('ms_status', 'already')->where('ms_name', $request->name)->update(['ms_code' => $randomkey]);
     return 0;
 });
