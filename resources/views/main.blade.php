@@ -34,8 +34,7 @@
                 @yield('dashboard')
                 @yield('mission')
                 @yield('regispage')
-                @yield('deposit')
-                @yield('withdraw')
+                @yield('usdt')
             </div>
         </div>
         <div class="drawer-side">
