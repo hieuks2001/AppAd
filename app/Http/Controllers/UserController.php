@@ -7,33 +7,24 @@ use App\Models\User;
 use App\Models\Page;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 
 class UserController extends Controller
 {
-    public function AuthLogin()
-    {
-
-        // $user = Session::get('user');
-        // if (!$user) {
-        //     return Redirect::to('/login')->send();
-        // } else {
-        //     return Redirect::to('/');
-        // }
-    }
-
     public function login(Request $request)
     {
-        $user = Session::get('user');
-        if ($user) {
+        if (Auth::check()) {
             return Redirect::to('/');
         }
         if (isset($request->username)) {
-            $user = User::where('password', md5($request->password))->where('username', $request->username)->first();
-            if ($user) {
-                Session::put('user', $user);
+            if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+                //Check is Admin -> Redirect to admin site
+                if (Auth::user()->isAdmin){
+                    return Redirect::to('/admin/dashboard');
+                }
                 return Redirect::to('/');
             } else {
                 return Redirect::to('/login')->with('error', 'Sai tên đăng nhập hoặc mật khẩu!');
@@ -41,6 +32,11 @@ class UserController extends Controller
         } else {
             return view('procedure.login');
         }
+    }
+
+    public function logout(){
+        Auth::logout();
+        return Redirect::to('/login');
     }
 
     public function register(Request $request)
@@ -52,7 +48,9 @@ class UserController extends Controller
                 $user = new User();
                 $user->user_uuid = Str::uuid();
                 $user->username = $request->username;
-                $user->password = md5($request->password);
+                $user->password = bcrypt($request->password);
+                $user->isAdmin = 0;
+                $user->status = 1;
                 $user->wallet = 0;
                 $user->commission = 0;
                 $user->save();
@@ -65,8 +63,9 @@ class UserController extends Controller
 
     public function index()
     {
-        $ms = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->first();
-        $missons = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->get();
+        $user = Auth::user();
+        $ms = Missions::where('ms_userUUID', $user->user_uuid)->where('ms_status', 'already')->first();
+        $missons = Missions::where('ms_userUUID', $user->user_uuid)->get();
         if ($ms) {
             return Redirect::to('/tu-khoa');
         } else {
@@ -77,14 +76,15 @@ class UserController extends Controller
     // ================== MISSIONS ==========================
     public function pastekey(Request $request)
     {
-        $ms = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->first();
+        $user = Auth::user();
+        $ms = Missions::where('ms_userUUID',$user->user_uuid)->where('ms_status', 'already')->first();
         if ($ms->ms_code == $request->key) {
-            $user = Missions::where('user_uuid', Session::get('user')->user_uuid)->first();
+            $user = Missions::where('user_uuid',$user->user_uuid)->first();
             print_r($user);
-            $us = Missions::where('user_uuid', Session::get('user')->user_uuid)->update(
+            $us = Missions::where('user_uuid',$user->user_uuid)->update(
                 ['wallet' => $user->wallet + $ms->ms_price]
             );
-            $ms = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'done']);
+            $ms = Missions::where('ms_userUUID',$user->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'done']);
 
             return Redirect::to('/');
         } else {
@@ -94,8 +94,9 @@ class UserController extends Controller
 
     public function tukhoa()
     {
-        $ms = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->first();
-        $missons = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->get();
+        $user = Auth::user();
+        $ms = Missions::where('ms_userUUID', $user->user_uuid)->where('ms_status', 'already')->first();
+        $missons = Missions::where('ms_userUUID', $user->user_uuid)->get();
 
         if ($ms) {
             $page = Page::where('page_name', $ms->ms_name)->first();
@@ -114,7 +115,7 @@ class UserController extends Controller
                     // $randomkey = substr(str_shuffle($permitted_chars), 0, 4) . '88';
                     $mission = new Missions();
                     $mission->ms_name = $value->page_name;
-                    $mission->ms_userUUID = Session::get('user')->user_uuid;
+                    $mission->ms_userUUID =$user->user_uuid;
                     $mission->ms_countdown = 60;
                     $mission->ms_price = 0.35;
                     $mission->ms_status = 'already';
@@ -129,7 +130,8 @@ class UserController extends Controller
 
     public function cancelmission()
     {
-        $ms = Missions::where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'cancel']);
+        $user = Auth::user();
+        $ms = Missions::where('ms_userUUID', $user->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'cancel']);
         return Redirect::to('/');
     }
 

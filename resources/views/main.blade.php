@@ -6,7 +6,7 @@
             <div class="right icon item">
                 {{-- <a href="{{URL::to('login')}}" class="ui inverted item">Login</a>
                 <a href="{{URL::to('register')}}" class="ui inverted item">Sign Up</a> --}}
-                <a href="#" class="ui item">{{ Session::get('user')->username }} </a>
+                <a href="#" class="ui item">{{ Auth::user()->username }} </a>
                 <a href="/logout" class="ui item"><i class="logout red icon"></i></a>
 
             </div>
