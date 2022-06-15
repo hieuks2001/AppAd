@@ -1,5 +1,5 @@
 @extends('layout')
-@section('main')
+@section('admin')
     <div class="drawer  drawer-mobile text-white">
         <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content flex flex-col items-center">
@@ -31,24 +31,16 @@
             </div>
             <!-- Page content here -->
             <div class="container px-5 py-5">
-                @yield('dashboard')
-                @yield('mission')
-                @yield('regispage')
-                @yield('usdt')
+                @yield('management-traffic')
+                @yield('management-users')
             </div>
         </div>
         <div class="drawer-side">
             <label for="my-drawer-3" class="drawer-overlay"></label>
             <ul class="menu p-4 overflow-y-auto w-80 bg-gray-800">
                 <!-- Sidebar content here -->
-                <li><a href="{{ URL::to('') }}">Tổng quan</a></li>
-                <li><a href="{{ URL::to('tu-khoa') }}">Nhiệm vụ từ khóa</a></li>
-                <li><a href="{{ URL::to('regispage') }}">Mua traffic user</a></li>
-                <li><a href="{{ URL::to('deposit') }}">Nạp tiền</a></li>
-                <li><a href="{{ URL::to('withdraw') }}">Rút tiền</a></li>
-                <li><a href="{{ URL::to('regispage') }}">Giới thiệu</a></li>
-                <li><a href="{{ URL::to('regispage') }}">Hướng dẫn</a></li>
-                <li><a href="{{ URL::to('regispage') }}">Cá nhân</a></li>
+                <li><a href="{{ URL::to('management/traffic') }}">Quản lý traffic</a></li>
+                <li><a href="{{ URL::to('management/users') }}">Quản lý người dùng</a></li>
             </ul>
         </div>
     </div>

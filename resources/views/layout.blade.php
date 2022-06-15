@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="night">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -22,6 +22,7 @@
 
 <body>
     @yield('main')
+    @yield('admin')
     @yield('login')
     @yield('register')
     @yield('countdown')
