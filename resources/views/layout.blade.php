@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="night">
 
 <head>
     <meta charset="UTF-8">
@@ -10,30 +10,23 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"
         integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
-
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ethjs@0.3.4/dist/ethjs.min.js"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.0.umd.min.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"
         integrity="sha512-dqw6X88iGgZlTsONxZK9ePmJEFrmHwpuMrsUChjAw1mRUhUITE5QU9pkcSox+ynfLhL15Sv2al5A0LVyDCmtUw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <title>Document</title>
-    <style type="text/css">
-        .column {
-            max-width: 450px;
-        }
-        .column-page{
-            max-width: 750px;
-        }
-    </style>
 </head>
 
 <body>
-
     @yield('main')
     @yield('login')
     @yield('register')
     @yield('countdown')
-    @yield('regispage')
+    <script src="{{ asset('js/web3.js') }}"></script>
+    @stack('scripts')
 </body>
 
 </html>
