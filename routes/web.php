@@ -20,16 +20,14 @@ use Illuminate\Support\Facades\Session;
 // INdex
 Route::get('/', 'UserController@index');
 
-Route::get('/login', 'UserController@login');
+Route::get('/login', 'UserController@login')->name('login');
+Route::get('/register', 'UserController@register');
 Route::post('/login', 'UserController@login');
 
 Route::get('/register', 'UserController@register');
 Route::post('/register', 'UserController@register');
 
-Route::get('/logout', function () {
-  Session::forget('user');
-  return Redirect::to('/login');
-});
+Route::get('/logout', 'UserController@logout');
 
 // Missions
 Route::post('/paste-key', 'UserController@pastekey');
@@ -49,6 +47,23 @@ Route::get('/regispage/tab-4', 'UserController@regispageTab4');
 Route::get('/deposit', 'UserController@deposit');
 Route::get('/withdraw', 'UserController@withdraw');
 
+// Missions
+Route::group(['middleware' => ['checkLogin']], function () {
+  Route::post('/paste-key', 'UserController@pastekey');
+  Route::get('/tu-khoa', 'UserController@tukhoa');
+  Route::get('/cancel-mission', 'UserController@cancelmission');
+});
+
+// Pages
+Route::group(['middleware' => ['checkLogin']], function () {
+  Route::post('/add-page', 'UserController@addpage');
+  Route::get('/regispage', 'UserController@regispage');
+});
+
+// Admin dashboard
+Route::group(['middleware' => ['checkAdmin']], function () {
+  Route::get('admin/dashboard', 'DashboardController@dashboard');
+});
 
 Route::post('/test1', 'MissionController@test');
 Route::get('/test', function () {

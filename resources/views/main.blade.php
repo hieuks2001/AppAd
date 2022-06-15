@@ -24,7 +24,7 @@
                         <!-- Navbar menu content here -->
                         {{-- <a href="{{URL::to('login')}}" class="ui inverted item">Login</a>
                                        <a href="{{URL::to('register')}}" class="ui inverted item">Sign Up</a> --}}
-                        <li><a href="#" class="ui item">{{ Session::get('user')->username }} </a></li>
+                        <li><a href="#" class="ui item">{{ Auth::user()->username }} </a></li>
                         <li><a href="/logout" class="ui item"><i class="logout red icon"></i></a></li>
                     </ul>
                 </div>
