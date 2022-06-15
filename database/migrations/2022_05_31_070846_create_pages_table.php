@@ -15,8 +15,17 @@ class CreatePagesTable extends Migration
     {
         Schema::create('pages', function (Blueprint $table) {
             $table->id();
-            $table->string('page_name')->nullable();
-            $table->string('page_image')->nullable();
+            $table->string('user_uuid');
+            $table->string('keyword')->nullable();
+            $table->string('image')->nullable();
+            $table->string('url');
+            $table->integer('traffic_per_day');
+            $table->integer('traffic_sum');
+            $table->integer('onsite');
+            $table->float('price');
+            $table->tinyInteger('is_approved')->default(0);
+            $table->tinyInteger('status')->nullable();
+            $table->tinyInteger('priority')->default(0);
             $table->timestamps();
         });
     }

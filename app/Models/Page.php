@@ -12,7 +12,6 @@ class Page extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'page_name', 'page_image'
+        'user_uuid', 'keyword', 'image', 'url', 'traffic_per_day', 'traffic_sum', 'onsite', 'is_approved', 'status'
     ];
-
 }

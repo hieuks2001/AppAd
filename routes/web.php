@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Session;
 */
 
 // INdex
-Route::get('/', 'UserController@index');
+Route::get('/', 'UserController@index')->middleware('checkLogin');
 
 Route::get('/login', 'UserController@login')->name('login');
 Route::get('/register', 'UserController@register');
@@ -56,8 +56,8 @@ Route::group(['middleware' => ['checkLogin']], function () {
 
 // Pages
 Route::group(['middleware' => ['checkLogin']], function () {
-  Route::post('/add-page', 'UserController@addpage');
-  Route::get('/regispage', 'UserController@regispage');
+    Route::get('/regispage', 'PageController@getTrafficOrder');
+    Route::post('/add-page', 'PageController@postTrafficOrder');
 });
 
 // Admin dashboard

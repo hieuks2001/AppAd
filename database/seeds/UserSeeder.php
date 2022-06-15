@@ -22,6 +22,14 @@ class UserSeeder extends Seeder
                 'status' => 1,
                 'isAdmin' => 1
             ],
+            [
+                'user_uuid' => Str::uuid(),
+                // 'email' => 'admin@gmail.com',
+                'password' => bcrypt('12341234'),
+                'username' => 'dlha',
+                'status' => 1,
+                'isAdmin' => 0
+            ]
         ];
 
         DB::table('users')->insert($data);
