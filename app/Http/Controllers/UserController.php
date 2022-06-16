@@ -47,12 +47,14 @@ class UserController extends Controller
       if ($request->password != $request->re_password) {
         return Redirect::to('/register')->with('error', 'Mật khẩu không trùng khớp!');
       } else {
+        $type =  DB::table('user_types')->where('name', 'normal')->first();
         $user = new User();
         $user->username = $request->username;
         $user->password = bcrypt($request->password);
         $user->is_admin = 0;
         $user->status = 1;
         $user->wallet = 0;
+        $user->user_type_id = $type->id;
         $user->commission = 0;
         $user->save();
         return Redirect::to('/login')->with('message', 'Đăng ký thành công!');
@@ -73,7 +75,7 @@ class UserController extends Controller
     // //   return view('mission.mission', ['missions' => $missons]);
     // // }
     if ($user) {
-      if ($user->isAdmin) {
+      if ($user->is_admin) {
         return Redirect::to('/management/traffic');
       }
       return view("dashboard.index");
@@ -190,27 +192,6 @@ class UserController extends Controller
         return Redirect::to('/tu-khoa')->with('error', 'Nhận nhiệm vụ không thành công!');
       }
     }
-  }
-
-  public function regispage()
-  {
-    return view('regispage.tab1');
-  }
-  public function regispageTab1()
-  {
-    return view('regispage.tab1');
-  }
-  public function regispageTab2()
-  {
-    return view('regispage.tab2');
-  }
-  public function regispageTab3()
-  {
-    return view('regispage.tab3');
-  }
-  public function regispageTab4()
-  {
-    return view('regispage.tab4');
   }
   // ====================== END PAGES ============================
 

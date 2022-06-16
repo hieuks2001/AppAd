@@ -37,11 +37,6 @@ Route::get('/cancel-mission', 'UserController@cancelmission');
 
 // pages
 Route::post('/add-page', 'UserController@addpage');
-Route::get('/regispage', 'UserController@regispage');
-Route::get('/regispage/tab-1', 'UserController@regispageTab1');
-Route::get('/regispage/tab-2', 'UserController@regispageTab2');
-Route::get('/regispage/tab-3', 'UserController@regispageTab3');
-Route::get('/regispage/tab-4', 'UserController@regispageTab4');
 
 // usdt
 Route::get('/deposit', 'UserController@deposit');
@@ -56,8 +51,12 @@ Route::group(['middleware' => ['checkLogin']], function () {
 
 // Pages
 Route::group(['middleware' => ['checkLogin']], function () {
-    Route::get('/regispage', 'PageController@getTrafficOrder');
-    Route::post('/add-page', 'PageController@postTrafficOrder');
+  Route::get('/regispage', 'PageController@getTrafficOrder');
+  Route::post('/add-page', 'PageController@postTrafficOrder');
+  Route::get('/regispage/tab-1', 'PageController@regispageTab1');
+  Route::get('/regispage/tab-2', 'PageController@regispageTab2');
+  Route::get('/regispage/tab-3', 'PageController@regispageTab3');
+  Route::get('/regispage/tab-4', 'PageController@regispageTab4');
 });
 
 // Admin dashboard
