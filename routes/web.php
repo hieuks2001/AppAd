@@ -62,7 +62,8 @@ Route::group(['middleware' => ['checkLogin']], function () {
 
 // Admin dashboard
 Route::group(['middleware' => ['checkAdmin']], function () {
-  Route::get('admin/dashboard', 'DashboardController@dashboard');
+  Route::get('management/traffic', 'DashboardController@managementTraffic');
+  Route::get('management/users', 'DashboardController@managementUsers');
 });
 
 Route::post('/test1', 'MissionController@test');

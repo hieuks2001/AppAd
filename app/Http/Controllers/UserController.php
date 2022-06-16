@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use Web3\Web3;
@@ -25,10 +26,7 @@ class UserController extends Controller
     if (isset($request->username)) {
       if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
         //Check is Admin -> Redirect to admin site
-        if (Auth::user()->isAdmin) {
-          return Redirect::to('/admin/dashboard');
-        }
-        return Redirect::to('/');
+        return Redirect::to('/')->with("isAdmin", Auth::user()->isAdmin);
       } else {
         return Redirect::to('/login')->with('error', 'Sai tên đăng nhập hoặc mật khẩu!');
       }
@@ -76,6 +74,9 @@ class UserController extends Controller
     // //   return view('mission.mission', ['missions' => $missons]);
     // // }
     if ($user) {
+      if ($user->isAdmin) {
+        return Redirect::to('/management/traffic');
+      }
       return view("dashboard.index");
     } else {
       return Redirect::to('/login');
