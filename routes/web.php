@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Session;
 */
 
 // INdex
-Route::get('/', 'UserController@index');
+Route::get('/', 'UserController@index')->middleware('checkLogin');
 
 Route::get('/login', 'UserController@login')->name('login');
 Route::get('/register', 'UserController@register');
@@ -37,11 +37,6 @@ Route::get('/cancel-mission', 'UserController@cancelmission');
 
 // pages
 Route::post('/add-page', 'UserController@addpage');
-Route::get('/regispage', 'UserController@regispage');
-Route::get('/regispage/tab-1', 'UserController@regispageTab1');
-Route::get('/regispage/tab-2', 'UserController@regispageTab2');
-Route::get('/regispage/tab-3', 'UserController@regispageTab3');
-Route::get('/regispage/tab-4', 'UserController@regispageTab4');
 
 // usdt
 Route::get('/deposit', 'UserController@deposit');
@@ -56,14 +51,23 @@ Route::group(['middleware' => ['checkLogin']], function () {
 
 // Pages
 Route::group(['middleware' => ['checkLogin']], function () {
-  Route::post('/add-page', 'UserController@addpage');
-  Route::get('/regispage', 'UserController@regispage');
+  Route::get('/regispage', 'PageController@getTrafficOrder');
+  Route::post('/add-page', 'PageController@postTrafficOrder');
+  Route::get('/regispage/tab-1', 'PageController@regispageTab1');
+  Route::get('/regispage/tab-2', 'PageController@regispageTab2');
+  Route::get('/regispage/tab-3', 'PageController@regispageTab3');
+  Route::get('/regispage/tab-4', 'PageController@regispageTab4');
 });
 
 // Admin dashboard
 Route::group(['middleware' => ['checkAdmin']], function () {
   Route::get('management/traffic', 'DashboardController@managementTraffic');
   Route::get('management/users', 'DashboardController@managementUsers');
+
+  // Manager Traffic
+  Route::get('management/traffic/{id}', 'DashboardController@getApproveTraffic');
+  Route::post('management/traffic/{id}', 'DashboardController@postApproveTraffic');
+  Route::post('management/traffic/{id}/del', 'DashboardController@delApproveTraffic');
 });
 
 Route::post('/test1', 'MissionController@test');

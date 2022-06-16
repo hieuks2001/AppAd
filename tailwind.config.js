@@ -6,7 +6,9 @@ module.exports = {
             display: ["Oswald"],
             body: ['"Open Sans"'],
         },
-        extend: {},
+        extend: {
+            textColor: "#000",
+        },
     },
     plugins: [require("daisyui")],
     daisyui: {

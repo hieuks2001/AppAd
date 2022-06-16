@@ -1,6 +1,6 @@
 @extends('layout')
 @section('main')
-    <div class="drawer  drawer-mobile ">
+    <div class="drawer drawer-mobile">
         <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content flex flex-col items-center">
             <!-- Navbar -->

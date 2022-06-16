@@ -1,10 +1,10 @@
 @extends('layout')
 @section('admin')
-    <div class="drawer  drawer-mobile text-white">
+    <div class="drawer  drawer-mobile ">
         <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content flex flex-col items-center">
             <!-- Navbar -->
-            <div class="w-full navbar bg-gray-800 sticky top-0 z-50 ">
+            <div class="w-full navbar bg-gray-800 sticky top-0 z-50 text-white">
                 <div class="flex-none lg:hidden">
                     <label for="my-drawer-3" class="btn btn-square btn-ghost">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -40,7 +40,7 @@
                 @yield('management-users')
             </div>
         </div>
-        <div class="drawer-side">
+        <div class="drawer-side text-white">
             <label for="my-drawer-3" class="drawer-overlay"></label>
             <ul class="menu p-4 overflow-y-auto w-80 bg-gray-800">
                 <!-- Sidebar content here -->

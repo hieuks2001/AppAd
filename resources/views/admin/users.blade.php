@@ -15,11 +15,13 @@
                     <th class="bg-slate-200">Số traffic tối đa / ngày</th>
                 </tr>
             <tbody>
+                @foreach($userTypes as $key => $value)
                 <tr>
-                    <td class="bg-white">a</td>
-                    <td class="bg-white">b</td>
-                    <td class="bg-white">c</td>
+                    <td class="bg-white">{{$value->id}}</td>
+                    <td class="bg-white">{{$value->name}}</td>
+                    <td class="bg-white">{{$value->max_traffic}}</td>
                 </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
@@ -38,11 +40,13 @@
                     <th class="bg-slate-200">Loại</th>
                 </tr>
             <tbody>
+                @foreach($users as $key => $value)
                 <tr>
-                    <td class="bg-white">a</td>
-                    <td class="bg-white">b</td>
-                    <td class="bg-white">c</td>
+                    <td class="bg-white">{{$value->id}}</td>
+                    <td class="bg-white">{{$value->username}}</td>
+                    <td class="bg-white">{{$value->userType->name}}</td>
                 </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
