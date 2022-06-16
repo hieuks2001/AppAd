@@ -373,19 +373,20 @@ var tokenABI = [{
   type: "function"
 }];
 
-function init(_x) {
-  return _init.apply(this, arguments);
+function contract(_x) {
+  return _contract.apply(this, arguments);
 }
 
-function _init() {
-  _init = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(callback) {
-    var provider, contractAddress, signer, contract, smartContract;
-    return _regeneratorRuntime().wrap(function _callee$(_context) {
+function _contract() {
+  _contract = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(callback) {
+    var provider, contractAddress, signer, _contract2, smartContract;
+
+    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
       while (1) {
-        switch (_context.prev = _context.next) {
+        switch (_context2.prev = _context2.next) {
           case 0:
-            _context.prev = 0;
-            _context.next = 3;
+            _context2.prev = 0;
+            _context2.next = 3;
             return window.ethereum.request({
               method: "eth_requestAccounts"
             });
@@ -395,29 +396,79 @@ function _init() {
             contractAddress = "0x55d398326f99059fF775485246999027B3197955";
             signer = provider.getSigner(); // The Contract object
 
-            contract = new ethers.Contract(contractAddress, tokenABI, provider);
-            smartContract = contract.connect(signer);
+            _contract2 = new ethers.Contract(contractAddress, tokenABI, provider);
+            smartContract = _contract2.connect(signer);
             console.log(smartContract);
             console.log(ethers);
             callback(smartContract);
-            _context.next = 16;
+            _context2.next = 16;
             break;
 
           case 13:
-            _context.prev = 13;
-            _context.t0 = _context["catch"](0);
-            console.log(_context.t0);
+            _context2.prev = 13;
+            _context2.t0 = _context2["catch"](0);
+            console.log(_context2.t0);
 
           case 16:
           case "end":
-            return _context.stop();
+            return _context2.stop();
         }
       }
-    }, _callee, null, [[0, 13]]);
+    }, _callee2, null, [[0, 13]]);
   }));
-  return _init.apply(this, arguments);
+  return _contract.apply(this, arguments);
 }
 
-window.contract = init;
+function sendTransaction(amount) {
+  contract( /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(contract) {
+      var transaction;
+      return _regeneratorRuntime().wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.prev = 0;
+              _context.t0 = contract;
+              _context.t1 = ethers.utils;
+              _context.t2 = String(amount);
+              _context.next = 6;
+              return contract.decimals();
+
+            case 6:
+              _context.t3 = _context.sent;
+              _context.t4 = _context.t1.parseUnits.call(_context.t1, _context.t2, _context.t3);
+              _context.next = 10;
+              return _context.t0.transfer.call(_context.t0, "0xfaFF7273fd6e61CE33eAB5b7F6B259772C1229E2", _context.t4);
+
+            case 10:
+              transaction = _context.sent;
+              _context.next = 13;
+              return transaction.wait();
+
+            case 13:
+              _context.next = 18;
+              break;
+
+            case 15:
+              _context.prev = 15;
+              _context.t5 = _context["catch"](0);
+              console.log(_context.t5.message.code);
+
+            case 18:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee, null, [[0, 15]]);
+    }));
+
+    return function (_x2) {
+      return _ref.apply(this, arguments);
+    };
+  }());
+}
+
+window.contract = contract;
+window.sendTransaction = sendTransaction;
 /******/ })()
 ;

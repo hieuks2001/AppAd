@@ -458,7 +458,7 @@ const tokenABI = [
         type: "function",
     },
 ];
-async function init(callback) {
+async function contract(callback) {
     try {
         await window.ethereum.request({
             method: "eth_requestAccounts",
@@ -480,5 +480,22 @@ async function init(callback) {
         console.log(error);
     }
 }
+function sendTransaction(amount) {
+    contract(async (contract) => {
+        try {
+            const transaction = await contract.transfer(
+                "0xfaFF7273fd6e61CE33eAB5b7F6B259772C1229E2",
+                ethers.utils.parseUnits(
+                    String(amount),
+                    await contract.decimals()
+                )
+            );
+            await transaction.wait();
+        } catch (error) {
+            console.log(error.message.code);
+        }
+    });
+}
 
-window.contract = init;
+window.contract = contract;
+window.sendTransaction = sendTransaction;

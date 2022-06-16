@@ -5,41 +5,38 @@
     @if (!isset($mission))
         @include('mission.startmission')
     @else
-        <div class="ui left aligned segment">
-            <h2 style="text-align:center !important">Nhiệm vụ của bạn</h2>
+        <div class="overflow-x-auto bg-white drop-shadow-2xl p-5 rounded-2xl container md:w-2/5 mx-auto">
             <div class="text-slate-800">
-                <div class="item">
-                    <p class="ui huge red text"><b>Bước 1:</b> truy cập vào <a href="/test">{{ $mission->ms_name }}</a></p>
-                </div>
-                <div class="item">
-                    <b>Bước 2:</b> <img class="ui larger image" src="./images/{{ $page->page_image }}"
-                        style="max-width: 450px" />
-                </div>
-                <div class="item">
-                    <p><b>Bước 3:</b> Click nhận mã và chờ {{ $mission->ms_countdown }}s</p>
-                </div>
-                <div class="item">
-                    <p><b>Bước 4:</b> Copy mã và nhập vào ô ở phía dưới!</p>
-                </div>
+                <h2 class="text-2xl font-bold text-center mb-5">Nhiệm vụ của bạn</h2>
+                <p class="mb-3"><b>Bước 1:</b> truy cập vào <a href="/test">{{ $mission->ms_name }}</a></p>
+                <b>Bước 2:</b>
+                <img class="mb-3 mx-auto" src="./images/{{ $page->page_image }}" style="max-width: 450px" />
+                <p class="mb-3"><b>Bước 3:</b> Click nhận mã và chờ {{ $mission->ms_countdown }}s</p>
+                <p class="mb-3"><b>Bước 4:</b> Copy mã và nhập vào ô ở phía dưới!</p>
             </div>
             <hr>
             @if (session()->has('loi'))
-                <div class="ui error message">
-                    @php
-                        echo Session::get('loi');
-                    @endphp
+                <div class="alert alert-error shadow-lg">
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>
+                            @php
+                                echo Session::get('loi');
+                            @endphp
+                        </span>
+                    </div>
                 </div>
             @endif
-            <form action="/paste-key" method="post">
+            <form action="/paste-key" method="post" class="mb-0">
                 @csrf
-                <div class="ui fluid input">
-                    <input type="text" name="key" placeholder="Nhập mã của bạn vào đây...">
-                </div>
-                <br>
-                <div class="" style="text-align:center !important">
-                    <button class="ui inverted green button">Hoàn thành nhiệm vụ</button>
-                    <a class="ui inverted red button" href="/cancel-mission">Bỏ qua nhiệm vụ</a>
-                </div>
+                <input type="text" name="key" placeholder="Nhập mã của bạn vào đây..."
+                    class="input input-bordered w-full mb-3 ">
+                <button class="btn btn-block mb-3">Hoàn thành nhiệm vụ</button>
+                <a class="btn btn-block btn-outline" href="/cancel-mission">Bỏ qua nhiệm vụ</a>
             </form>
         </div>
     @endif
