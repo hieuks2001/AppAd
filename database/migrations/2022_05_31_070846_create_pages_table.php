@@ -15,14 +15,16 @@ class CreatePagesTable extends Migration
     {
         Schema::create('pages', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
-            $table->uuid('user_uuid');
+            $table->foreignUuid('user_id')->constrained();
             $table->string('keyword')->nullable();
             $table->string('image')->nullable();
             $table->string('url');
             $table->integer('traffic_per_day');
             $table->integer('traffic_sum');
+            $table->integer('traffic_remain');
             $table->integer('onsite');
-            $table->float('price');
+            $table->float('price_per_traffic', 7, 3);
+            $table->float('price', 10, 3);
             $table->tinyInteger('is_approved')->default(0);
             $table->tinyInteger('status')->nullable();
             $table->tinyInteger('priority')->default(0);

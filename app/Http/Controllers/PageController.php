@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Redirect;
 use ReflectionClass;
 use App\Constants\OntimeTypeConstants;
 use App\Constants\OntimePriceConstants;
+use App\Constants\TransactionTypeConstants;
+use App\Models\LogTransaction;
+use Illuminate\Support\Facades\DB;
 
 class PageController extends Controller
 {
@@ -28,18 +31,28 @@ class PageController extends Controller
 
         try {
             $user = Auth::user();
-
             $page = new Page($validated);
 
-            $page->user_uuid = $user->id;
+            DB::transaction(function () use ($user, $page) {
 
-            // Demo only
-            $page->price = $page->traffic_sum * OntimePriceConstants::TYPE_PRICE[$page->onsite];
+                $page->traffic_remain = $page->traffic_sum;
+                $page->user_id = $user->id;
+                $page->price_per_traffic = OntimePriceConstants::TYPE_PRICE[$page->onsite];
+                $page->price = $page->traffic_sum * $page->price_per_traffic;
 
-            $page->save();
-
+                //Add log 
+                $log = new LogTransaction();
+                $log->user_id = $user->id;
+                $log->amount  = $page->price;
+                $log->type = TransactionTypeConstants::PAY;
+                
+                DB::table('users')->where('id', $user->id)->decrement('wallet', $page->price);
+                $log->save();
+                $page->save();
+            });
         } catch (\Throwable $th) {
             // *TODO: Add transaction here: Rollback usdt
+            dd($th);
             return redirect()->back()->with('error', 'Thêm thất bại!');
         }
         return redirect()->back()->with('message', 'Thêm thành công!');

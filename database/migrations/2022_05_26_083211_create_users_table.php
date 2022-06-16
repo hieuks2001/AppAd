@@ -17,10 +17,12 @@ class CreateUsersTable extends Migration
             $table->uuid('id')->primary();
             $table->string('username');
             $table->string('password');
+            $table->string('phone_number')->nullable();
             $table->bigInteger('wallet')->nullable();
             $table->bigInteger('commission')->nullable();
             $table->tinyInteger('status')->default(1);
             $table->tinyInteger('is_admin')->default(0);
+            $table->foreignUuid('user_type_id')->constrained();
             $table->timestamps();
         });
     }

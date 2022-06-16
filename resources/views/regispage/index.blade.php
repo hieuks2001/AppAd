@@ -28,7 +28,8 @@
                     required>
                 <input type="number" name="traffic_sum" placeholder="Nhập tổng Traffic" class="input input-bordere w-full  mb-5"
                     required>
-                <select name="onsite" id="">
+                <select name="onsite" id="" class="select select-bordered w-full mb-5">
+                    <option selected disabled> Vui lòng chọn gói Onsite </option>
                     @foreach($onsite as $key => $value)
                     <option value="{{$value}}">Time onsite > {{$value}}</option>
                     @endforeach

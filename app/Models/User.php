@@ -32,5 +32,9 @@ class User extends Authenticatable
     public $incrementing = false;
 
     public $timestamps = true;
+
+    public function userType(){
+        return $this->belongsTo('App\Models\UserType');
+    }
     
 }
