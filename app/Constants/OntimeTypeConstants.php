@@ -9,5 +9,3 @@ final class OntimeTypeConstants {
     public const TYPE_120 = 120;
     public const TYPE_150 = 150;
 }
-
-?>

@@ -15,20 +15,20 @@ class UserSeeder extends Seeder
     {
         $data = [
             [
-                'user_uuid' => Str::uuid(),
+                'id' => Str::uuid(),
                 // 'email' => 'admin@gmail.com',
                 'password' => bcrypt('12341234'),
                 'username' => 'Admin',
                 'status' => 1,
-                'isAdmin' => 1
+                'is_admin' => 1
             ],
             [
-                'user_uuid' => Str::uuid(),
+                'id' => Str::uuid(),
                 // 'email' => 'admin@gmail.com',
                 'password' => bcrypt('12341234'),
                 'username' => 'dlha',
                 'status' => 1,
-                'isAdmin' => 0
+                'is_admin' => 0
             ]
         ];
 

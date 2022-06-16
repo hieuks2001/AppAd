@@ -1,16 +1,18 @@
 <?php
 
 namespace App\Models;
+
+use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use Notifiable, Uuids;
 
     protected $fillable = [
-        'password', 'username', 'wallet', 'commission'
+        'password', 'username', 'wallet', 'commission', 'is_admin', 'status'
     ];
 
         /**
@@ -22,7 +24,7 @@ class User extends Authenticatable
         'password',
     ];
 
-    protected $primaryKey = 'user_uuid';
+    protected $primaryKey = 'id';
     protected $table = 'users';
 
     

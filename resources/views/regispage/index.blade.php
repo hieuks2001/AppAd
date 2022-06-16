@@ -3,11 +3,11 @@
     @include('box.patternBox2')
     <br />
     <div class="container md:w-2/5 mx-auto" style="margin-top:5%">
-        @if (session()->has('error'))
+        @if ($errors->all())
             <div class="ui error message">
-                @php
-                    echo Session::get('error');
-                @endphp
+                @foreach($errors->all() as $err)
+                    {{$err}}
+                @endforeach
             </div>
         @endif
         @if (session()->has('message'))
@@ -22,9 +22,18 @@
             <div class="shadow-2xl p-5 rounded-2xl text-center">
                 <input type="text" name="url" placeholder="Nhập url đích muốn chạy traffic"
                     class="input input-bordere w-full  mb-5" required>
-                <input type="text" name="pagename" placeholder="Nhập từ khóa" class="input input-bordere w-full  mb-5"
+                <input type="text" name="keyword" placeholder="Nhập từ khóa" class="input input-bordere w-full  mb-5"
                     required>
-                <label class="block">
+                <input type="number" name="traffic_per_day" placeholder="Nhập lượng Traffic mỗi ngày" class="input input-bordere w-full  mb-5"
+                    required>
+                <input type="number" name="traffic_sum" placeholder="Nhập tổng Traffic" class="input input-bordere w-full  mb-5"
+                    required>
+                <select name="onsite" id="">
+                    @foreach($onsite as $key => $value)
+                    <option value="{{$value}}">Time onsite > {{$value}}</option>
+                    @endforeach
+                </select>
+                <!-- <label class="block">
                     <span class="sr-only">Choose profile photo</span>
                     <input type="file" accept="image/*"
                         class="block w-full text-sm text-slate-500
@@ -33,7 +42,7 @@
                                         file:text-sm file:font-semibold
                                         file:bg-violet-50 file:text-violet-700
                                         hover:file:bg-violet-100 mb-5"
-                        name="image" id="fileUpload" required>
+                        name="image" id="fileUpload" required> -->
                 </label>
                 <div class="avatar mb-5">
                     <div class="max-w-xs rounded">

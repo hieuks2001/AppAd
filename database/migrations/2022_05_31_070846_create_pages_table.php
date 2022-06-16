@@ -14,8 +14,8 @@ class CreatePagesTable extends Migration
     public function up()
     {
         Schema::create('pages', function (Blueprint $table) {
-            $table->id();
-            $table->string('user_uuid');
+            $table->uuid('id')->primary()->unique();
+            $table->uuid('user_uuid');
             $table->string('keyword')->nullable();
             $table->string('image')->nullable();
             $table->string('url');

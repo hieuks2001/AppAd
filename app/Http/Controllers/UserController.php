@@ -48,10 +48,9 @@ class UserController extends Controller
         return Redirect::to('/register')->with('error', 'Mật khẩu không trùng khớp!');
       } else {
         $user = new User();
-        $user->user_uuid = Str::uuid();
         $user->username = $request->username;
         $user->password = bcrypt($request->password);
-        $user->isAdmin = 0;
+        $user->is_admin = 0;
         $user->status = 1;
         $user->wallet = 0;
         $user->commission = 0;
@@ -66,8 +65,8 @@ class UserController extends Controller
   public function index()
   {
     $user = Auth::user();
-    // $ms = DB::table('missions')->where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->first();
-    // $missons = DB::table('missions')->where('ms_userUUID', Session::get('user')->user_uuid)->get();
+    // $ms = DB::table('missions')->where('ms_userUUID', Session::get('user')->id)->where('ms_status', 'already')->first();
+    // $missons = DB::table('missions')->where('ms_userUUID', Session::get('user')->id)->get();
     // // if ($ms) {
     // //   return Redirect::to('/tu-khoa')->with('error', "");
     // // } else {
@@ -87,14 +86,14 @@ class UserController extends Controller
   public function pastekey(Request $request)
   {
     $user = Auth::user();
-    $ms = Missions::where('ms_userUUID', $user->user_uuid)->where('ms_status', 'already')->first();
+    $ms = Missions::where('ms_userUUID', $user->id)->where('ms_status', 'already')->first();
     if ($ms->ms_code == $request->key) {
-      $user = Missions::where('user_uuid', $user->user_uuid)->first();
+      $user = Missions::where('user_uuid', $user->id)->first();
       print_r($user);
-      $us = Missions::where('user_uuid', $user->user_uuid)->update(
+      $us = Missions::where('user_uuid', $user->id)->update(
         ['wallet' => $user->wallet + $ms->ms_price]
       );
-      $ms = Missions::where('ms_userUUID', $user->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'done']);
+      $ms = Missions::where('ms_userUUID', $user->id)->where('ms_status', 'already')->update(['ms_status' => 'done']);
 
       return Redirect::to('/tu-khoa');
     } else {
@@ -105,8 +104,8 @@ class UserController extends Controller
   public function tukhoa()
   {
     $user = Auth::user();
-    $ms = Missions::where('ms_userUUID', $user->user_uuid)->where('ms_status', 'already')->first();
-    $missons = Missions::where('ms_userUUID', $user->user_uuid)->get();
+    $ms = Missions::where('ms_userUUID', $user->id)->where('ms_status', 'already')->first();
+    $missons = Missions::where('ms_userUUID', $user->id)->get();
 
     if ($ms) {
       $page = Page::where('page_name', $ms->ms_name)->first();
@@ -142,7 +141,7 @@ class UserController extends Controller
   public function cancelmission()
   {
     $user = Auth::user();
-    $ms = Missions::where('ms_userUUID', $user->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'cancel']);
+    $ms = Missions::where('ms_userUUID', $user->id)->where('ms_status', 'already')->update(['ms_status' => 'cancel']);
     return Redirect::to('/tu-khoa');
   }
 
@@ -181,7 +180,7 @@ class UserController extends Controller
         // $randomkey = substr(str_shuffle($permitted_chars), 0, 4) . '88';
         $mission = new Missions();
         $mission->ms_name = $value->page_name;
-        $mission->ms_userUUID = $user->user_uuid;
+        $mission->ms_userUUID = $user->id;
         $mission->ms_countdown = 60;
         $mission->ms_price = 0.35;
         $mission->ms_status = 'already';
