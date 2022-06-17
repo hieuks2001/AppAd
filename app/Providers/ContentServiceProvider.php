@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Constants\OntimeTypeConstants;
 use App\Constants\PagePriorityConstants;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use ReflectionClass;
 
@@ -36,6 +37,10 @@ class ContentServiceProvider extends ServiceProvider
     view()->composer('admin.editTraffic', function ($view) {
       $priority = new ReflectionClass(PagePriorityConstants::class);
       $view->with('priority', $priority);
+    });
+    view()->composer('admin.users', function ($view) {
+      $types = DB::table('user_types')->get();
+      $view->with('user_types', $types);
     });
   }
 }

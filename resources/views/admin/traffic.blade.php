@@ -109,9 +109,9 @@
                 let data = item.classList[item.classList.length - 1]
                 if (data in row) {
                     if (data == 'user') {
-                        item.innerHTML = row[data].username
+                        item.textContent = row[data].username
                     } else {
-                        item.innerHTML = row[data]
+                        item.textContent = row[data]
                     }
                 }
             })
