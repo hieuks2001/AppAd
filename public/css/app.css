@@ -1782,13 +1782,6 @@ body[dir="rtl"] .checkbox:checked,
   color: hsl(var(--bc) / var(--tw-text-opacity));
   box-shadow: none;
 }
-.input-primary {
-  --tw-border-opacity: 1;
-  border-color: hsl(var(--p) / var(--tw-border-opacity));
-}
-.input-primary:focus {
-  outline: 2px solid hsl(var(--p));
-}
 .input-disabled, 
   .input[disabled] {
   cursor: not-allowed;
@@ -2419,14 +2412,14 @@ body[dir="rtl"] .checkbox:checked,
   margin-top: 2.5rem;
   margin-bottom: 2.5rem;
 }
+.mb-0 {
+  margin-bottom: 0px;
+}
 .mb-5 {
   margin-bottom: 1.25rem;
 }
 .mb-10 {
   margin-bottom: 2.5rem;
-}
-.mb-0 {
-  margin-bottom: 0px;
 }
 .mt-10 {
   margin-top: 2.5rem;
@@ -2463,6 +2456,9 @@ body[dir="rtl"] .checkbox:checked,
 }
 .h-full {
   height: 100%;
+}
+.h-10 {
+  height: 2.5rem;
 }
 .w-full {
   width: 100%;
@@ -2617,6 +2613,12 @@ body[dir="rtl"] .checkbox:checked,
 }
 .font-bold {
   font-weight: 700;
+}
+.font-light {
+  font-weight: 300;
+}
+.font-normal {
+  font-weight: 400;
 }
 .uppercase {
   text-transform: uppercase;

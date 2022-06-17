@@ -65,9 +65,8 @@
                         <td class="">{{ $value->price }}</td>
                         <td class="">
                             <label for="modal-approve--traffic" class="btn btn-success btn-block btn-sm"
-                                onclick="@php
-                                    $page= $value
-                                @endphp">Duyệt</label>
+                                onclick="
+                            onClick({{ $value }})">Duyệt</label>
                             <form class="mb-0"
                                 action="{{ action('DashboardController@delApproveTraffic', $value->id) }}"
                                 method="post">
@@ -84,7 +83,38 @@
     <div class="modal text-slate-800">
         <div class="modal-box relative">
             <label for="modal-approve--traffic" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
-            @include('admin.editTraffic', ['page' => $page])
+            @include('admin.editTraffic')
         </div>
     </div>
+    <script>
+        var output = document.getElementById('output');
+        var fileUpload = document.getElementById('fileUpload');
+        fileUpload?.addEventListener('change', (event) => {
+            if (event.target.files.length > 0) {
+                output.src = URL.createObjectURL(event.target.files[0]);
+                output.onload = function() {
+                    URL.revokeObjectURL(output.src) // free memory
+                }
+            } else {
+                output.removeAttribute('src');
+            }
+        });
+
+        const form = document.getElementById('form');
+        let formItems = document.querySelectorAll('#form .item');
+
+        function onClick(row) {
+            form.action = `/management/traffic/${row.id}`
+            formItems.forEach((item, row_i) => {
+                let data = item.classList[item.classList.length - 1]
+                if (data in row) {
+                    if (data == 'user') {
+                        item.innerHTML = row[data].username
+                    } else {
+                        item.innerHTML = row[data]
+                    }
+                }
+            })
+        }
+    </script>
 @endsection
