@@ -25,8 +25,7 @@ class CreatePagesTable extends Migration
             $table->integer('onsite');
             $table->float('price_per_traffic', 7, 3);
             $table->float('price', 10, 3);
-            $table->tinyInteger('is_approved')->default(0);
-            $table->tinyInteger('status')->nullable();
+            $table->tinyInteger('status')->default(0);
             $table->tinyInteger('priority')->default(0);
             $table->timestamps();
         });

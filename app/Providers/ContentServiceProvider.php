@@ -36,7 +36,7 @@ class ContentServiceProvider extends ServiceProvider
     });
     view()->composer('admin.editTraffic', function ($view) {
       $priority = new ReflectionClass(PagePriorityConstants::class);
-      $view->with('priority', $priority);
+      $view->with('priority', $priority->getConstants());
     });
     view()->composer('admin.users', function ($view) {
       $types = DB::table('user_types')->get();

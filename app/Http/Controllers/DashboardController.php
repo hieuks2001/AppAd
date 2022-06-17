@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Constants\PagePriorityConstants;
+use App\Constants\PageStatusConstants;
 use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
 use Illuminate\Http\Request;
@@ -11,6 +12,7 @@ use App\Models\User;
 use App\Models\UserType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
 use ReflectionClass;
 
@@ -18,16 +20,16 @@ class DashboardController extends Controller
 {
 	public function managementTraffic()
 	{
-		$pages = Page::where('is_approved', 1)->get();
-		$notApprovedPages = Page::where('is_approved', 0)->get();
+		$pages = Page::where('status', PageStatusConstants::APPROVED)->get();
+		$notApprovedPages = Page::where('status', PageStatusConstants::PENDING)->get();
 		return view('admin.traffic', compact(['pages', 'notApprovedPages']));
 	}
 
 	public function getApproveTraffic($id)
 	{
 		$priority = new ReflectionClass(PagePriorityConstants::class);
-		$page = Page::where('is_approved', 0)->where('id', $id)->first();
-		if (!$page){
+		$page = Page::where('status', PageStatusConstants::PENDING)->where('id', $id)->first();
+		if (!$page) {
 			return redirect()->to('/management/traffic');
 		}
 		return view('admin.editTraffic')->with('page', $page)->with('priority', $priority->getConstants());
@@ -43,12 +45,13 @@ class DashboardController extends Controller
 
 			$page->priority = $request['priority'];
 			$page->image = $filename;
-			// Set approved to TRUE
-			$page->is_approved = 1;
+			// Set status to APPROVED => 1
+			$page->status = PageStatusConstants::APPROVED;
 
 			$page->save();
 
 		} catch (\Throwable $th) {
+			File::delete(public_path('images'). DIRECTORY_SEPARATOR .$filename);
 			return redirect()->to('/management/traffic');
 		}
 
@@ -60,9 +63,9 @@ class DashboardController extends Controller
 		$page = Page::where('id', $id)->first();
 		$user = Auth::user();
 
-		DB::transaction(function() use ($page, $user){
-			$page->is_approved = 2;
-			
+		DB::transaction(function () use ($page, $user) {
+			$page->status = PageStatusConstants::CANCEL;
+
 			$log = new LogTransaction();
 			$log->user_id = $page->user_id;
 			$log->amount  = $page->price;
@@ -70,7 +73,7 @@ class DashboardController extends Controller
 
 
 			DB::table('users')->where('id', $page->user_id)->increment('wallet', $page->price);
-			
+
 			$page->save();
 			$log->save();
 		});
