@@ -15,7 +15,7 @@ class Page extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'user_uuid', 'keyword', 'image', 'url', 'traffic_per_day', 'traffic_sum', 'onsite', 'status', 'price', 'price_per_traffic', 'traffic_remain'
+        'user_uuid', 'keyword', 'image', 'url', 'traffic_per_day', 'traffic_sum', 'onsite', 'status', 'price', 'price_per_traffic', 'traffic_remain', 'page_type', 'timeout'
     ];
 
     // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model

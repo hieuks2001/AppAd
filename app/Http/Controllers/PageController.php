@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Redirect;
 use ReflectionClass;
 use App\Constants\OntimeTypeConstants;
 use App\Constants\OntimePriceConstants;
+use App\Constants\PageStatusConstants;
 use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
 use Illuminate\Support\Facades\DB;
@@ -38,14 +39,14 @@ class PageController extends Controller
         $page->price_per_traffic = OntimePriceConstants::TYPE_PRICE[$page->onsite];
         $page->price = $page->traffic_sum * $page->price_per_traffic;
 
-        //Add log 
-        $log = new LogTransaction();
-        $log->user_id = $user->id;
-        $log->amount  = $page->price;
-        $log->type = TransactionTypeConstants::PAY;
+        // //Add log 
+        // $log = new LogTransaction();
+        // $log->user_id = $user->id;
+        // $log->amount  = $page->price;
+        // $log->type = TransactionTypeConstants::PAY;
 
-        DB::table('users')->where('id', $user->id)->decrement('wallet', $page->price);
-        $log->save();
+        // DB::table('users')->where('id', $user->id)->decrement('wallet', $page->price);
+        // $log->save();
         $page->save();
       });
     } catch (\Throwable $th) {
@@ -57,18 +58,26 @@ class PageController extends Controller
   }
   public function regispageTab1()
   {
-    return view('regispage.tab1');
+    // Pending Traffic order
+    $pages = Page::where('status', PageStatusConstants::PENDING)->limit(5)->get();
+    return view('regispage.tab1')->with('pages', $pages);
   }
   public function regispageTab2()
   {
-    return view('regispage.tab2');
+    // Running Traffic order (Approved page)
+    $pages = Page::where('status', PageStatusConstants::APPROVED)->where('traffic_remain', '>', 0)->limit(5)->get();
+    return view('regispage.tab2')->with('pages', $pages);
   }
   public function regispageTab3()
   {
-    return view('regispage.tab3');
+    // Completed Traffic order (Approved page)
+    $pages = Page::where('status', PageStatusConstants::APPROVED)->where('traffic_remain', 0)->limit(5)->get();
+    return view('regispage.tab3')->with('pages', $pages);
   }
   public function regispageTab4()
   {
-    return view('regispage.tab4');
+    // Canceled Traffic order (Error)
+    $pages = Page::where('status', PageStatusConstants::CANCEL)->limit(5)->get();
+    return view('regispage.tab4')->with('pages', $pages);
   }
 }
