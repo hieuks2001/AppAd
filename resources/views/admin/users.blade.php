@@ -93,6 +93,7 @@
                         </select>
                         <input type="text" class="input input-bordered ml-3 w-14 read-only:bg-slate-200 max_traffic"
                             readonly />
+                        <input name="user_id" type="hidden" value="">
                     </div>
                 </div>
                 <button type="submit" class="btn btn-block">Sửa</button>
@@ -104,7 +105,8 @@
         <div class="modal-box relative">
             <label for="modal-create" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
             <h3 class="font-bold text-lg mb-3">Tạo loại người dùng mới</h3>
-            <form id="form-create" action="" method="post" class="mb-0">
+            <form id="form-create" action="/management/usertypes" method="post" class="mb-0">
+                @csrf
                 <input type="text" name="name" placeholder="Tên loại người dùng"
                     class="input input-bordered w-full mb-3" />
                 <input type="text" name="max_traffic" placeholder="Giới hạn nhiệm vụ trong ngày"
@@ -124,7 +126,7 @@
         function onClickUser(uid) {
             const user = users.find(user => user.id == uid)
             /* Setting the action attribute of the form to the url of the user. */
-            // formEdit.action = `/admin/users/${uid}`;
+            formEdit.action = `/admin/users/${uid}`;
             items.forEach(item => {
                 let key = item.classList[item.classList.length - 1];
                 if (key in user) {

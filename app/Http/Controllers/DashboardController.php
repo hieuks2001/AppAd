@@ -8,6 +8,7 @@ use App\Models\LogTransaction;
 use Illuminate\Http\Request;
 use App\Models\Page;
 use App\Models\User;
+use App\Models\UserType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
@@ -77,6 +78,8 @@ class DashboardController extends Controller
 		return redirect()->to('/management/traffic');
 	}
 
+	// Management User - UserType
+
 	public function managementUsers()
 	{
 		$userTypes = DB::table('user_types')->get();
@@ -84,4 +87,33 @@ class DashboardController extends Controller
 
 		return view('admin.users', compact(['userTypes', 'users']));
 	}
+
+	public function postCreateUserType(Request $request){
+        
+        $validated = $request->validate([
+            'name' => 'required|max:255',
+            'max_traffic' => 'required|numeric|gt:0'
+        ]);
+        
+        $userType = new UserType($validated);
+
+        $userType->save();
+        
+        return redirect()->to('/management/users');
+    }
+
+	public function postChangeUserType(Request $request, $id){
+        // Edit user user_type 
+        $userTypeID = $request['user_type'];
+        
+		$user = User::where('id', $id)->first();
+		if($user){
+			$type = UserType::where('id', $userTypeID)->first();
+			if ($type) {
+				$user->user_type_id = $type->id;
+				$user->save();
+			}
+		}      
+        return redirect()->to('/management/users');
+    }
 }
