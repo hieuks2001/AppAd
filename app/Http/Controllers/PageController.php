@@ -20,7 +20,10 @@ class PageController extends Controller
 {
   public function getTrafficOrder()
   {
-    return view('regispage.tab1');
+    // Pending Traffic order
+    $pages = Page::where('status', PageStatusConstants::PENDING)
+                  ->where('user_id', Auth::user()->id)->limit(5)->get();
+    return view('regispage.tab1')->with('pages', $pages);
   }
 
   public function postTrafficOrder(StoreOrderPageTraffic $request)
@@ -59,25 +62,31 @@ class PageController extends Controller
   public function regispageTab1()
   {
     // Pending Traffic order
-    $pages = Page::where('status', PageStatusConstants::PENDING)->limit(5)->get();
+    $pages = Page::where('status', PageStatusConstants::PENDING)
+              ->where('user_id', Auth::user()->id)->limit(5)->get();
     return view('regispage.tab1')->with('pages', $pages);
   }
   public function regispageTab2()
   {
     // Running Traffic order (Approved page)
-    $pages = Page::where('status', PageStatusConstants::APPROVED)->where('traffic_remain', '>', 0)->limit(5)->get();
+    $pages = Page::where('status', PageStatusConstants::APPROVED)
+              ->where('user_id', Auth::user()->id)
+              ->where('traffic_remain', '>', 0)->limit(5)->get();
     return view('regispage.tab2')->with('pages', $pages);
   }
   public function regispageTab3()
   {
     // Completed Traffic order (Approved page)
-    $pages = Page::where('status', PageStatusConstants::APPROVED)->where('traffic_remain', 0)->limit(5)->get();
+    $pages = Page::where('status', PageStatusConstants::APPROVED)
+                  ->where('user_id', Auth::user()->id)
+                  ->where('traffic_remain', 0)->limit(5)->get();
     return view('regispage.tab3')->with('pages', $pages);
   }
   public function regispageTab4()
   {
     // Canceled Traffic order (Error)
-    $pages = Page::where('status', PageStatusConstants::CANCEL)->limit(5)->get();
+    $pages = Page::where('status', PageStatusConstants::CANCEL)
+                  ->where('user_id', Auth::user()->id)->limit(5)->get();
     return view('regispage.tab4')->with('pages', $pages);
   }
 }
