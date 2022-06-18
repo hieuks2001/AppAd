@@ -5,7 +5,7 @@
     <p class="font-bold mb-3">Tổng số lượng traffic: <span class="item font-normal traffic_sum"></span></p>
     <p class="font-bold mb-3">Số lượng traffic trong ngày: <span class="item font-normal traffic_per_day"></span></p>
     <p class="font-bold mb-3">Time onsite: <span class="item font-normal onsite"></span></p>
-    <p class="font-bold mb-3">Đã trả (USDT): <span class="item font-normal price"></span></p>
+    <p class="font-bold mb-3">Phải trả (USDT): <span class="item font-normal price"></span></p>
 
     <label class="block">
         <span class="sr-only">Choose profile photo</span>
@@ -27,6 +27,12 @@
                 <option value="{{ $value }}">{{ $key }}</option>
             @endforeach
         </select>
+    </div>
+    <div class="flex justify-between items-center">
+        <label class="label">
+            <span class="label-text">Ghi chú</span>
+        </label> 
+        <textarea name="note" class="textarea textarea-bordered" placeholder="Ghi chú ở đây"></textarea>
     </div>
     <div class="mb-5 w-full">
         <div class="max-w-xs rounded mx-auto">

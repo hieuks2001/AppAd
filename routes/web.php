@@ -67,6 +67,7 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   // Manager Traffic
   Route::get('management/traffic/{id}', 'DashboardController@getApproveTraffic');
   Route::post('management/traffic/{id}', 'DashboardController@postApproveTraffic');
+  Route::post('management/traffic/{id}/edit', 'DashboardController@postEditTraffic');
   Route::post('management/traffic/{id}/del', 'DashboardController@delApproveTraffic');
 
   // Manager User

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Page;
 use App\Models\User;
 use App\Models\UserType;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -35,18 +36,52 @@ class DashboardController extends Controller
 		return view('admin.editTraffic')->with('page', $page)->with('priority', $priority->getConstants());
 	}
 
-	public function postApproveTraffic(Request $request, $id)
+	public function postApproveTraffic(Request $request, $id){
+		$page = Page::where('id', $id)->first();
+		$user = $page->user;
+
+		if ($user->wallet >= $page->price){
+			DB::transaction(function () use ($page, $user) {
+				$page->status = PageStatusConstants::APPROVED;
+	
+				$log = new LogTransaction();
+				$log->user_id = $page->user_id;
+				$log->amount  = $page->price;
+				$log->type = TransactionTypeConstants::PAY;
+	
+				DB::table('users')->where('id', $page->user_id)->decrement('wallet', $page->price);
+	
+				$page->save();
+				$log->save();
+			});
+
+		}
+
+		return redirect()->to('/management/traffic'); 
+	}
+
+	public function postEditTraffic(Request $request, $id)
 	{
 		$page = Page::where('id', $id)->first();
+
 		try {
 			// Store page image
-			$filename = time() . '.' . request()->image->getClientOriginalExtension();
-			request()->image->move(public_path('images'), $filename);
+			if ($request->file('image')){
+				$oldImage = $page->image;
+
+				$filename = time() . '.' . request()->image->getClientOriginalExtension();
+				request()->image->move(public_path('images'), $filename);
+				$page->image = $filename;
+				
+				// Delete old file
+				if(!empty($oldImage)){
+					File::delete(public_path('images'). DIRECTORY_SEPARATOR .$oldImage);
+				}
+			}
 
 			$page->priority = $request['priority'];
-			$page->image = $filename;
-			// Set status to APPROVED => 1
-			$page->status = PageStatusConstants::APPROVED;
+				
+			$page->note = $request['note'];
 
 			$page->save();
 
@@ -70,6 +105,11 @@ class DashboardController extends Controller
 			$log->user_id = $page->user_id;
 			$log->amount  = $page->price;
 			$log->type = TransactionTypeConstants::REFUND;
+
+			// Delete image file
+			if(!empty($page->image)){
+				File::delete(public_path('images'). DIRECTORY_SEPARATOR .$page->image);
+			}
 
 
 			DB::table('users')->where('id', $page->user_id)->increment('wallet', $page->price);

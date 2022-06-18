@@ -27,6 +27,8 @@ class CreatePagesTable extends Migration
             $table->float('price', 10, 3);
             $table->tinyInteger('status')->default(0);
             $table->tinyInteger('priority')->default(0);
+            $table->string('note')->nullable();
+            $table->time('timeout')->default('02:00:00');
             $table->timestamps();
         });
     }
