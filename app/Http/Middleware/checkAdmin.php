@@ -22,7 +22,7 @@ class checkAdmin
         }
         
         $user = Auth::user();
-        if (!$user->isAdmin){
+        if (!$user->is_admin){
             Auth::logout();
             return redirect()->route('login');
         }

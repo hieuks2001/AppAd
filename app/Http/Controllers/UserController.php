@@ -47,13 +47,14 @@ class UserController extends Controller
       if ($request->password != $request->re_password) {
         return Redirect::to('/register')->with('error', 'Mật khẩu không trùng khớp!');
       } else {
+        $type =  DB::table('user_types')->where('name', 'normal')->first();
         $user = new User();
-        $user->user_uuid = Str::uuid();
         $user->username = $request->username;
         $user->password = bcrypt($request->password);
-        $user->isAdmin = 0;
+        $user->is_admin = 0;
         $user->status = 1;
         $user->wallet = 0;
+        $user->user_type_id = $type->id;
         $user->commission = 0;
         $user->save();
         return Redirect::to('/login')->with('message', 'Đăng ký thành công!');
@@ -66,15 +67,15 @@ class UserController extends Controller
   public function index()
   {
     $user = Auth::user();
-    // $ms = DB::table('missions')->where('ms_userUUID', Session::get('user')->user_uuid)->where('ms_status', 'already')->first();
-    // $missons = DB::table('missions')->where('ms_userUUID', Session::get('user')->user_uuid)->get();
+    // $ms = DB::table('missions')->where('ms_userUUID', Session::get('user')->id)->where('ms_status', 'already')->first();
+    // $missons = DB::table('missions')->where('ms_userUUID', Session::get('user')->id)->get();
     // // if ($ms) {
     // //   return Redirect::to('/tu-khoa')->with('error', "");
     // // } else {
     // //   return view('mission.mission', ['missions' => $missons]);
     // // }
     if ($user) {
-      if ($user->isAdmin) {
+      if ($user->is_admin) {
         return Redirect::to('/management/traffic');
       }
       return view("dashboard.index");
@@ -87,14 +88,14 @@ class UserController extends Controller
   public function pastekey(Request $request)
   {
     $user = Auth::user();
-    $ms = Missions::where('ms_userUUID', $user->user_uuid)->where('ms_status', 'already')->first();
+    $ms = Missions::where('ms_userUUID', $user->id)->where('ms_status', 'already')->first();
     if ($ms->ms_code == $request->key) {
-      $user = Missions::where('user_uuid', $user->user_uuid)->first();
+      $user = Missions::where('user_uuid', $user->id)->first();
       print_r($user);
-      $us = Missions::where('user_uuid', $user->user_uuid)->update(
+      $us = Missions::where('user_uuid', $user->id)->update(
         ['wallet' => $user->wallet + $ms->ms_price]
       );
-      $ms = Missions::where('ms_userUUID', $user->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'done']);
+      $ms = Missions::where('ms_userUUID', $user->id)->where('ms_status', 'already')->update(['ms_status' => 'done']);
 
       return Redirect::to('/tu-khoa');
     } else {
@@ -105,8 +106,8 @@ class UserController extends Controller
   public function tukhoa()
   {
     $user = Auth::user();
-    $ms = Missions::where('ms_userUUID', $user->user_uuid)->where('ms_status', 'already')->first();
-    $missons = Missions::where('ms_userUUID', $user->user_uuid)->get();
+    $ms = Missions::where('ms_userUUID', $user->id)->where('ms_status', 'already')->first();
+    $missons = Missions::where('ms_userUUID', $user->id)->get();
 
     if ($ms) {
       $page = Page::where('page_name', $ms->ms_name)->first();
@@ -142,7 +143,7 @@ class UserController extends Controller
   public function cancelmission()
   {
     $user = Auth::user();
-    $ms = Missions::where('ms_userUUID', $user->user_uuid)->where('ms_status', 'already')->update(['ms_status' => 'cancel']);
+    $ms = Missions::where('ms_userUUID', $user->id)->where('ms_status', 'already')->update(['ms_status' => 'cancel']);
     return Redirect::to('/tu-khoa');
   }
 
@@ -181,7 +182,7 @@ class UserController extends Controller
         // $randomkey = substr(str_shuffle($permitted_chars), 0, 4) . '88';
         $mission = new Missions();
         $mission->ms_name = $value->page_name;
-        $mission->ms_userUUID = $user->user_uuid;
+        $mission->ms_userUUID = $user->id;
         $mission->ms_countdown = 60;
         $mission->ms_price = 0.35;
         $mission->ms_status = 'already';
@@ -191,27 +192,6 @@ class UserController extends Controller
         return Redirect::to('/tu-khoa')->with('error', 'Nhận nhiệm vụ không thành công!');
       }
     }
-  }
-
-  public function regispage()
-  {
-    return view('regispage.tab1');
-  }
-  public function regispageTab1()
-  {
-    return view('regispage.tab1');
-  }
-  public function regispageTab2()
-  {
-    return view('regispage.tab2');
-  }
-  public function regispageTab3()
-  {
-    return view('regispage.tab3');
-  }
-  public function regispageTab4()
-  {
-    return view('regispage.tab4');
   }
   // ====================== END PAGES ============================
 

@@ -3,6 +3,7 @@
     @include('box.patternBox2')
     <div class="mt-5 flex p-5 bg-white drop-shadow-2xl rounded-2xl mb-10">
         <form class="flex flex-1 m-0" action="" method="post" id="form-deposit">
+            @csrf
             <input type="text" placeholder="Nhập số tiền muốn nạp" class="input input-bordered w-full max-w-xs mr-5" />
             <button id="deposit-btn" class="btn btn-primary" type="submit">Nạp tiền</button>
         </form>
@@ -21,11 +22,13 @@
                 <tr>
                     <th class="bg-slate-200">Ngày</th>
                     <th class="bg-slate-200">Số tiền</th>
+                    <th class="bg-slate-200">Từ</th>
                     <th class="bg-slate-200">Ghi chú</th>
                 </tr>
             <tbody>
                 <tr>
                     <td class="bg-white">a</td>
+                    <td class="bg-white">b</td>
                     <td class="bg-white">b</td>
                     <td class="bg-white">c</td>
                 </tr>
@@ -52,18 +55,5 @@
             e.preventDefault();
             sendTransaction(amount.value)
         })
-
-        function sendTransaction(amount) {
-            contract(async (contract) => {
-                try {
-                    const transaction = await contract.transfer(
-                        "0xfaFF7273fd6e61CE33eAB5b7F6B259772C1229E2", ethers.utils.parseUnits(
-                            String(amount), await contract.decimals()))
-                    await transaction.wait()
-                } catch (error) {
-                    console.log(error.message.code);
-                }
-            });
-        }
     </script>
 @endpush
