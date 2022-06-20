@@ -11,28 +11,28 @@
         <br />
         <table class="table w-full ">
             <!-- head -->
-            <thead class="">
+            <thead>
                 <tr>
                     <th>URL</th>
                     <th>Username</th>
-                    <th>Tổng số lượng traffic</th>
-                    <th>Số lượng traffic / ngày</th>
+                    <th>Tổng traffic</th>
+                    <th>traffic/ngày</th>
                     <th>Time onsite(s)</th>
                     <th>Loại site</th>
                     <th>Đã trả (USDT)</th>
-                    <th>Số Traffic còn lại</th>
+                    <th>Traffic còn lại</th>
                 </tr>
             <tbody>
                 @foreach ($pages as $key => $value)
                     <tr>
-                        <td class="">{{ $value->url }}</td>
-                        <td class="">{{ $value->user->username }}</td>
-                        <td class="">{{ $value->traffic_sum }}</td>
-                        <td class="">{{ $value->traffic_per_day }}</td>
-                        <td class="">{{ $value->onsite }}</td>
-                        <td class="">{{ $value->pageType->name }}</td>
-                        <td class="">{{ $value->price }}</td>
-                        <td class="">{{ $value->traffic_remain }}</td>
+                        <td>{{ $value->url }}</td>
+                        <td>{{ $value->user->username }}</td>
+                        <td>{{ $value->traffic_sum }}</td>
+                        <td>{{ $value->traffic_per_day }}</td>
+                        <td>{{ $value->onsite }}</td>
+                        <td>{{ $value->pageType->name }}</td>
+                        <td>{{ $value->price }}</td>
+                        <td>{{ $value->traffic_remain }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -46,30 +46,30 @@
         <br />
         <table class="table w-full ">
             <!-- head -->
-            <thead class="">
+            <thead>
                 <tr>
-                    <th class="bg-slate-200">URL</th>
-                    <th class="bg-slate-200">Username</th>
-                    <th class="bg-slate-200">Wallet (USDT)</th>
-                    <th class="bg-slate-200">Tổng số lượng traffic</th>
-                    <th class="bg-slate-200">Số lượng traffic / ngày</th>
-                    <th class="bg-slate-200">Time onsite(s)</th>
-                    <th class="bg-slate-200">Loại site</th>
-                    <th class="bg-slate-200">Phải trả (USDT)</th>
-                    <th class="bg-slate-200">Hành động</th>
+                    <th>URL</th>
+                    <th>Username</th>
+                    <th>Wallet (USDT)</th>
+                    <th>Tổng số lượng traffic</th>
+                    <th>Số lượng traffic / ngày</th>
+                    <th>Time onsite(s)</th>
+                    <th>Loại site</th>
+                    <th>Phải trả (USDT)</th>
+                    <th>Hành động</th>
                 </tr>
             <tbody>
                 @foreach ($notApprovedPages as $key => $value)
                     <tr data-row="{{ $value->id }}">
-                        <td class="">{{ $value->url }}</td>
-                        <td class="">{{ $value->user->username }}</td>
-                        <td class="">{{ $value->user->wallet }}</td>
-                        <td class="">{{ $value->traffic_sum }}</td>
-                        <td class="">{{ $value->traffic_per_day }}</td>
-                        <td class="">{{ $value->onsite }}</td>
-                        <td class="">{{ $value->pageType->name }}</td>
-                        <td class="">{{ $value->price }}</td>
-                        <td class="">
+                        <td>{{ $value->url }}</td>
+                        <td>{{ $value->user->username }}</td>
+                        <td>{{ $value->user->wallet }}</td>
+                        <td>{{ $value->traffic_sum }}</td>
+                        <td>{{ $value->traffic_per_day }}</td>
+                        <td>{{ $value->onsite }}</td>
+                        <td>{{ $value->pageType->name }}</td>
+                        <td>{{ $value->price }}</td>
+                        <td>
                             <label for="modal-approve--traffic" class="btn btn-info btn-block btn-sm"
                                 onclick="
                             onClick({{ $value }})">Sửa</label>
@@ -128,8 +128,8 @@
                     }
                 }
             })
-            if (row.image){
-                output.src = "/images/"+row.image
+            if (row.image) {
+                output.src = "/images/" + row.image
             }
         }
     </script>
