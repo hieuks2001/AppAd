@@ -29,15 +29,17 @@ class StoreOrderPageTraffic extends FormRequest
             'url' => 'required|url',
             'traffic_per_day' => 'required|numeric|min:30',
             'traffic_sum' => 'required|numeric|min:500',
-            'onsite' => [
-                'required', Rule::in([
-                    OntimeTypeConstants::TYPE_60,
-                    OntimeTypeConstants::TYPE_70,
-                    OntimeTypeConstants::TYPE_90,
-                    OntimeTypeConstants::TYPE_120,
-                    OntimeTypeConstants::TYPE_150
-                ])
-            ],
+            // 'onsite' => [
+            //     'required', Rule::in([
+            //         OntimeTypeConstants::TYPE_60,
+            //         OntimeTypeConstants::TYPE_70,
+            //         OntimeTypeConstants::TYPE_90,
+            //         OntimeTypeConstants::TYPE_120,
+            //         OntimeTypeConstants::TYPE_150
+            //     ])
+            // ],
+            'onsite' => 'required|numeric',
+            'page_type' => 'required',
             'keyword' => 'required'
         ];
     }

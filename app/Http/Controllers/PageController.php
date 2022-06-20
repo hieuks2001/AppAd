@@ -13,6 +13,7 @@ use App\Constants\OntimePriceConstants;
 use App\Constants\PageStatusConstants;
 use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
+use App\Models\PageType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
 
@@ -35,11 +36,15 @@ class PageController extends Controller
       $user = Auth::user();
       $page = new Page($validated);
 
-      DB::transaction(function () use ($user, $page) {
+      DB::transaction(function () use ($user, $page, $validated) {
 
         $page->traffic_remain = $page->traffic_sum;
         $page->user_id = $user->id;
-        $page->price_per_traffic = OntimePriceConstants::TYPE_PRICE[$page->onsite];
+
+        $page_type = PageType::where('id', $validated['page_type'])->first();
+        $page->page_type_id = $page_type->id;
+        $page->price_per_traffic = $page_type->onsite[$page->onsite];
+        // Cal the price (onsite price * traffic sum)
         $page->price = $page->traffic_sum * $page->price_per_traffic;
 
         // //Add log 
@@ -54,7 +59,6 @@ class PageController extends Controller
       });
     } catch (\Throwable $th) {
       // *TODO: Add transaction here: Rollback usdt
-      dd($th);
       return redirect()->back()->with('error', 'Thêm thất bại!');
     }
     return redirect()->back()->with('message', 'Thêm thành công!');

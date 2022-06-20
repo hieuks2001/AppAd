@@ -18,6 +18,7 @@
                     <th>Tổng số lượng traffic</th>
                     <th>Số lượng traffic / ngày</th>
                     <th>Time onsite(s)</th>
+                    <th>Loại site</th>
                     <th>Đã trả (USDT)</th>
                     <th>Số Traffic còn lại</th>
                 </tr>
@@ -29,6 +30,7 @@
                         <td class="">{{ $value->traffic_sum }}</td>
                         <td class="">{{ $value->traffic_per_day }}</td>
                         <td class="">{{ $value->onsite }}</td>
+                        <td class="">{{ $value->pageType->name }}</td>
                         <td class="">{{ $value->price }}</td>
                         <td class="">{{ $value->traffic_remain }}</td>
                     </tr>
@@ -52,6 +54,7 @@
                     <th class="bg-slate-200">Tổng số lượng traffic</th>
                     <th class="bg-slate-200">Số lượng traffic / ngày</th>
                     <th class="bg-slate-200">Time onsite(s)</th>
+                    <th class="bg-slate-200">Loại site</th>
                     <th class="bg-slate-200">Phải trả (USDT)</th>
                     <th class="bg-slate-200">Hành động</th>
                 </tr>
@@ -64,6 +67,7 @@
                         <td class="">{{ $value->traffic_sum }}</td>
                         <td class="">{{ $value->traffic_per_day }}</td>
                         <td class="">{{ $value->onsite }}</td>
+                        <td class="">{{ $value->pageType->name }}</td>
                         <td class="">{{ $value->price }}</td>
                         <td class="">
                             <label for="modal-approve--traffic" class="btn btn-info btn-block btn-sm"

@@ -8,6 +8,7 @@ use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
 use Illuminate\Http\Request;
 use App\Models\Page;
+use App\Models\PageType;
 use App\Models\User;
 use App\Models\UserType;
 use Carbon\Carbon;
@@ -77,6 +78,13 @@ class DashboardController extends Controller
 				if(!empty($oldImage)){
 					File::delete(public_path('images'). DIRECTORY_SEPARATOR .$oldImage);
 				}
+			}
+
+			if ($request['page_type']){
+				$page_type = PageType::where('id', $request['page_type'])->first();
+				$page->price_per_traffic = $page_type->onsite[$page->onsite];
+				$page->price = $page->traffic_sum * $page->price_per_traffic;
+				$page->page_type_id = $page_type->id;
 			}
 
 			$page->priority = $request['priority'];

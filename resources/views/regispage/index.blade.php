@@ -28,12 +28,21 @@
                     class="input input-bordered w-full  mb-5" required>
                 <input type="number" name="traffic_sum" placeholder="Nhập tổng Traffic"
                     class="input input-bordered w-full  mb-5" required>
-                <select name="onsite" id="" class="select select-bordered w-full mb-5">
-                    <option selected disabled> Vui lòng chọn gói Onsite </option>
+                <select name="page_type" id="" class="select select-bordered w-full mb-5">
+                    <option selected disabled> Vui lòng chọn loại site </option>
                     @foreach ($onsite as $key => $value)
-                        <option value="{{ $value }}">Time onsite > {{ $value }}</option>
+                        <option value="{{ $value->id }}">{{ $value->name }}</option>
                     @endforeach
                 </select>
+                <select name="onsite" id="" class="select select-bordered w-full mb-5">
+                    <option selected disabled> Vui lòng chọn gói Onsite </option>
+                    @foreach ($onsite as $key1 => $value1)
+                        @foreach ($value1->onsite as $key => $value)
+                        <option value="{{ $key }}">{{ $value1->name }} Time onsite > {{ $key }}</option>
+                        @endforeach
+                    @endforeach
+                </select>
+
                 <!-- <label class="block">
                             <span class="sr-only">Choose profile photo</span>
                             <input type="file" accept="image/*"
@@ -74,6 +83,10 @@
         @yield('tab4-blade')
     </div>
     <script>
+        @foreach( $onsite as $key => $value)
+            console.log("{{$value->name}}")
+            console.log(@json($value->onsite))
+        @endforeach
         var output = document.getElementById('output');
         var fileUpload = document.getElementById('fileUpload');
         fileUpload?.addEventListener('change', (event) => {
