@@ -14,7 +14,6 @@
                 </label>
             </div>
         </div>
-
         <br />
         <table class="table w-full ">
             <!-- head -->

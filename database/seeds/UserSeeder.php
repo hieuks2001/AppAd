@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
                 'username' => 'dlha',
                 'status' => 1,
                 'is_admin' => 0,
-                'wallet' => 9999999999,
+                'wallet' => 99999999,
                 'user_type_id' => $type->id,
             ]
         ];
