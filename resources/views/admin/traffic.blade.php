@@ -51,8 +51,8 @@
                     <th>URL</th>
                     <th>Username</th>
                     <th>Wallet (USDT)</th>
-                    <th>Tổng số lượng traffic</th>
-                    <th>Số lượng traffic / ngày</th>
+                    <th>Tổng traffic</th>
+                    <th>traffic/ngày</th>
                     <th>Time onsite(s)</th>
                     <th>Loại site</th>
                     <th>Phải trả (USDT)</th>
@@ -73,12 +73,14 @@
                             <label for="modal-approve--traffic" class="btn btn-info btn-block btn-sm"
                                 onclick="
                             onClick({{ $value }})">Sửa</label>
-                            <form class="mb-0"
-                                action="{{ action('DashboardController@postApproveTraffic', $value->id) }}"
-                                method="post">
-                                @csrf
-                                <button class="btn btn-success btn-block btn-sm">Duyệt</button>
-                            </form>
+                            @if (!empty($value->image))
+                                <form class="mb-0"
+                                    action="{{ action('DashboardController@postApproveTraffic', $value->id) }}"
+                                    method="post">
+                                    @csrf
+                                    <button class="btn btn-success btn-block btn-sm">Duyệt</button>
+                                </form>
+                            @endif
                             <form class="mb-0"
                                 action="{{ action('DashboardController@delApproveTraffic', $value->id) }}"
                                 method="post">
@@ -95,7 +97,7 @@
     <div class="modal text-slate-800">
         <div class="modal-box relative">
             <label for="modal-approve--traffic" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
-            @include('admin.editTraffic')
+            @include('admin.editTraffic', $notApprovedPages)
         </div>
     </div>
     <script>
@@ -117,12 +119,26 @@
         let formItems = document.querySelectorAll('#form .item');
 
         function onClick(row) {
+            console.log(row);
             form.action = `/management/traffic/${row.id}/edit`
             formItems.forEach((item, row_i) => {
                 let data = item.classList[item.classList.length - 1]
                 if (data in row) {
                     if (data == 'user') {
                         item.textContent = row[data].username
+                    } else if (data == "page_type_id") {
+                        item.value = row[data]
+                    } else if (data == "page_type") {
+                        for (const k in row[data].onsite) {
+                            const option = document.createElement("option");
+                            option.value = k;
+                            if (row.onsite == k) {
+                                console.log(row.onsite);
+                                option.setAttribute("selected", true)
+                            }
+                            option.textContent = `${row[data].name} Time onsite > ${k}s`;
+                            selectSiteTypeOnsiteEle.appendChild(option);
+                        }
                     } else {
                         item.textContent = row[data]
                     }

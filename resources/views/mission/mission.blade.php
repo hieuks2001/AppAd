@@ -25,7 +25,7 @@
                         </svg>
                         foreach($errors->all() as $error)
                         <span>
-                            {{$error}}
+                            {{ $error }}
                         </span>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
                     <th class="bg-slate-200">Trạng thái</th>
                 </tr>
             <tbody>
-               
+
             </tbody>
         </table>
     </div>
