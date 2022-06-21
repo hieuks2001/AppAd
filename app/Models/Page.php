@@ -21,6 +21,10 @@ class Page extends Model
     // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
     public $incrementing = false;
 
+    protected $dates = [
+        'timeout',
+    ];
+
     public function user()
     {
         return $this->belongsTo('App\Models\User');
