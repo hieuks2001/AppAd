@@ -87,6 +87,12 @@ class DashboardController extends Controller
 				$page->page_type_id = $page_type->id;
 			}
 
+			if ($request['timeout']) {
+				if (Carbon::parse($request['timeout'])){
+					$page->timeout = $request['timeout'];
+				}
+			}
+
 			$page->priority = $request['priority'];
 				
 			$page->note = $request['note'];

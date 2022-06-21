@@ -40,7 +40,12 @@
             @endforeach
         </select>
     </div>
-    
+    <div class="flex justify-between items-center">
+        <p>
+            Chọn timeout
+        </p>
+        <input type="time" name="timeout" id="">
+    </div>
     <div class="flex justify-between items-center">
         <label class="label">
             <span class="label-text">Ghi chú</span>
