@@ -100,6 +100,20 @@
             @include('admin.editTraffic', $notApprovedPages)
         </div>
     </div>
+    <input type="checkbox" id="my-modal" class="modal-toggle" @if (session()->has('error')) checked @endif />
+    <div class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Thông báo!</h3>
+            <p class="py-4">
+                @php
+                    echo Session::get('error');
+                @endphp
+            </p>
+            <div class="modal-action">
+                <label for="my-modal" class="btn">HỦY!</label>
+            </div>
+        </div>
+    </div>
     <script>
         var output = document.getElementById('output');
         var fileUpload = document.getElementById('fileUpload');
@@ -128,17 +142,8 @@
                         item.textContent = row[data].username
                     } else if (data == "page_type_id") {
                         item.value = row[data]
-                    } else if (data == "page_type") {
-                        for (const k in row[data].onsite) {
-                            const option = document.createElement("option");
-                            option.value = k;
-                            if (row.onsite == k) {
-                                console.log(row.onsite);
-                                option.setAttribute("selected", true)
-                            }
-                            option.textContent = `${row[data].name} Time onsite > ${k}s`;
-                            selectSiteTypeOnsiteEle.appendChild(option);
-                        }
+                    } else if (data == "priority") {
+                        item.value = row[data]
                     } else {
                         item.textContent = row[data]
                     }
