@@ -25,6 +25,15 @@ class Page extends Model
         'timeout',
     ];
 
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'timeout' => 'timestamp',
+    ];
+
     public function user()
     {
         return $this->belongsTo('App\Models\User');
