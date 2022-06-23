@@ -100,6 +100,7 @@ class DashboardController extends Controller
 
       $page->save();
     } catch (\Throwable $th) {
+      dd($th);
       File::delete(public_path('images') . DIRECTORY_SEPARATOR . $filename);
       return redirect()->to('/management/traffic');
     }

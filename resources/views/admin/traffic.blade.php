@@ -144,6 +144,15 @@
                         item.value = row[data]
                     } else if (data == "priority") {
                         item.value = row[data]
+                    } else if (data == "timeout") {
+                        console.log(row[data]);
+                        let date = new Date(row[data] * 1000)
+                        console.log(date);
+                        item.value = `${date.getUTCHours()}:${"0" + date.getUTCMinutes()}`
+                        let hourEle = document.getElementById("hour");
+                        let minuteEle = document.getElementById("minute");
+                        hourEle.value = date.getUTCHours()
+                        minuteEle.value = "0" + date.getUTCMinutes()
                     } else {
                         item.textContent = row[data]
                     }

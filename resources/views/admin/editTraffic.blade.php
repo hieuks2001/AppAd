@@ -46,7 +46,7 @@
         <p>
             Chọn timeout
         </p>
-        <input type="text" name="timeout" id="timeout" hidden>
+        <input type="text" name="timeout" id="timeout" class="item timeout" hidden>
         <div class="flex items-center">
             <input type="number" id="hour" class="input input-bordered" placeholder="HH" maxlength="2"
                 min="0" max="24">
