@@ -58,6 +58,25 @@
                     <th class="bg-slate-200">Trạng thái</th>
                 </tr>
             <tbody>
+            @foreach($missions as $mission)
+            <tr>
+                <td>{{$mission->id}}</td>
+                <td>{{$mission->created_at}}</td>
+                <td>{{$mission->updated_at}}</td>
+                <td>{{$mission->reward}}</td>
+                @switch($mission->status)
+                    @case (0)
+                        <td class="bg-white">Đang chờ</td>
+                        @break
+                    @case (1)
+                        <td class="bg-white">Hoàn thành</td>
+                        @break
+                    @case (-1)
+                        <td class="bg-white">Đã huỷ</td>
+                        @break
+                @endswitch
+            </tr>
+            @endforeach
 
             </tbody>
         </table>

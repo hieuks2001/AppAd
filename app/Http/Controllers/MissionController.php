@@ -33,7 +33,7 @@ class MissionController extends Controller
         if ($mission) {
             $page = Page::where('id', $mission->page_id)
                 ->where('status', PageStatusConstants::APPROVED)->first();
-            return view('mission.mission', ['mission' => $mission, 'missions' => $mission, 'page' => $page]); 
+            return view('mission.mission', ['mission' => $mission, 'page' => $page]); 
         } else {
             return view('mission.mission', [])->withErrors("Bạn chưa nhận nhiệm vụ!");
         }
