@@ -45,8 +45,9 @@ Route::get('/withdraw', 'UserController@withdraw');
 // Missions
 Route::group(['middleware' => ['checkLogin']], function () {
   Route::post('/paste-key', 'UserController@pastekey');
-  Route::get('/tu-khoa', 'UserController@tukhoa');
-  Route::get('/cancel-mission', 'UserController@cancelmission');
+  Route::post('/tu-khoa', 'MissionController@postMission');
+  Route::get('/tu-khoa', 'MissionController@getMission');
+  Route::get('/cancel-mission', 'MissionController@cancelmission');
 });
 
 // Pages

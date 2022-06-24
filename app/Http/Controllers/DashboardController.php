@@ -20,157 +20,160 @@ use ReflectionClass;
 
 class DashboardController extends Controller
 {
-	public function managementTraffic()
-	{
-		$pages = Page::where('status', PageStatusConstants::APPROVED)->get();
-		$notApprovedPages = Page::where('status', PageStatusConstants::PENDING)->get();
-		return view('admin.traffic', compact(['pages', 'notApprovedPages']));
-	}
+  public function managementTraffic()
+  {
+    $pages = Page::where('status', PageStatusConstants::APPROVED)->get();
+    $notApprovedPages = Page::where('status', PageStatusConstants::PENDING)->get();
+    return view('admin.traffic', compact(['pages', 'notApprovedPages']));
+  }
 
-	public function getApproveTraffic($id)
-	{
-		$priority = new ReflectionClass(PagePriorityConstants::class);
-		$page = Page::where('status', PageStatusConstants::PENDING)->where('id', $id)->first();
-		if (!$page) {
-			return redirect()->to('/management/traffic');
-		}
-		return view('admin.editTraffic')->with('page', $page)->with('priority', $priority->getConstants());
-	}
+  public function getApproveTraffic($id)
+  {
+    $priority = new ReflectionClass(PagePriorityConstants::class);
+    $page = Page::where('status', PageStatusConstants::PENDING)->where('id', $id)->first();
+    if (!$page) {
+      return redirect()->to('/management/traffic');
+    }
+    return view('admin.editTraffic')->with('page', $page)->with('priority', $priority->getConstants());
+  }
 
-	public function postApproveTraffic(Request $request, $id){
-		$page = Page::where('id', $id)->first();
-		$user = $page->user;
+  public function postApproveTraffic(Request $request, $id)
+  {
+    $page = Page::where('id', $id)->first();
+    $user = $page->user;
 
-		if ($user->wallet >= $page->price){
-			DB::transaction(function () use ($page, $user) {
-				$page->status = PageStatusConstants::APPROVED;
-	
-				$log = new LogTransaction();
-				$log->user_id = $page->user_id;
-				$log->amount  = $page->price;
-				$log->type = TransactionTypeConstants::PAY;
-	
-				DB::table('users')->where('id', $page->user_id)->decrement('wallet', $page->price);
-	
-				$page->save();
-				$log->save();
-			});
+    if ($user->wallet >= $page->price) {
+      DB::transaction(function () use ($page, $user) {
+        $page->status = PageStatusConstants::APPROVED;
 
-		}
+        $log = new LogTransaction();
+        $log->user_id = $page->user_id;
+        $log->amount  = $page->price;
+        $log->type = TransactionTypeConstants::PAY;
 
-		return redirect()->to('/management/traffic'); 
-	}
+        DB::table('users')->where('id', $page->user_id)->decrement('wallet', $page->price);
 
-	public function postEditTraffic(Request $request, $id)
-	{
-		$page = Page::where('id', $id)->first();
+        $page->save();
+        $log->save();
+      });
+      return redirect()->to('/management/traffic');
+    } else {
+      return redirect()->to('/management/traffic')->with("error", "Người dùng này không có đủ tiền!.");
+    }
+  }
 
-		try {
-			// Store page image
-			if ($request->file('image')){
-				$oldImage = $page->image;
+  public function postEditTraffic(Request $request, $id)
+  {
+    $page = Page::where('id', $id)->first();
 
-				$filename = time() . '.' . request()->image->getClientOriginalExtension();
-				request()->image->move(public_path('images'), $filename);
-				$page->image = $filename;
-				
-				// Delete old file
-				if(!empty($oldImage)){
-					File::delete(public_path('images'). DIRECTORY_SEPARATOR .$oldImage);
-				}
-			}
+    try {
+      // Store page image
+      if ($request->file('image')) {
+        $oldImage = $page->image;
 
-			if ($request['page_type']){
-				$page_type = PageType::where('id', $request['page_type'])->first();
-				$page->price_per_traffic = $page_type->onsite[$page->onsite];
-				$page->price = $page->traffic_sum * $page->price_per_traffic;
-				$page->page_type_id = $page_type->id;
-			}
+        $filename = time() . '.' . request()->image->getClientOriginalExtension();
+        request()->image->move(public_path('images'), $filename);
+        $page->image = $filename;
 
-			if ($request['timeout']) {
-				if (Carbon::parse($request['timeout'])){
-					$page->timeout = $request['timeout'];
-				}
-			}
+        // Delete old file
+        if (!empty($oldImage)) {
+          File::delete(public_path('images') . DIRECTORY_SEPARATOR . $oldImage);
+        }
+      }
 
-			$page->priority = $request['priority'];
-				
-			$page->note = $request['note'];
+      if ($request['page_type']) {
+        $page_type = PageType::where('id', $request['page_type'])->first();
+        $page->price_per_traffic = $page_type->onsite[$page->onsite];
+        $page->price = $page->traffic_sum * $page->price_per_traffic;
+        $page->page_type_id = $page_type->id;
+      }
 
-			$page->save();
+      if ($request['timeout']) {
+        if (Carbon::parse($request['timeout'])) {
+          $page->timeout = $request['timeout'];
+        }
+      }
 
-		} catch (\Throwable $th) {
-			File::delete(public_path('images'). DIRECTORY_SEPARATOR .$filename);
-			return redirect()->to('/management/traffic');
-		}
+      $page->priority = $request['priority'];
 
-		return redirect()->to('/management/traffic');
-	}
+      $page->note = $request['note'];
 
-	public function delApproveTraffic($id)
-	{
-		$page = Page::where('id', $id)->first();
-		$user = Auth::user();
-
-		DB::transaction(function () use ($page, $user) {
-			$page->status = PageStatusConstants::CANCEL;
-
-			$log = new LogTransaction();
-			$log->user_id = $page->user_id;
-			$log->amount  = $page->price;
-			$log->type = TransactionTypeConstants::REFUND;
-
-			// Delete image file
-			if(!empty($page->image)){
-				File::delete(public_path('images'). DIRECTORY_SEPARATOR .$page->image);
-			}
-
-
-			DB::table('users')->where('id', $page->user_id)->increment('wallet', $page->price);
-
-			$page->save();
-			$log->save();
-		});
-
-		return redirect()->to('/management/traffic');
-	}
-
-	// Management User - UserType
-
-	public function managementUsers()
-	{
-		$userTypes = DB::table('user_types')->get();
-		$users = User::where('status', 1)->get();
-
-		return view('admin.users', compact(['userTypes', 'users']));
-	}
-
-	public function postCreateUserType(Request $request){
-        
-        $validated = $request->validate([
-            'name' => 'required|max:255',
-            'max_traffic' => 'required|numeric|gt:0'
-        ]);
-        
-        $userType = new UserType($validated);
-
-        $userType->save();
-        
-        return redirect()->to('/management/users');
+      $page->save();
+    } catch (\Throwable $th) {
+      dd($th);
+      File::delete(public_path('images') . DIRECTORY_SEPARATOR . $filename);
+      return redirect()->to('/management/traffic');
     }
 
-	public function postChangeUserType(Request $request, $id){
-        // Edit user user_type 
-        $userTypeID = $request['user_type'];
-        
-		$user = User::where('id', $id)->first();
-		if($user){
-			$type = UserType::where('id', $userTypeID)->first();
-			if ($type) {
-				$user->user_type_id = $type->id;
-				$user->save();
-			}
-		}      
-        return redirect()->to('/management/users');
+    return redirect()->to('/management/traffic');
+  }
+
+  public function delApproveTraffic($id)
+  {
+    $page = Page::where('id', $id)->first();
+    $user = Auth::user();
+
+    DB::transaction(function () use ($page, $user) {
+      $page->status = PageStatusConstants::CANCEL;
+
+      $log = new LogTransaction();
+      $log->user_id = $page->user_id;
+      $log->amount  = $page->price;
+      $log->type = TransactionTypeConstants::REFUND;
+
+      // Delete image file
+      if (!empty($page->image)) {
+        File::delete(public_path('images') . DIRECTORY_SEPARATOR . $page->image);
+      }
+
+
+      DB::table('users')->where('id', $page->user_id)->increment('wallet', $page->price);
+
+      $page->save();
+      $log->save();
+    });
+
+    return redirect()->to('/management/traffic');
+  }
+
+  // Management User - UserType
+
+  public function managementUsers()
+  {
+    $userTypes = DB::table('user_types')->get();
+    $users = User::where('status', 1)->get();
+
+    return view('admin.users', compact(['userTypes', 'users']));
+  }
+
+  public function postCreateUserType(Request $request)
+  {
+
+    $validated = $request->validate([
+      'name' => 'required|max:255',
+      'max_traffic' => 'required|numeric|gt:0'
+    ]);
+
+    $userType = new UserType($validated);
+
+    $userType->save();
+
+    return redirect()->to('/management/users');
+  }
+
+  public function postChangeUserType(Request $request, $id)
+  {
+    // Edit user user_type 
+    $userTypeID = $request['user_type'];
+
+    $user = User::where('id', $id)->first();
+    if ($user) {
+      $type = UserType::where('id', $userTypeID)->first();
+      if ($type) {
+        $user->user_type_id = $type->id;
+        $user->save();
+      }
     }
+    return redirect()->to('/management/users');
+  }
 }

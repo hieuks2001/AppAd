@@ -21,6 +21,19 @@ class Page extends Model
     // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
     public $incrementing = false;
 
+    protected $dates = [
+        'timeout',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'timeout' => 'timestamp',
+    ];
+
     public function user()
     {
         return $this->belongsTo('App\Models\User');
