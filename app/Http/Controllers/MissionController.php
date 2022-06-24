@@ -39,7 +39,7 @@ class MissionController extends Controller
         }
     }
 
-    public function postMission()
+    public function postMission(Request $request)
     {
         $user = Auth::user();
 
@@ -58,7 +58,7 @@ class MissionController extends Controller
         if ($mission) {
             $page = Page::where('id', $mission->page_id)
                 ->where('status', PageStatusConstants::APPROVED)->first();
-            return view('mission.mission', ['mission' => $mission, 'missions' => $mission, 'page' => $page]); 
+            return view('mission.mission', ['mission' => $mission, 'page' => $page]); 
         }
 
         // Query pages by Priority (HIGH -> MEDIUM -> LOW)
@@ -92,6 +92,7 @@ class MissionController extends Controller
         foreach ($pages as $page) {
             $mission = Mission::where('page_id', $page->id)
                 ->where('status', MissionStatusConstants::COMPLETED)
+                ->where('ip', $request->ip())
                 ->whereDate('updated_at',  Carbon::today())
                 ->orderBy('updated_at', 'desc')->first();
 
@@ -117,7 +118,7 @@ class MissionController extends Controller
         }
 
         // Begin database transaction
-        DB::transaction(function () use ($pickedPage, $user) {
+        DB::transaction(function () use ($pickedPage, $user, $request) {
             // Refresh data
             $pickedPage = $pickedPage->refresh();
 
@@ -127,6 +128,8 @@ class MissionController extends Controller
             // Reward = (price - 10% ) / traffic_sum
             $newMission->reward = ($pickedPage->price - ($pickedPage->price * 10 / 100) ) / $pickedPage->traffic_sum;
             $newMission->status = MissionStatusConstants::DOING;
+            $newMission->ip = $request->ip();
+            $newMission->user_agent = $request->userAgent();
             $newMission->save();
 
             $pickedPage->traffic_remain -= 1;

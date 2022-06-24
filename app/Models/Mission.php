@@ -15,7 +15,7 @@ class Mission extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'user_id', 'page_id', 'reward', 'status'
+        'user_id', 'page_id', 'reward', 'status', 'ip', 'user_agent'
     ];
 
     // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
