@@ -11,6 +11,7 @@ use App\Models\Page;
 use App\Models\PageType;
 use App\Models\User;
 use App\Models\UserType;
+use Brick\Math\Exception\NumberFormatException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -92,6 +93,14 @@ class DashboardController extends Controller
         if (Carbon::parse($request['timeout'])) {
           $page->timeout = $request['timeout'];
         }
+      }
+
+      if ($request['hold_percentage']){
+        $hold = $request['hold_percentage'];
+        if ($hold <= 0  || $hold > 100) {
+          throw new NumberFormatException('hold_percentage not in correct format (1 - 100)');
+        }
+        $page->hold_percentage = $hold;
       }
 
       $page->priority = $request['priority'];

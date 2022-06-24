@@ -126,7 +126,7 @@ class MissionController extends Controller
             $newMission->page_id = $pickedPage->id;
             $newMission->user_id = $user->id;
             // Reward = (price - 10% ) / traffic_sum
-            $newMission->reward = ($pickedPage->price - ($pickedPage->price * 10 / 100) ) / $pickedPage->traffic_sum;
+            $newMission->reward = ($pickedPage->price - ($pickedPage->price * $pickedPage->hold_percentage / 100) ) / $pickedPage->traffic_sum;
             $newMission->status = MissionStatusConstants::DOING;
             $newMission->ip = $request->ip();
             $newMission->user_agent = $request->userAgent();
