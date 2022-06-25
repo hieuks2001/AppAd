@@ -8,11 +8,12 @@
         <div class="overflow-x-auto bg-white drop-shadow-2xl p-5 rounded-2xl container md:w-2/5 mx-auto">
             <div class="text-slate-800">
                 <h2 class="text-2xl font-bold text-center mb-5">Nhiệm vụ của bạn</h2>
-                <p class="mb-3"><b>Bước 1:</b> truy cập vào <a href="">{{ $page->url }}</a></p>
-                <b>Bước 2:</b>
+                <p class="mb-3"><b>Bước 1:</b> Truy cập công cụ tìm kiếm: <b>>> Google.com</b>
+                <p class="mb-3"><b>Bước 2:</b> Tìm kiếm từ khoá  <b>>> <span style="color: red;">{{$page->keyword}}</span></b>
+                <p class="mb-3"><b>Bước 3:</b> Truy cập vào trang web như hướng dẫn:
                 <img class="mb-3 mx-auto" src="./images/{{ $page->image }}" style="max-width: 450px" />
-                <p class="mb-3"><b>Bước 3:</b> Click nhận mã và chờ {{ $page->onsite }}s</p>
-                <p class="mb-3"><b>Bước 4:</b> Copy mã và nhập vào ô ở phía dưới!</p>
+                <p class="mb-3"><b>Bước 3:</b> Lướt thật chậm từ trên xuống dưới giống như đang đọc nội dung bài viết rồi ấn vào nút <b>Nhận mã ngay</b> và đợi {{ $page->onsite }}s kết thúc</p>
+                <p class="mb-3"><b>Bước 4:</b> Copy mã và nhập vào ô ở phía dưới và bấm vào nút "<b>Hoàn thành nhiệm vụ</b>" và nhận <b>{{$mission->reward}}</b> USDT</p>
             </div>
             <hr>
             @if ($errors->all())
