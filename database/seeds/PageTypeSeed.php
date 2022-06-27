@@ -23,7 +23,8 @@ class PageTypeSeed extends Seeder
                     90 => 0.075,
                     120 => 0.08,
                     150 => 0.09,
-                ])
+                ]),
+                'mission_need' => 1
             ],
             [
                 'id' => Str::uuid(),
@@ -34,7 +35,8 @@ class PageTypeSeed extends Seeder
                     90 => 0.095,
                     120 => 0.1,
                     150 => 0.110,
-                ])
+                ]),
+                'mission_need' => 2
             ]
         ];
 

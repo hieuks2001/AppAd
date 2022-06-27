@@ -25,8 +25,10 @@ class CreatePagesTable extends Migration
             $table->integer('onsite');
             $table->float('price_per_traffic', 8, 4);
             $table->float('price', 11, 4);
+            $table->decimal('hold_percentage')->default(10);
             $table->tinyInteger('status')->default(0);
             $table->tinyInteger('priority')->default(0);
+            $table->foreignUuid('page_type_id')->constrained();
             $table->string('note')->nullable();
             $table->time('timeout')->default('02:00:00');
             $table->timestamps();

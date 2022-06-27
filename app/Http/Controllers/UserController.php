@@ -47,14 +47,14 @@ class UserController extends Controller
       if ($request->password != $request->re_password) {
         return Redirect::to('/register')->with('error', 'Mật khẩu không trùng khớp!');
       } else {
-        $type =  DB::table('user_types')->where('name', 'normal')->first();
+        $type =  DB::table('page_types')->orderBy('mission_need', 'asc')->first();
         $user = new User();
         $user->username = $request->username;
         $user->password = bcrypt($request->password);
         $user->is_admin = 0;
         $user->status = 1;
         $user->wallet = 0;
-        $user->user_type_id = $type->id;
+        $user->page_type_id = $type->id;
         $user->commission = 0;
         $user->save();
         return Redirect::to('/login')->with('message', 'Đăng ký thành công!');

@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $type =  DB::table('user_types')->where('name', 'normal')->first();
+        $type =  DB::table('page_types')->first();
         $data = [
             [
                 'id' => Str::uuid(),
@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
                 'status' => 1,
                 'is_admin' => 1,
                 'wallet' => 0,
-                'user_type_id' => $type->id,
+                'page_type_id' => $type->id,
             ],
             [
                 'id' => Str::uuid(),
@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
                 'status' => 1,
                 'is_admin' => 0,
                 'wallet' => 99999999,
-                'user_type_id' => $type->id,
+                'page_type_id' => $type->id,
             ]
         ];
 

@@ -21,8 +21,10 @@ class CreateUsersTable extends Migration
             $table->float('wallet', 12, 3)->nullable();
             $table->bigInteger('commission')->nullable();
             $table->tinyInteger('status')->default(1);
+            $table->integer('mission_count')->default(0);
             $table->tinyInteger('is_admin')->default(0);
-            $table->foreignUuid('user_type_id')->constrained();
+            // $table->foreignUuid('user_type_id')->constrained();
+            $table->uuid('page_type_id')->nullable();
             $table->timestamps();
         });
     }

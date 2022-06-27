@@ -13,11 +13,11 @@ class CreateUserTypeTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_types', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('name');
-            $table->integer('max_traffic');
-        });
+        // Schema::create('user_types', function (Blueprint $table) {
+        //     $table->uuid('id')->primary();
+        //     $table->string('name');
+        //     $table->integer('max_traffic');
+        // });
     }
 
     /**
@@ -27,8 +27,8 @@ class CreateUserTypeTable extends Migration
      */
     public function down()
     {
-        Schema::table('user_types', function (Blueprint $table) {
-            Schema::dropIfExists('user_types');
-        });
+        // Schema::table('user_types', function (Blueprint $table) {
+        //     Schema::dropIfExists('user_types');
+        // });
     }
 }

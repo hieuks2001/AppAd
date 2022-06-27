@@ -28,7 +28,7 @@
                     <tr>
                         <td>{{ $value->id }}</td>
                         <td>{{ $value->name }}</td>
-                        <td>{{ $value->max_traffic }}</td>
+                        <td>{{ $value->mission_need }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -54,7 +54,7 @@
                     <tr>
                         <td>{{ $value->id }}</td>
                         <td>{{ $value->username }}</td>
-                        <td>{{ $value->userType->name }}</td>
+                        <td>{{ $value->pageType->name }}</td>
                         <td>
                             <label for="modal-edit" class="btn btn-square btn-outline btn-sm"
                                 onclick="onClickUser('{{ $value->id }}')">
@@ -142,7 +142,7 @@
         userTypeEle.addEventListener("change", function(e) {
             const userType = e.target.value;
             const userTypeObj = user_types.find(user => user.id == userType);
-            maxTrafficEle.value = userTypeObj.max_traffic;
+            maxTrafficEle.value = userTypeObj.mission_need;
         });
     </script>
 @endsection

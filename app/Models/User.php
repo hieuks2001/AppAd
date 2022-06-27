@@ -12,7 +12,7 @@ class User extends Authenticatable
     use Notifiable, Uuids;
 
     protected $fillable = [
-        'password', 'username', 'wallet', 'commission', 'is_admin', 'status'
+        'password', 'username', 'wallet', 'commission', 'is_admin', 'status', 'mission_count'
     ];
 
         /**
@@ -33,8 +33,8 @@ class User extends Authenticatable
 
     public $timestamps = true;
 
-    public function userType(){
-        return $this->belongsTo('App\Models\UserType');
+    public function pageType(){
+        return $this->belongsTo('App\Models\PageType');
     }
     
 }

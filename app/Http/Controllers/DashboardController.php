@@ -149,7 +149,7 @@ class DashboardController extends Controller
 
   public function managementUsers()
   {
-    $userTypes = DB::table('user_types')->get();
+    $userTypes = DB::table('page_types')->get();
     $users = User::where('status', 1)->get();
 
     return view('admin.users', compact(['userTypes', 'users']));
