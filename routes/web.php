@@ -39,8 +39,12 @@ Route::get('/cancel-mission', 'UserController@cancelmission');
 Route::post('/add-page', 'UserController@addpage');
 
 // usdt
-Route::get('/deposit', 'UserController@deposit');
-Route::get('/withdraw', 'UserController@withdraw');
+Route::group(['middleware' => ['checkLogin']], function () {
+  Route::get('/deposit', 'UserController@depositView');
+  Route::post('/deposit', 'UserController@deposit');
+  Route::get('/withdraw', 'UserController@withdrawView');
+  Route::post('/withdraw', 'UserController@withdraw');
+});
 
 // Missions
 Route::group(['middleware' => ['checkLogin']], function () {
@@ -49,6 +53,8 @@ Route::group(['middleware' => ['checkLogin']], function () {
   Route::get('/tu-khoa', 'MissionController@getMission');
   Route::get('/cancel-mission', 'MissionController@cancelmission');
 });
+Route::post('/info-site', 'MissionController@getInfoOfSite');
+Route::post('/generate-code', 'MissionController@generateCode');
 
 // Pages
 Route::group(['middleware' => ['checkLogin']], function () {
