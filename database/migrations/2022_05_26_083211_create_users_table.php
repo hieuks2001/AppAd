@@ -25,6 +25,7 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('is_admin')->default(0);
             // $table->foreignUuid('user_type_id')->constrained();
             $table->uuid('page_type_id')->nullable();
+            $table->boolean('is_updated_page_type')->default(false);
             $table->timestamps();
         });
     }

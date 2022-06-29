@@ -177,9 +177,10 @@ class DashboardController extends Controller
 
     $user = User::where('id', $id)->first();
     if ($user) {
-      $type = UserType::where('id', $userTypeID)->first();
+      $type = PageType::where('id', $userTypeID)->get('id')->first();
       if ($type) {
-        $user->user_type_id = $type->id;
+        $user->page_type_id = $type->id;
+        $user->is_updated_page_type = true;
         $user->save();
       }
     }
