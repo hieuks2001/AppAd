@@ -94,9 +94,14 @@ class UserController extends Controller
       ["user_agent", $request->userAgent()],
       ["status", 0]
     ]);
-    $msCode = $ms->get("code")->first()->code;
-    if ($msCode == $request->key) {
+    $msGet = $ms->get(["code", "reward"])->first();
+    if (!empty($msGet->code) and $msGet->code == $request->key) {
       $ms->update(["status" => 1]);
+      $u = User::where('id', $user->id)->first();
+      $u->update([
+        'wallet' => $u->wallet + $msGet->reward,
+        'mission_count' => $u->mission_count + 1
+      ]);
       return Redirect::to('/tu-khoa');
     } else {
       return Redirect::to('/tu-khoa')->withErrors('Sai mã!');

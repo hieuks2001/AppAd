@@ -12,6 +12,7 @@ use App\Models\PageType;
 use App\Models\User;
 use App\Models\UserType;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -179,34 +180,35 @@ class MissionController extends Controller
   public function getInfoOfSite(Request $rq)
   {
     $pageId = $rq->pageId;
-    $uIP = $rq->ip();
-    $uAgent = $rq->userAgent();
-    $mission = Missions::join("pages", "pages.id", "=", "missions.page_id")
-      ->where([
-        ["ip", $uIP],
-        ["user_agent", $uAgent],
-        ["page_id", $pageId],
-        ["missions.status", 0]
-      ])
+    $mission = Page::where([
+      ["id", $pageId],
+      ["status", 1],
+    ])
       ->get("onsite")
       ->first();
+
+    //handle error here if $mission is null when this page has not approve
     return response()->json($mission);
   }
   public function generateCode(Request $rq)
   {
-    $pageId = $rq->pageId;
-    $uIP = $rq->ip();
-    $uAgent = $rq->userAgent();
-    //rule here
-    $mission = Missions::join("pages", "pages.id", "=", "missions.page_id")
-      ->where([
-        ["ip", $uIP],
-        ["user_agent", $uAgent],
-        ["page_id", $pageId],
-        ["missions.status", 0]
-      ]);
-    $uuid = Uuid::uuid4()->toString();
-    $mission->update(["missions.code" => $uuid]);
-    return response()->json($uuid);
+    try {
+      $pageId = $rq->pageId;
+      $uIP = $rq->ip();
+      $uAgent = $rq->userAgent();
+      //rule here
+      $mission = Missions::join("pages", "pages.id", "=", "missions.page_id")
+        ->where([
+          ["ip", $uIP],
+          ["user_agent", $uAgent],
+          ["page_id", $pageId],
+          ["missions.status", 0]
+        ]);
+      $uuid = Uuid::uuid4()->toString();
+      $mission->update(["missions.code" => $uuid]);
+      return response()->json($uuid);
+    } catch (Exception $err) {
+      return response()->json(["error" => $err->getMessage()], 500);
+    }
   }
 }
