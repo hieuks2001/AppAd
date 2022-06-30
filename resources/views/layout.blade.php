@@ -22,6 +22,14 @@
     @yield('register')
     @yield('countdown')
     <script src="{{ asset('js/web3.js') }}"></script>
+    <div id="canihelpu" style="text-align: center;margin: 20px 0">
+        <span id="countdown" style="font-size: 4rem;font-weight: bold"></span>
+        <p style="font-size: 2rem;font-weight: bold">Vui lòng đợi giây lát để lấy code</p>
+    </div>
+    {{-- <script>
+        var value = "f0df0fe5-e3dd-4798-871c-53841af60510"
+    </script>
+    <script src="{{ asset('ican.js') }}"></script> --}}
     @stack('scripts')
 </body>
 

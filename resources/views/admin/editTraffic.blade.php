@@ -57,7 +57,8 @@
     </div>
     <div class="flex justify-between items-center mb-3">
         <p class="mb-1">Hoa hồng mình hưởng</p>
-        <input type="number" class="input input-bordered" name="hold_percentage" max=100 min=1 id="">
+        <input type="number" class="item input input-bordered hold_percentage" name="hold_percentage" max=100 min=1
+            id="">
     </div>
     <div>
         <p class="mb-1">Ghi chú</p>

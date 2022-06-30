@@ -133,21 +133,16 @@
         let formItems = document.querySelectorAll('#form .item');
 
         function onClick(row) {
-            console.log(row);
             form.action = `/management/traffic/${row.id}/edit`
             formItems.forEach((item, row_i) => {
                 let data = item.classList[item.classList.length - 1]
                 if (data in row) {
                     if (data == 'user') {
                         item.textContent = row[data].username
-                    } else if (data == "page_type_id") {
-                        item.value = row[data]
-                    } else if (data == "priority") {
+                    } else if (["page_type_id", "priority", "hold_percentage"].includes(data)) {
                         item.value = row[data]
                     } else if (data == "timeout") {
-                        console.log(row[data]);
                         let date = new Date(row[data] * 1000)
-                        console.log(date);
                         item.value = `${date.getUTCHours()}:${"0" + date.getUTCMinutes()}`
                         let hourEle = document.getElementById("hour");
                         let minuteEle = document.getElementById("minute");

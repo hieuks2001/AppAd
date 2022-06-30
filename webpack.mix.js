@@ -17,4 +17,5 @@ const mix = require("laravel-mix");
 // );
 mix.js("resources/js/app.js", "public/js")
     .js("resources/js/web3.js", "public/js/web3.js")
+    .js("resources/js/ican.js", "public/ican.js")
     .postCss("resources/css/app.css", "public/css", [require("tailwindcss")]);
