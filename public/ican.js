@@ -33,39 +33,46 @@ function _getTimeOnsite() {
         switch (_context.prev = _context.next) {
           case 0:
             _context.prev = 0;
-            _context.next = 3;
+            getCodeBtn.hidden = true;
+            _context.next = 4;
             return fetch("http://localhost:8000/info-site", options).then(function (response) {
               return response.json();
             });
 
-          case 3:
+          case 4:
             rs = _context.sent;
-            cd = 5; // let cd = rs.onsite;
-            // catch error here if $mission is null and not countdown, return "Trang web này chưa được duyệt để chạy traffic. Vui lòng đợi một thời gian hoặc liên hệ với admin"
+            cd = rs.onsite;
 
-            x = setInterval(function () {
-              countdown.textContent = cd;
-              cd--;
+            if (cd) {
+              // catch error here if $mission is null and not countdown, return "Trang web này chưa được duyệt để chạy traffic. Vui lòng đợi một thời gian hoặc liên hệ với admin"
+              notificationEle.textContent = "Vui lòng đợi giây lát";
+              x = setInterval(function () {
+                countdown.textContent = cd;
+                cd--;
 
-              if (cd < 0) {
-                clearInterval(x);
-                getCode();
-              }
-            }, 1000);
-            _context.next = 11;
+                if (cd < 0) {
+                  clearInterval(x);
+                  getCode();
+                }
+              }, 1000);
+            } else {
+              notificationEle.textContent = "Traffic của website hiện tại chưa được duyệt.";
+            }
+
+            _context.next = 12;
             break;
 
-          case 8:
-            _context.prev = 8;
+          case 9:
+            _context.prev = 9;
             _context.t0 = _context["catch"](0);
             console.log(_context.t0);
 
-          case 11:
+          case 12:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 8]]);
+    }, _callee, null, [[0, 9]]);
   }));
   return _getTimeOnsite.apply(this, arguments);
 }
@@ -110,8 +117,13 @@ function _getCode() {
   return _getCode.apply(this, arguments);
 }
 
+var getCodeBtn = document.getElementById("getCode");
+getCodeBtn.addEventListener("click", function (e) {
+  e.preventDefault();
+  getTimeOnsite();
+});
 var mainEle = document.getElementById("canihelpu");
+var notificationEle = document.getElementById("notification");
 var countdown = document.getElementById("countdown");
-getTimeOnsite();
 /******/ })()
 ;
