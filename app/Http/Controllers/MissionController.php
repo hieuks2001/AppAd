@@ -10,7 +10,6 @@ use App\Models\Missions;
 use App\Models\Page;
 use App\Models\PageType;
 use App\Models\User;
-use App\Models\UserType;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -75,7 +74,7 @@ class MissionController extends Controller
       return view('mission.mission', ['mission' => $mission, 'page' => $page]);
     }
 
-    // NO MISSION CURRENTLY DOING 
+    // NO MISSION CURRENTLY DOING
 
     $pageQuery = Page::query();
     // Get all id of page_type have mission_need <= current user page_type
@@ -202,7 +201,7 @@ class MissionController extends Controller
           ["ip", $uIP],
           ["user_agent", $uAgent],
           ["page_id", $pageId],
-          ["missions.status", 0]
+          ["missions.status", MissionStatusConstants::DOING]
         ]);
       $uuid = Uuid::uuid4()->toString();
       $mission->update(["missions.code" => $uuid]);

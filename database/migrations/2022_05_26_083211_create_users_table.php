@@ -18,7 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('username');
             $table->string('password');
             $table->string('phone_number')->nullable();
-            $table->float('wallet', 12, 3)->nullable();
+            $table->decimal('wallet', 19, 4)->nullable();
             $table->bigInteger('commission')->nullable();
             $table->tinyInteger('status')->default(1);
             $table->integer('mission_count')->default(0);

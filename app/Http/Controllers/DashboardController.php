@@ -172,15 +172,21 @@ class DashboardController extends Controller
 
   public function postChangeUserType(Request $request, $id)
   {
-    // Edit user user_type 
+    // Edit user user_type
     $userTypeID = $request['user_type'];
 
     $user = User::where('id', $id)->first();
     if ($user) {
-      $type = PageType::where('id', $userTypeID)->get('id')->first();
+      $type = PageType::where('id', $userTypeID)
+        ->get(['id', 'mission_need'])
+        ->first();
       if ($type) {
+        if ($type->id == $user->page_type_id){
+          return redirect()->to('/management/users');
+        }
         $user->page_type_id = $type->id;
         $user->is_updated_page_type = true;
+        $user->mission_count = $type->mission_need;
         $user->save();
       }
     }

@@ -101,7 +101,11 @@
           <tr>
             <td>{{ $mission->id }}</td>
             <td>{{ $mission->created_at }}</td>
-            <td>{{ $mission->updated_at }}</td>
+            @if($mission->status == 1)
+              <td>{{ $mission->updated_at }}</td>
+            @else
+              <td></td>
+            @endif
             <td>{{ $mission->reward }}</td>
             @switch($mission->status)
               @case (0)

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\TransactionTypeConstants;
+use App\Models\LogTransaction;
 use App\Models\Missions;
 use App\Models\User;
 use App\Models\Page;
@@ -96,12 +98,22 @@ class UserController extends Controller
     ]);
     $msGet = $ms->get(["code", "reward"])->first();
     if (!empty($msGet->code) and $msGet->code == $request->key) {
-      $ms->update(["status" => 1]);
-      $u = User::where('id', $user->id)->first();
-      $u->update([
-        'wallet' => $u->wallet + $msGet->reward,
-        'mission_count' => $u->mission_count + 1
-      ]);
+      DB::transaction(function () use ($ms, $user, $msGet){
+        $ms->update(["status" => 1]);
+        $u = User::where('id', $user->id)->first();
+        $u->update([
+          'wallet' => $u->wallet + $msGet->reward,
+          'mission_count' => $u->mission_count + 1
+        ]);
+        // Create log
+        $log = new LogTransaction([
+          'amount' => $msGet->reward,
+          'user_id' => $u->id,
+          'type' => TransactionTypeConstants::REWARD,
+        ]);
+        $log->save();
+      });
+
       return Redirect::to('/tu-khoa');
     } else {
       return Redirect::to('/tu-khoa')->withErrors('Sai mã!');
