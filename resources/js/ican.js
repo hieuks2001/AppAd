@@ -23,7 +23,11 @@ async function getCode() {
       (response) => response.json()
     );
     code.textContent = rs;
+    code.title = "Click để copy code";
     mainEle.appendChild(code);
+    code.addEventListener("click", () => {
+      navigator.clipboard.writeText(rs);
+    });
   } catch (error) {
     console.log(error);
   }
