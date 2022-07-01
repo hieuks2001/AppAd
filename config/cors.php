@@ -2,7 +2,7 @@
 
 return [
 
-    /*
+  /*
     |--------------------------------------------------------------------------
     | Cross-Origin Resource Sharing (CORS) Configuration
     |--------------------------------------------------------------------------
@@ -15,20 +15,20 @@ return [
     |
     */
 
-    'paths' => ['api/*'],
+  'paths' => ['api/*', "/info-site", "/generate-code"],
 
-    'allowed_methods' => ['*'],
+  'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+  'allowed_origins' => ['*'],
 
-    'allowed_origins_patterns' => [],
+  'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+  'allowed_headers' => ['*'],
 
-    'exposed_headers' => false,
+  'exposed_headers' => false,
 
-    'max_age' => false,
+  'max_age' => false,
 
-    'supports_credentials' => false,
+  'supports_credentials' => false,
 
 ];
