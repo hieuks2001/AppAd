@@ -43,13 +43,24 @@ class MissionController extends Controller
     return $type;
   }
 
+  public function IsBlockedUser(User $user)
+  {
+    if ($user->status == 0){
+      return true;
+    } else {
+      return  false;
+    }
+  }
+
   public function getMission()
   {
     $user = Auth::user();
+    if ($this->IsBlockedUser($user)){
+        return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
+    }
     $mission = Mission::where('user_id', $user->id)
       ->where('status', MissionStatusConstants::DOING)
       ->orderBy('created_at', 'desc')->first();
-
     if ($mission) {
       $page = Page::where('id', $mission->page_id)
         ->where('status', PageStatusConstants::APPROVED)->first();
@@ -64,7 +75,9 @@ class MissionController extends Controller
     // Update UserType
     $pageType = $this->UpdateUserType();
     $user = Auth::user();
-
+    if ($this->IsBlockedUser($user)){
+      return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
+    }
     $mission = Mission::where('user_id', $user->id)
       ->where('status', MissionStatusConstants::DOING)
       ->orderBy('created_at', 'desc')->first();
