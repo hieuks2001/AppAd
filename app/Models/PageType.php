@@ -10,7 +10,7 @@ class PageType extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'name', 'onsite'
+        'name', 'onsite', 'mission_need'
     ];
 
     // Cast onsite into array

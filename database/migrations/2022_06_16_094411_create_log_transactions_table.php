@@ -15,7 +15,7 @@ class CreateLogTransactionsTable extends Migration
     {
         Schema::create('log_transactions', function (Blueprint $table) {
             $table->uuid('user_id');
-            $table->float('amount', 9, 4);
+            $table->float('amount', 10, 6);
             $table->string('type');
             $table->timestamps();
         });

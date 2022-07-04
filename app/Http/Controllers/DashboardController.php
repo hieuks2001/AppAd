@@ -11,6 +11,7 @@ use App\Models\Page;
 use App\Models\PageType;
 use App\Models\User;
 use App\Models\UserType;
+use Brick\Math\Exception\NumberFormatException;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -94,6 +95,14 @@ class DashboardController extends Controller
         }
       }
 
+      if ($request['hold_percentage']){
+        $hold = $request['hold_percentage'];
+        if ($hold <= 0  || $hold > 100) {
+          throw new NumberFormatException('hold_percentage not in correct format (1 - 100)');
+        }
+        $page->hold_percentage = $hold;
+      }
+
       $page->priority = $request['priority'];
 
       $page->note = $request['note'];
@@ -140,7 +149,7 @@ class DashboardController extends Controller
 
   public function managementUsers()
   {
-    $userTypes = DB::table('user_types')->get();
+    $userTypes = DB::table('page_types')->get();
     $users = User::where('status', 1)->get();
 
     return view('admin.users', compact(['userTypes', 'users']));
@@ -163,14 +172,21 @@ class DashboardController extends Controller
 
   public function postChangeUserType(Request $request, $id)
   {
-    // Edit user user_type 
+    // Edit user user_type
     $userTypeID = $request['user_type'];
 
     $user = User::where('id', $id)->first();
     if ($user) {
-      $type = UserType::where('id', $userTypeID)->first();
+      $type = PageType::where('id', $userTypeID)
+        ->get(['id', 'mission_need'])
+        ->first();
       if ($type) {
-        $user->user_type_id = $type->id;
+        if ($type->id == $user->page_type_id){
+          return redirect()->to('/management/users');
+        }
+        $user->page_type_id = $type->id;
+        $user->is_updated_page_type = true;
+        $user->mission_count = $type->mission_need;
         $user->save();
       }
     }

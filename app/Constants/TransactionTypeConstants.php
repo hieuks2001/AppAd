@@ -7,4 +7,5 @@ final class TransactionTypeConstants {
     public const DEPOSIT = 'deposit';
     public const PAY = 'pay';
     public const REFUND = 'refund';
+    public const REWARD = 'reward';
 }

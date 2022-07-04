@@ -13,14 +13,17 @@
     "autoprefixer": "^10.4.7",
     "axios": "^0.27.2",
     "cross-env": "^7.0",
+    "javascript-obfuscator": "^4.0.0",
     "laravel-mix": "^6.0.49",
+    "laravel-mix-obfuscator": "^1.0.0",
     "lodash": "^4.17.13",
     "postcss": "^8.4.14",
     "resolve-url-loader": "^3.1.0",
     "sass": "^1.15.2",
     "sass-loader": "^8.0.0",
     "tailwindcss": "^3.1.1",
-    "vue-template-compiler": "^2.6.14"
+    "vue-template-compiler": "^2.6.14",
+    "webpack-obfuscator": "^3.5.1"
   },
   "dependencies": {
     "daisyui": "^2.15.3"

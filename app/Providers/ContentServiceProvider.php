@@ -43,7 +43,7 @@ class ContentServiceProvider extends ServiceProvider
       $view->with('onsite', $onsite);
     });
     view()->composer('admin.users', function ($view) {
-      $types = DB::table('user_types')->get();
+      $types = DB::table('page_types')->get();
       $view->with('user_types', $types);
     });
     view()->composer('mission.mission', function ($view) {

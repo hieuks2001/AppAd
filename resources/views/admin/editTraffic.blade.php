@@ -55,6 +55,11 @@
                 min="0" max="59">
         </div>
     </div>
+    <div class="flex justify-between items-center mb-3">
+        <p class="mb-1">Hoa hồng mình hưởng</p>
+        <input type="number" class="item input input-bordered hold_percentage" name="hold_percentage" max=100 min=1
+            id="">
+    </div>
     <div>
         <p class="mb-1">Ghi chú</p>
         <textarea name="note" class="w-full textarea textarea-bordered" placeholder="Ghi chú ở đây"></textarea>

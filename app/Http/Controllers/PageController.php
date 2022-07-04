@@ -23,7 +23,7 @@ class PageController extends Controller
   {
     // Pending Traffic order
     $pages = Page::where('status', PageStatusConstants::PENDING)
-                  ->where('user_id', Auth::user()->id)->limit(5)->get();
+      ->where('user_id', Auth::user()->id)->limit(5)->get();
     return view('regispage.tab1')->with('pages', $pages);
   }
 
@@ -57,40 +57,40 @@ class PageController extends Controller
         // $log->save();
         $page->save();
       });
+      return redirect()->back()->with(['message' => 'Thêm thành công!', "pageId" => $page->id]);
     } catch (\Throwable $th) {
       // *TODO: Add transaction here: Rollback usdt
       return redirect()->back()->with('error', 'Thêm thất bại!');
     }
-    return redirect()->back()->with('message', 'Thêm thành công!');
   }
   public function regispageTab1()
   {
     // Pending Traffic order
     $pages = Page::where('status', PageStatusConstants::PENDING)
-              ->where('user_id', Auth::user()->id)->limit(5)->get();
+      ->where('user_id', Auth::user()->id)->limit(5)->get();
     return view('regispage.tab1')->with('pages', $pages);
   }
   public function regispageTab2()
   {
     // Running Traffic order (Approved page)
     $pages = Page::where('status', PageStatusConstants::APPROVED)
-              ->where('user_id', Auth::user()->id)
-              ->where('traffic_remain', '>', 0)->limit(5)->get();
+      ->where('user_id', Auth::user()->id)
+      ->where('traffic_remain', '>', 0)->limit(5)->get();
     return view('regispage.tab2')->with('pages', $pages);
   }
   public function regispageTab3()
   {
     // Completed Traffic order (Approved page)
     $pages = Page::where('status', PageStatusConstants::APPROVED)
-                  ->where('user_id', Auth::user()->id)
-                  ->where('traffic_remain', 0)->limit(5)->get();
+      ->where('user_id', Auth::user()->id)
+      ->where('traffic_remain', 0)->limit(5)->get();
     return view('regispage.tab3')->with('pages', $pages);
   }
   public function regispageTab4()
   {
     // Canceled Traffic order (Error)
     $pages = Page::where('status', PageStatusConstants::CANCEL)
-                  ->where('user_id', Auth::user()->id)->limit(5)->get();
+      ->where('user_id', Auth::user()->id)->limit(5)->get();
     return view('regispage.tab4')->with('pages', $pages);
   }
 }
