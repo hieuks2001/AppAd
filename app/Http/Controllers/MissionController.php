@@ -22,10 +22,7 @@ class MissionController extends Controller
 {
   public function test(Request $request)
   {
-    $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $randomkey = substr(str_shuffle($permitted_chars), 0, 10);
-    $mission = Mission::where('ms_status', 'already')->where('ms_name', $request->name)->update(['ms_code' => $randomkey]);
-    return Redirect::to('/test');
+    dd($request->headers->get('origin'));
   }
 
   // Helper function
@@ -45,7 +42,7 @@ class MissionController extends Controller
 
   public function IsBlockedUser(User $user)
   {
-    if ($user->status == 0){
+    if ($user->status == 0) {
       return true;
     } else {
       return  false;
@@ -55,8 +52,8 @@ class MissionController extends Controller
   public function getMission()
   {
     $user = Auth::user();
-    if ($this->IsBlockedUser($user)){
-        return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
+    if ($this->IsBlockedUser($user)) {
+      return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
     }
     $mission = Mission::where('user_id', $user->id)
       ->where('status', MissionStatusConstants::DOING)
@@ -75,7 +72,7 @@ class MissionController extends Controller
     // Update UserType
     $pageType = $this->UpdateUserType();
     $user = Auth::user();
-    if ($this->IsBlockedUser($user)){
+    if ($this->IsBlockedUser($user)) {
       return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
     }
     $mission = Mission::where('user_id', $user->id)
@@ -192,15 +189,20 @@ class MissionController extends Controller
   public function getInfoOfSite(Request $rq)
   {
     $pageId = $rq->pageId;
-    $mission = Page::where([
+    $uIP = $rq->ip();
+    $uAgent = $rq->userAgent();
+    $page = Page::where([
       ["id", $pageId],
-      ["status", 1],
-    ])
-      ->get("onsite")
-      ->first();
-
+      ["status", 1]
+    ])->get("onsite")->first();
+    $mission = Mission::where([
+      ["ip", $uIP],
+      ["user_agent", $uAgent],
+      ["page_id", $pageId],
+      ["missions.status", MissionStatusConstants::DOING]
+    ])->update(['updated_at' => Carbon::now()]);
     //handle error here if $mission is null when this page has not approve
-    return response()->json($mission);
+    return response()->json($page);
   }
   public function generateCode(Request $rq)
   {
@@ -208,17 +210,25 @@ class MissionController extends Controller
       $pageId = $rq->pageId;
       $uIP = $rq->ip();
       $uAgent = $rq->userAgent();
+      $time = $mission = Mission::where([
+        ["ip", $uIP],
+        ["user_agent", $uAgent],
+        ["page_id", $pageId],
+        ["missions.status", MissionStatusConstants::DOING]
+      ])->get('updated_at')->first();
       //rule here
+      $timeDiff = Carbon::now()->diffInSeconds($time->updated_at);
       $mission = Missions::join("pages", "pages.id", "=", "missions.page_id")
         ->where([
           ["ip", $uIP],
           ["user_agent", $uAgent],
           ["page_id", $pageId],
-          ["missions.status", MissionStatusConstants::DOING]
-        ]);
+          ["missions.status", MissionStatusConstants::DOING],
+        ])
+        ->where("pages.onsite", "<=", $timeDiff);
       $uuid = Uuid::uuid4()->toString();
       $mission->update(["missions.code" => $uuid]);
-      return response()->json($uuid);
+      return response()->json($timeDiff);
     } catch (Exception $err) {
       return response()->json(["error" => $err->getMessage()], 500);
     }
