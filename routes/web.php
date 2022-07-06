@@ -53,8 +53,10 @@ Route::group(['middleware' => ['checkLogin']], function () {
   Route::get('/tu-khoa', 'MissionController@getMission');
   Route::get('/cancel-mission', 'MissionController@cancelmission');
 });
-Route::post('/info-site', 'MissionController@getInfoOfSite');
-Route::post('/generate-code', 'MissionController@generateCode');
+Route::group(['middleware' => ['checkDomain']], function () {
+  Route::post('/info-site', 'MissionController@getInfoOfSite');
+  Route::post('/generate-code', 'MissionController@generateCode');
+});
 
 // Pages
 Route::group(['middleware' => ['checkLogin']], function () {
@@ -82,7 +84,6 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::post('management/usertypes', 'DashboardController@postCreateUserType');
 });
 
-Route::post('/test1', 'MissionController@test');
 Route::get('/test', function () {
   $mission = DB::table('missions')->where('ms_status', 'already')->first();
   return view('test.countdown', ['mission' => $mission]);

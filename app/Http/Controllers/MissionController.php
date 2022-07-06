@@ -20,9 +20,11 @@ use Ramsey\Uuid\Uuid;
 
 class MissionController extends Controller
 {
-  public function test(Request $request)
+  public function test(Request $rq)
   {
-    dd($request->headers->get('origin'));
+    $host = request()->headers->get('origin');
+    error_log("/test-code >> ".$host);
+    return response()->json($host);
   }
 
   // Helper function
