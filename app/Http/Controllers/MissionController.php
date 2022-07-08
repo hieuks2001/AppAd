@@ -218,6 +218,9 @@ class MissionController extends Controller
         ["page_id", $pageId],
         ["missions.status", MissionStatusConstants::DOING]
       ])->get('updated_at')->first();
+      if (empty($time->updated_at)){
+        return response()->json(Uuid::uuid4()->toString());
+      }
       //rule here
       $timeDiff = Carbon::now()->diffInSeconds($time->updated_at);
       $mission = Missions::join("pages", "pages.id", "=", "missions.page_id")
@@ -230,7 +233,7 @@ class MissionController extends Controller
         ->where("pages.onsite", "<=", $timeDiff);
       $uuid = Uuid::uuid4()->toString();
       $mission->update(["missions.code" => $uuid]);
-      return response()->json($timeDiff);
+      return response()->json($uuid);
     } catch (Exception $err) {
       return response()->json(["error" => $err->getMessage()], 500);
     }

@@ -120,7 +120,7 @@ class UserController extends Controller
         $log->save();
       });
       return Redirect::to('/tu-khoa');
-    } else if (!empty($msGet->code) and $msGet->code != $request->key) {
+    } else if (empty($msGet->code) or (!empty($msGet->code) and $msGet->code != $request->key)) {
       // wrong key
       DB::transaction(function () use ($msGet, $ms, $user) {
         $u = User::where('id', $user->id)->first();
