@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\MissionStatusConstants;
 use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
 use App\Models\Missions;
@@ -90,20 +91,25 @@ class UserController extends Controller
   public function pastekey(Request $request)
   {
     $user = Auth::user();
+    if ($user->status == 0) {
+      // check if user is blocked
+      return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
+    }
     //rule here
     $ms = Missions::where('user_id', $user->id)->where([
       ["ip", $request->ip()],
       ["user_agent", $request->userAgent()],
       ["status", 0]
     ]);
-    $msGet = $ms->get(["code", "reward"])->first();
+    $msGet = ($ms)->get(["code", "reward", "page_id"])->first();
     if (!empty($msGet->code) and $msGet->code == $request->key) {
-      DB::transaction(function () use ($ms, $user, $msGet){
+      DB::transaction(function () use ($ms, $user, $msGet) {
         $ms->update(["status" => 1]);
         $u = User::where('id', $user->id)->first();
         $u->update([
           'wallet' => $u->wallet + $msGet->reward,
-          'mission_count' => $u->mission_count + 1
+          'mission_count' => $u->mission_count + 1,
+          'mission_attempts' => 0
         ]);
         // Create log
         $log = new LogTransaction([
@@ -113,11 +119,28 @@ class UserController extends Controller
         ]);
         $log->save();
       });
-
       return Redirect::to('/tu-khoa');
-    } else {
+    } else if (empty($msGet->code) or (!empty($msGet->code) and $msGet->code != $request->key)) {
+      // wrong key
+      DB::transaction(function () use ($msGet, $ms, $user) {
+        $u = User::where('id', $user->id)->first();
+        if ($u->mission_attempts < 2) {
+          $u->mission_attempts += 1;
+        }
+        if ($u->mission_attempts == 2) {
+          $u->status = 0;
+          $ms->update(['status' => MissionStatusConstants::CANCEL]);
+          $page = Page::where('id', $msGet->page_id)->first();
+          if ($page->traffic_remain < $page->traffic_sum) {
+            $page->traffic_remain += 1;
+            $page->save();
+          }
+        }
+        $u->save();
+      });
       return Redirect::to('/tu-khoa')->withErrors('Sai mã!');
     }
+    return Redirect::to('/tu-khoa')->withErrors('Sai mã!');
   }
 
   public function tukhoa()
