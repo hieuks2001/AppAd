@@ -9,32 +9,37 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use Notifiable, Uuids;
+  use Notifiable, Uuids;
 
-    protected $fillable = [
-        'password', 'username', 'wallet', 'commission', 'is_admin', 'status', 'mission_count', 'mission_attempts'
-    ];
+  protected $fillable = [
+    'password', 'username', 'wallet', 'commission', 'is_admin', 'status', 'mission_count', 'mission_attempts', 'user_type_id'
+  ];
 
-        /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-    ];
+  /**
+   * The attributes that should be hidden for arrays.
+   *
+   * @var array
+   */
+  protected $hidden = [
+    'password',
+  ];
 
-    protected $primaryKey = 'id';
-    protected $table = 'users';
+  // Cast onsite into array
+  protected $casts = [
+    'mission_count' => 'array'
+  ];
+
+  protected $primaryKey = 'id';
+  protected $table = 'users';
 
 
-    // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
-    public $incrementing = false;
+  // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
+  public $incrementing = false;
 
-    public $timestamps = true;
+  public $timestamps = true;
 
-    public function pageType(){
-        return $this->belongsTo('App\Models\PageType');
-    }
-
+  public function userType()
+  {
+    return $this->belongsTo('App\Models\UserType');
+  }
 }

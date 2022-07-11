@@ -7,6 +7,7 @@ use App\Constants\OntimeTypeConstants;
 use App\Constants\PagePriorityConstants;
 use App\Models\Mission;
 use App\Models\PageType;
+use App\Models\UserType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -43,7 +44,7 @@ class ContentServiceProvider extends ServiceProvider
       $view->with('onsite', $onsite);
     });
     view()->composer('admin.users', function ($view) {
-      $types = DB::table('page_types')->get();
+      $types = UserType::all()->sortBy('name');
       $view->with('user_types', $types);
     });
     view()->composer('mission.mission', function ($view) {

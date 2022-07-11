@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $type =  DB::table('page_types')->orderBy('mission_need', 'asc')->first();
+        $type =  DB::table('user_types')->where('is_default', 1)->first();
         $data = [
             [
                 'id' => Str::uuid(),
@@ -23,7 +23,8 @@ class UserSeeder extends Seeder
                 'status' => 1,
                 'is_admin' => 1,
                 'wallet' => 0,
-                'page_type_id' => $type->id,
+                'user_type_id' => $type->id,
+                'mission_count' => json_encode(array()),
             ],
             [
                 'id' => Str::uuid(),
@@ -33,7 +34,8 @@ class UserSeeder extends Seeder
                 'status' => 1,
                 'is_admin' => 0,
                 'wallet' => 99999999,
-                'page_type_id' => $type->id,
+                'user_type_id' => $type->id,
+                'mission_count' => json_encode(array()),
             ]
         ];
 

@@ -13,11 +13,14 @@ class CreateUserTypeTable extends Migration
      */
     public function up()
     {
-        // Schema::create('user_types', function (Blueprint $table) {
-        //     $table->uuid('id')->primary();
-        //     $table->string('name');
-        //     $table->integer('max_traffic');
-        // });
+        Schema::create('user_types', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('name');
+            $table->json('mission_need');
+            $table->json('page_weight'); # percentages to get page mission
+            $table->tinyInteger('is_default')->default(0); # is default for new user
+            $table->timestamps();
+        });
     }
 
     /**

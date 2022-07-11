@@ -38,14 +38,13 @@
         <tr>
           <th>ID</th>
           <th>Tên</th>
-          <th>Số traffic tối đa / ngày</th>
+          <!-- <th>Số traffic tối đa / ngày</th> -->
         </tr>
       <tbody>
         @foreach ($userTypes as $key => $value)
           <tr>
             <td>{{ $value->id }}</td>
             <td>{{ $value->name }}</td>
-            <td>{{ $value->mission_need }}</td>
           </tr>
         @endforeach
       </tbody>
@@ -78,7 +77,7 @@
           <tr>
             <td>{{ $value->id }}</td>
             <td>{{ $value->username }}</td>
-            <td>{{ $value->pageType->name }}</td>
+            <td>{{ $value->userType->name }}</td>
             <td>
               <label
                 for="modal-edit"
