@@ -8,6 +8,8 @@ use App\Models\LogTransaction;
 use App\Models\Missions;
 use App\Models\User;
 use App\Models\Page;
+use App\Models\PageType;
+use App\Models\UserType;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,14 +52,14 @@ class UserController extends Controller
       if ($request->password != $request->re_password) {
         return Redirect::to('/register')->with('error', 'Mật khẩu không trùng khớp!');
       } else {
-        $type =  DB::table('page_types')->orderBy('mission_need', 'asc')->first();
+        $type =  UserType::where('is_default', 1)->get('id')->first();
         $user = new User();
         $user->username = $request->username;
         $user->password = bcrypt($request->password);
         $user->is_admin = 0;
         $user->status = 1;
         $user->wallet = 0;
-        $user->page_type_id = $type->id;
+        $user->user_type_id = $type->id;
         $user->commission = 0;
         $user->save();
         return Redirect::to('/login')->with('message', 'Đăng ký thành công!');
@@ -106,9 +108,18 @@ class UserController extends Controller
       DB::transaction(function () use ($ms, $user, $msGet) {
         $ms->update(["status" => 1]);
         $u = User::where('id', $user->id)->first();
+        $uMsCount = $u->mission_count;
+        $pageTypeId = Page::where('id', $msGet->page_id)->get('page_type_id')->first();
+        // Update mission count base on Type of page buy traffic.
+        if (!array_key_exists($pageTypeId->page_type_id, $uMsCount)){
+          $uMsCount[$pageTypeId->page_type_id] = 1;
+        } else {
+          $uMsCount[$pageTypeId->page_type_id] += 1;
+        }
         $u->update([
           'wallet' => $u->wallet + $msGet->reward,
-          'mission_count' => $u->mission_count + 1,
+          // 'mission_count' => $u->mission_count + 1,
+          'mission_count' => $uMsCount,
           'mission_attempts' => 0
         ]);
         // Create log

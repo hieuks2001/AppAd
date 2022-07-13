@@ -31,15 +31,29 @@ class MissionController extends Controller
   public function UpdateUserType()
   {
     $user = Auth::user();
-    $type = PageType::whereBetween('mission_need', [$user->mission_count, PageType::max('mission_need')])
-      ->orderBy('mission_need', 'asc')->first();
-    if (!$type) {
-      $type = PageType::orderBy('mission_need', 'desc')->limit(1)->first();
+    // $type = PageType::whereBetween('mission_need', [$user->mission_count, PageType::max('mission_need')])
+    //   ->orderBy('mission_need', 'asc')->first();
+    $types = PageType::orderBy('name', 'asc')->pluck('id');
+    $uType = $user->userType;
+    $uMission = $user->mission_count;
+    $condition = $uType->mission_need;
+    $pageWeight = $uType->page_weight;
+    $result = array();
+    foreach ($types as $key => $typeId) {
+      if (array_key_exists($typeId, $uMission)) {
+        $result[$typeId] = $pageWeight[$typeId];
+        if ($uMission[$typeId] < $condition[$typeId]) {
+          return $result;
+        }
+      }
     }
-    if ($type->id != $user->page_type_id) {
-      User::where('id', $user->id)->update(['page_type_id' => $type->id]);
+    if (empty($result)) {
+      // No page type found => pick page Loai '1'
+      $result[$types[0]] = $uType->page_weight[$types[0]];
+      return $result;
     }
-    return $type;
+    // Meet all mission requirements => return all page weight
+    return $pageWeight;
   }
 
   public function IsBlockedUser(User $user)
@@ -51,7 +65,7 @@ class MissionController extends Controller
     }
   }
 
-   /**
+  /**
    * getRandomWeightedElement()
    * Utility function for getting random values with weighting.
    * Pass in an associative array, such as array('A'=>5, 'B'=>45, 'C'=>50)
@@ -111,52 +125,63 @@ class MissionController extends Controller
     }
 
     // NO MISSION CURRENTLY DOING
-
-    $pageQuery = Page::query();
-    // Get all id of page_type have mission_need <= current user page_type
-    $pageTypeIdArr = PageType::where('mission_need', '<=', $pageType->mission_need)->pluck('id');
-    // Add conditions
-    $pageQuery->where('traffic_remain', '>', 0)
-      ->where('status', PageStatusConstants::APPROVED)
-      ->whereIn('page_type_id', $pageTypeIdArr);
-
-    // Query pages by Priority (HIGH -> MEDIUM -> LOW)
-    $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::HIGH)->get();
-    if ($pages->isEmpty()) { // If no HIGH priority page found
-      $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::MEDIUM)->get();
-    }
-    if ($pages->isEmpty()) { // If no MEDIUM priority page found
-      $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::LOW)->get();
-    }
-    if ($pages->isEmpty()) { // If there is no pages available
-      return view('mission.mission', [])->withErrors('Không còn nhiệm vụ, vui lòng quay lại sau!');
-    }
-
-    // If there are pages available
-    // pick random page from pages
-    $pages = $pages->shuffle();
-    $now = Carbon::now();
     $pickedPage = null;
 
-    foreach ($pages as $page) {
-      $mission = Mission::where('page_id', $page->id)
-        ->where('status', MissionStatusConstants::COMPLETED)
-        ->where('ip', $request->ip())
-        ->whereDate('updated_at',  Carbon::today())
-        ->orderBy('updated_at', 'desc')->first();
+    while (count($pageType) > 0 and !$pickedPage) {
+      // Get random page type id base on weights
+      $pageTypeId = $this->GetRandomWeightedElement($pageType);
+      $pageQuery = Page::query();
+      // Get all id of page_type have mission_need <= current user page_type
+      // $pageTypeIdArr = PageType::where('mission_need', '<=', $pageType->mission_need)->pluck('id');
+      // Add conditions
+      $pageQuery->where('traffic_remain', '>', 0)
+        ->where('status', PageStatusConstants::APPROVED)
+        // ->whereIn('page_type_id', $pageTypeIdArr);
+        ->where('page_type_id', $pageTypeId);
 
-      if (!$mission) {
-        // There is no mission that user doing
-        $pickedPage = $page;
-        break;
+      // Query pages by Priority (HIGH -> MEDIUM -> LOW)
+      $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::HIGH)->get();
+      if ($pages->isEmpty()) { // If no HIGH priority page found
+        $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::MEDIUM)->get();
+      }
+      if ($pages->isEmpty()) { // If no MEDIUM priority page found
+        $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::LOW)->get();
+      }
+      if ($pages->isEmpty()) { // If there is no pages available
+        // return view('mission.mission', [])->withErrors('Không còn nhiệm vụ, vui lòng quay lại sau!');
+        unset($pageType[$pageTypeId]); // remove this page type id
+        continue;
       }
 
-      // Find difference from last done mission of this page from user
-      $lastMissionTime = new Carbon($mission->updated_at);
-      $time = Carbon::parse($now->diff($lastMissionTime)->format('%H:%I:%S'));
-      if ($time->gte(Carbon::createFromTimestamp($page->timeout))) {
-        $pickedPage = $page;
-        break;
+      // If there are pages available
+      // pick random page from pages
+      $pages = $pages->shuffle();
+      $now = Carbon::now();
+
+      foreach ($pages as $page) {
+        $mission = Mission::where('page_id', $page->id)
+          ->where('status', MissionStatusConstants::COMPLETED)
+          ->where('ip', $request->ip())
+          ->whereDate('updated_at',  Carbon::today())
+          ->orderBy('updated_at', 'desc')->first();
+
+        if (!$mission) {
+          // There is no mission that user doing
+          $pickedPage = $page;
+          break 2;
+        }
+
+        // Find difference from last done mission of this page from user
+        $lastMissionTime = new Carbon($mission->updated_at);
+        $time = Carbon::parse($now->diff($lastMissionTime)->format('%H:%I:%S'));
+        if ($time->gte(Carbon::createFromTimestamp($page->timeout))) {
+          $pickedPage = $page;
+          break 2;
+        }
+      }
+
+      if (!$pickedPage){
+        unset($pageType[$pageTypeId]);
       }
     }
 
@@ -164,7 +189,6 @@ class MissionController extends Controller
       // No page available -> comback later
       return view('mission.mission', [])->withErrors('Không còn nhiệm vụ, vui lòng quay lại sau!');
     }
-
     // Begin database transaction
     DB::transaction(function () use ($pickedPage, $user, $request) {
       // Refresh data
