@@ -32,15 +32,29 @@ class MissionController extends Controller
   public function UpdateUserType()
   {
     $user = Auth::user();
-    $type = PageType::whereBetween('mission_need', [$user->mission_count, PageType::max('mission_need')])
-      ->orderBy('mission_need', 'asc')->first();
-    if (!$type) {
-      $type = PageType::orderBy('mission_need', 'desc')->limit(1)->first();
+    // $type = PageType::whereBetween('mission_need', [$user->mission_count, PageType::max('mission_need')])
+    //   ->orderBy('mission_need', 'asc')->first();
+    $types = PageType::orderBy('name', 'asc')->pluck('id');
+    $uType = $user->userType;
+    $uMission = $user->mission_count;
+    $condition = $uType->mission_need;
+    $pageWeight = $uType->page_weight;
+    $result = array();
+    foreach ($types as $key => $typeId) {
+      if (array_key_exists($typeId, $uMission)) {
+        $result[$typeId] = $pageWeight[$typeId];
+        if ($uMission[$typeId] < $condition[$typeId]) {
+          return $result;
+        }
+      }
     }
-    if ($type->id != $user->page_type_id) {
-      User::where('id', $user->id)->update(['page_type_id' => $type->id]);
+    if (empty($result)) {
+      // No page type found => pick page Loai '1'
+      $result[$types[0]] = $uType->page_weight[$types[0]];
+      return $result;
     }
-    return $type;
+    // Meet all mission requirements => return all page weight
+    return $pageWeight;
   }
 
   public function IsBlockedUser(User $user)
@@ -49,6 +63,30 @@ class MissionController extends Controller
       return true;
     } else {
       return  false;
+    }
+  }
+
+  /**
+   * getRandomWeightedElement()
+   * Utility function for getting random values with weighting.
+   * Pass in an associative array, such as array('A'=>5, 'B'=>45, 'C'=>50)
+   * An array like this means that "A" has a 5% chance of being selected, "B" 45%, and "C" 50%.
+   * The return value is the array key, A, B, or C in this case.  Note that the values assigned
+   * do not have to be percentages.  The values are simply relative to each other.  If one value
+   * weight was 2, and the other weight of 1, the value with the weight of 2 has about a 66%
+   * chance of being selected.  Also note that weights should be integers.
+   *
+   * @param array $weightedValues
+   */
+  public function GetRandomWeightedElement(array $weightedValues)
+  {
+    $rand = mt_rand(1, (int) array_sum($weightedValues));
+
+    foreach ($weightedValues as $key => $value) {
+      $rand -= $value;
+      if ($rand <= 0) {
+        return $key;
+      }
     }
   }
 
@@ -219,7 +257,9 @@ class MissionController extends Controller
         ["id", $pageId],
         ["status", 1],
       ])->get(["onsite", "url"])->first();
-
+      if (empty($page)) {
+        return response()->json(["error" => "Traffic của site chưa sẵn sàng"]);
+      }
       if (!str_contains($page->url, $host)) {
         return response()->json(["error" => "Lỗi, nhúng không đúng site"]);
       }

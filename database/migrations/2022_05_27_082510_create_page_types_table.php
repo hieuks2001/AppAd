@@ -17,7 +17,6 @@ class CreatePageTypesTable extends Migration
             $table->uuid('id')->primary()->unique();
             $table->string('name');
             $table->json('onsite');
-            $table->integer('mission_need');
             $table->timestamps();
         });
     }

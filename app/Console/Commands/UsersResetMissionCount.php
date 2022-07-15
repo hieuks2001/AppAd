@@ -38,10 +38,8 @@ class UsersResetMissionCount extends Command
      */
     public function handle()
     {
-        User::where('mission_count', '>', 0)
-            ->where('is_updated_page_type', false)
-            ->chunkById(200, function ($users) {
-                $users->each->update(['mission_count'=>0]);
+        User::chunkById(200, function ($users) {
+                $users->each->update(['mission_count'=>array()]);
             }, $column='id');
     }
 }

@@ -22,12 +22,10 @@ class CreateUsersTable extends Migration
       $table->bigInteger('commission')->nullable();
       $table->tinyInteger('status')->default(1);
       // $table->integer('mission_count')->default(0);
-      $table->json('mission_count')->default([]);
+      $table->json('mission_count')->nullable();
       $table->tinyInteger('mission_attempts')->default(0);
       $table->tinyInteger('is_admin')->default(0);
-      // $table->foreignUuid('user_type_id')->constrained();
-      $table->uuid('page_type_id')->nullable();
-      $table->boolean('is_updated_page_type')->default(false);
+      $table->foreignUuid('user_type_id')->constrained();
       $table->timestamps();
     });
   }

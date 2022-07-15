@@ -12,6 +12,7 @@ async function getCode() {
     const rs = await fetch("http://localhost:8000/generate-code", options).then(
       (response) => response.json()
     );
+    console.log(rs);
     if ("code" in rs || "onsite" in rs) {
       return rs;
     } else if ("error" in rs) {
@@ -35,6 +36,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   } else {
     getCodeBtn.addEventListener("click", (e) => {
       e.preventDefault();
+      getCodeBtn.disabled = true;
       run(result.onsite);
     });
   }
