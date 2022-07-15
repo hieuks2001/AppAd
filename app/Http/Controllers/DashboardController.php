@@ -95,7 +95,7 @@ class DashboardController extends Controller
         }
       }
 
-      if ($request['hold_percentage']){
+      if ($request['hold_percentage']) {
         $hold = $request['hold_percentage'];
         if ($hold <= 0  || $hold > 100) {
           throw new NumberFormatException('hold_percentage not in correct format (1 - 100)');
@@ -181,7 +181,7 @@ class DashboardController extends Controller
         ->get(['id', 'mission_need'])
         ->first();
       if ($type) {
-        if ($type->id == $user->page_type_id){
+        if ($type->id == $user->page_type_id) {
           return redirect()->to('/management/users');
         }
         $user->page_type_id = $type->id;
@@ -189,6 +189,16 @@ class DashboardController extends Controller
         $user->mission_count = $type->mission_need;
         $user->save();
       }
+    }
+    return redirect()->to('/management/users');
+  }
+
+  public function postUnblockUser(Request $request, $id)
+  {
+    $user = User::where('id', $id)->first();
+    if ($user and $user->status == 0) {
+      $user->status = 1;
+      $user->save();
     }
     return redirect()->to('/management/users');
   }

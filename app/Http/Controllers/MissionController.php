@@ -21,12 +21,11 @@ use Ramsey\Uuid\Uuid;
 
 class MissionController extends Controller
 {
-  public function test(Request $request)
+  public function test(Request $rq)
   {
-    $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $randomkey = substr(str_shuffle($permitted_chars), 0, 10);
-    $mission = Mission::where('ms_status', 'already')->where('ms_name', $request->name)->update(['ms_code' => $randomkey]);
-    return Redirect::to('/test');
+    $host = request()->headers->get('origin');
+    error_log("/test-code >> " . $host);
+    return response()->json($host);
   }
 
   // Helper function
@@ -44,13 +43,24 @@ class MissionController extends Controller
     return $type;
   }
 
+  public function IsBlockedUser(User $user)
+  {
+    if ($user->status == 0) {
+      return true;
+    } else {
+      return  false;
+    }
+  }
+
   public function getMission()
   {
     $user = Auth::user();
+    if ($this->IsBlockedUser($user)) {
+      return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
+    }
     $mission = Mission::where('user_id', $user->id)
       ->where('status', MissionStatusConstants::DOING)
       ->orderBy('created_at', 'desc')->first();
-
     if ($mission) {
       $page = Page::where('id', $mission->page_id)
         ->where('status', PageStatusConstants::APPROVED)->first();

@@ -83,7 +83,6 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::post('management/usertypes', 'DashboardController@postCreateUserType');
 });
 
-Route::post('/test1', 'MissionController@test');
 Route::get('/test', function () {
   $mission = DB::table('missions')->where('ms_status', 'already')->first();
   return view('test.countdown', ['mission' => $mission]);

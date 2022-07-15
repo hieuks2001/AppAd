@@ -12,7 +12,7 @@ class User extends Authenticatable
     use Notifiable, Uuids;
 
     protected $fillable = [
-        'password', 'username', 'wallet', 'commission', 'is_admin', 'status', 'mission_count'
+        'password', 'username', 'wallet', 'commission', 'is_admin', 'status', 'mission_count', 'mission_attempts'
     ];
 
         /**
@@ -27,7 +27,7 @@ class User extends Authenticatable
     protected $primaryKey = 'id';
     protected $table = 'users';
 
-    
+
     // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
     public $incrementing = false;
 
@@ -36,5 +36,5 @@ class User extends Authenticatable
     public function pageType(){
         return $this->belongsTo('App\Models\PageType');
     }
-    
+
 }
