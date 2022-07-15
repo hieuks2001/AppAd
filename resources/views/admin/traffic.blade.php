@@ -81,8 +81,7 @@
               <label
                 for="modal-approve--traffic"
                 class="btn btn-info btn-block btn-sm"
-                onclick="
-                            onClick({{ $value }})"
+                onclick="onClick({{ $value }})"
               >Sửa</label>
               @if (!empty($value->image))
                 <form
@@ -119,7 +118,7 @@
         for="modal-approve--traffic"
         class="btn btn-sm btn-circle absolute right-2 top-2"
       >✕</label>
-      @include('admin.editTraffic', $notApprovedPages)
+      @include('admin.editTraffic')
     </div>
   </div>
   <input
@@ -163,6 +162,7 @@
     let formItems = document.querySelectorAll('#form .item');
 
     function onClick(row) {
+      output.src = "";
       form.action = `/management/traffic/${row.id}/edit`
       formItems.forEach((item, row_i) => {
         let data = item.classList[item.classList.length - 1]
@@ -174,11 +174,13 @@
             item.value = row[data]
           } else if (data == "timeout") {
             let date = new Date(row[data] * 1000)
-            item.value = `${date.getUTCHours()}:${"0" + date.getUTCMinutes()}`
+            item.value = `${date.getHours()}:${ date.getMinutes()}`
+            console.log(
+              `${date.getHours()}:${ date.getMinutes()}`);
             let hourEle = document.getElementById("hour");
             let minuteEle = document.getElementById("minute");
-            hourEle.value = date.getUTCHours()
-            minuteEle.value = "0" + date.getUTCMinutes()
+            hourEle.value = date.getHours()
+            minuteEle.value = date.getMinutes()
           } else {
             item.textContent = row[data]
           }

@@ -134,17 +134,17 @@
           <div class="flex">
             <select
               name="user_type"
-              class="item select select-bordered user_type mb-3 w-full flex-1"
+              class="item select select-bordered  mb-3 w-full flex-1 user_type"
             >
               @foreach ($user_types as $item)
                 <option value="{{ $item->id }}">{{ $item->name }}</option>
               @endforeach
             </select>
-            <input
+            {{-- <input
               type="text"
               class="input input-bordered max_traffic ml-3 w-14 read-only:bg-slate-200"
               readonly
-            />
+            /> --}}
             <input
               name="user_id"
               type="hidden"
@@ -217,6 +217,9 @@
             const userTypeObj = user_types.find(type => type.id == user[key]
               .id);
             maxTrafficEle.value = userTypeObj.max_traffic;
+          } else if (["user_type"].includes(key)) {
+            item.value = user[key];
+
           } else {
             item.textContent = user[key];
           }

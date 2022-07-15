@@ -15,6 +15,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Ramsey\Uuid\Uuid;
 
@@ -64,7 +65,9 @@ class MissionController extends Controller
     // Update UserType
     $pageType = $this->UpdateUserType();
     $user = Auth::user();
-
+    if ($this->IsBlockedUser($user)) {
+      return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
+    }
     $mission = Mission::where('user_id', $user->id)
       ->where('status', MissionStatusConstants::DOING)
       ->orderBy('created_at', 'desc')->first();
@@ -75,52 +78,63 @@ class MissionController extends Controller
     }
 
     // NO MISSION CURRENTLY DOING
-
-    $pageQuery = Page::query();
-    // Get all id of page_type have mission_need <= current user page_type
-    $pageTypeIdArr = PageType::where('mission_need', '<=', $pageType->mission_need)->pluck('id');
-    // Add conditions
-    $pageQuery->where('traffic_remain', '>', 0)
-      ->where('status', PageStatusConstants::APPROVED)
-      ->whereIn('page_type_id', $pageTypeIdArr);
-
-    // Query pages by Priority (HIGH -> MEDIUM -> LOW)
-    $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::HIGH)->get();
-    if ($pages->isEmpty()) { // If no HIGH priority page found
-      $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::MEDIUM)->get();
-    }
-    if ($pages->isEmpty()) { // If no MEDIUM priority page found
-      $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::LOW)->get();
-    }
-    if ($pages->isEmpty()) { // If there is no pages available
-      return view('mission.mission', [])->withErrors('Không còn nhiệm vụ, vui lòng quay lại sau!');
-    }
-
-    // If there are pages available
-    // pick random page from pages
-    $pages = $pages->shuffle();
-    $now = Carbon::now();
     $pickedPage = null;
 
-    foreach ($pages as $page) {
-      $mission = Mission::where('page_id', $page->id)
-        ->where('status', MissionStatusConstants::COMPLETED)
-        ->where('ip', $request->ip())
-        ->whereDate('updated_at',  Carbon::today())
-        ->orderBy('updated_at', 'desc')->first();
+    while (count($pageType) > 0 and !$pickedPage) {
+      // Get random page type id base on weights
+      $pageTypeId = $this->GetRandomWeightedElement($pageType);
+      $pageQuery = Page::query();
+      // Get all id of page_type have mission_need <= current user page_type
+      // $pageTypeIdArr = PageType::where('mission_need', '<=', $pageType->mission_need)->pluck('id');
+      // Add conditions
+      $pageQuery->where('traffic_remain', '>', 0)
+        ->where('status', PageStatusConstants::APPROVED)
+        // ->whereIn('page_type_id', $pageTypeIdArr);
+        ->where('page_type_id', $pageTypeId);
 
-      if (!$mission) {
-        // There is no mission that user doing
-        $pickedPage = $page;
-        break;
+      // Query pages by Priority (HIGH -> MEDIUM -> LOW)
+      $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::HIGH)->get();
+      if ($pages->isEmpty()) { // If no HIGH priority page found
+        $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::MEDIUM)->get();
+      }
+      if ($pages->isEmpty()) { // If no MEDIUM priority page found
+        $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::LOW)->get();
+      }
+      if ($pages->isEmpty()) { // If there is no pages available
+        // return view('mission.mission', [])->withErrors('Không còn nhiệm vụ, vui lòng quay lại sau!');
+        unset($pageType[$pageTypeId]); // remove this page type id
+        continue;
       }
 
-      // Find difference from last done mission of this page from user
-      $lastMissionTime = new Carbon($mission->updated_at);
-      $time = Carbon::parse($now->diff($lastMissionTime)->format('%H:%I:%S'));
-      if ($time->gte(Carbon::createFromTimestamp($page->timeout))) {
-        $pickedPage = $page;
-        break;
+      // If there are pages available
+      // pick random page from pages
+      $pages = $pages->shuffle();
+      $now = Carbon::now();
+
+      foreach ($pages as $page) {
+        $mission = Mission::where('page_id', $page->id)
+          ->where('status', MissionStatusConstants::COMPLETED)
+          ->where('ip', $request->ip())
+          ->whereDate('updated_at',  Carbon::today())
+          ->orderBy('updated_at', 'desc')->first();
+
+        if (!$mission) {
+          // There is no mission that user doing
+          $pickedPage = $page;
+          break 2;
+        }
+
+        // Find difference from last done mission of this page from user
+        $lastMissionTime = new Carbon($mission->updated_at);
+        $time = Carbon::parse($now->diff($lastMissionTime)->format('%H:%I:%S'));
+        if ($time->gte(Carbon::createFromTimestamp($page->timeout))) {
+          $pickedPage = $page;
+          break 2;
+        }
+      }
+
+      if (!$pickedPage) {
+        unset($pageType[$pageTypeId]);
       }
     }
 
@@ -128,7 +142,6 @@ class MissionController extends Controller
       // No page available -> comback later
       return view('mission.mission', [])->withErrors('Không còn nhiệm vụ, vui lòng quay lại sau!');
     }
-
     // Begin database transaction
     DB::transaction(function () use ($pickedPage, $user, $request) {
       // Refresh data
@@ -150,6 +163,7 @@ class MissionController extends Controller
 
     return Redirect::to('/tu-khoa');
   }
+
 
   public function cancelMission()
   {
@@ -176,36 +190,66 @@ class MissionController extends Controller
     return Redirect::to('/tu-khoa');
   }
 
-  public function getInfoOfSite(Request $rq)
-  {
-    $pageId = $rq->pageId;
-    $mission = Page::where([
-      ["id", $pageId],
-      ["status", 1],
-    ])
-      ->get("onsite")
-      ->first();
-
-    //handle error here if $mission is null when this page has not approve
-    return response()->json($mission);
-  }
   public function generateCode(Request $rq)
   {
     try {
       $pageId = $rq->pageId;
+      $host = $rq->host;
+      $path = $rq->path;
       $uIP = $rq->ip();
       $uAgent = $rq->userAgent();
+      $mission = Mission::where([
+        ["ip", $uIP],
+        ["user_agent", $uAgent],
+        ["page_id", $pageId],
+        ["missions.status", MissionStatusConstants::DOING]
+      ]);
       //rule here
-      $mission = Missions::join("pages", "pages.id", "=", "missions.page_id")
-        ->where([
-          ["ip", $uIP],
-          ["user_agent", $uAgent],
-          ["page_id", $pageId],
-          ["missions.status", MissionStatusConstants::DOING]
-        ]);
-      $uuid = Uuid::uuid4()->toString();
-      $mission->update(["missions.code" => $uuid]);
-      return response()->json($uuid);
+      $page = Page::where([
+        ["id", $pageId],
+        ["status", 1],
+      ])->get(["onsite", "url"])->first();
+
+      if (!str_contains($page->url, $host)) {
+        return response()->json(["error" => "Lỗi, nhúng không đúng site"]);
+      }
+
+      //check this ip don't have mission
+      if ($mission->count() === 0) {
+        return response()->json(["error" => "Lỗi"]);
+      }
+
+      //first count down
+      $time = $mission->get('updated_at')->first();
+      if (empty($time->updated_at)) {
+        $mission->update(['updated_at' => Carbon::now()]);
+        return response()->json(["onsite" => $page->onsite]);
+      }
+
+      // f5 - or click anything link
+      $code = $mission->get('code')->first();
+      //check code is exist
+      if (empty($code->code)) {
+        //generateCode
+
+        //check rule
+        $timeDiff = Carbon::now()->diffInSeconds($time->updated_at);
+        if ($page->onsite <= $timeDiff) {
+          if ($path !== "/") {
+            $uuid = Uuid::uuid4()->toString();
+            $mission->update(["missions.code" => $uuid]);
+            return response()->json(["code" => $uuid]);
+          } else {
+            $mission->update(['updated_at' => Carbon::now()]);
+            return response()->json(["onsite" => $page->onsite]);
+          }
+        } else {
+          $mission->update(['updated_at' => Carbon::now()]);
+          return response()->json(["onsite" => $page->onsite]);
+        }
+      } else {
+        return response()->json($code);
+      }
     } catch (Exception $err) {
       return response()->json(["error" => $err->getMessage()], 500);
     }
