@@ -45,7 +45,8 @@ class ContentServiceProvider extends ServiceProvider
     });
     view()->composer('admin.users', function ($view) {
       $types = UserType::all()->sortBy('name');
-      $view->with('user_types', $types);
+      $pageTypes = PageType::all()->sortBy('name');
+      $view->with(['user_types' => $types, "page_types" => $pageTypes]);
     });
     view()->composer('mission.mission', function ($view) {
       $missions = Mission::where('user_id', Auth::user()->id)

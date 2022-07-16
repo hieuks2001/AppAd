@@ -157,7 +157,7 @@ class DashboardController extends Controller
 
   public function postCreateUserType(Request $request)
   {
-
+    dd(json_decode($request->mission_need, true));
     $validated = $request->validate([
       'name' => 'required|max:255',
       'max_traffic' => 'required|numeric|gt:0'
