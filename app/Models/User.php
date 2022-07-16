@@ -29,6 +29,15 @@ class User extends Authenticatable
     'mission_count' => 'array'
   ];
 
+  /**
+   * The model's default values for attributes.
+   *
+   * @var array
+   */
+  protected $attributes = [
+    'mission_count' => '[]',
+  ];
+
   protected $primaryKey = 'id';
   protected $table = 'users';
 
