@@ -41,7 +41,7 @@
           <!-- <th>Số traffic tối đa / ngày</th> -->
         </tr>
       <tbody>
-        @foreach ($userTypes as $key => $value)
+        @foreach ($user_types as $key => $value)
           <tr>
             <td>{{ $value->id }}</td>
             <td>{{ $value->name }}</td>
@@ -60,7 +60,7 @@
       >
     </div>
     <br >
-    <table 
+    <table
       class="table w-full"
       id="table-users">
       <!-- head -->
