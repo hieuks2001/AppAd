@@ -1,6 +1,7 @@
 {
     "/js/app.js": "/js/app.js",
     "/js/web3.js": "/js/web3.js",
+    "/js/h2c.js": "/js/h2c.js",
     "/ican.js": "/ican.js",
     "/css/app.css": "/css/app.css"
 }

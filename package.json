@@ -26,6 +26,7 @@
     "webpack-obfuscator": "^3.5.1"
   },
   "dependencies": {
-    "daisyui": "^2.15.3"
+    "daisyui": "^2.15.3",
+    "html2canvas": "^1.4.1"
   }
 }

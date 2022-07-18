@@ -53,9 +53,9 @@ Route::group(['middleware' => ['checkLogin']], function () {
   Route::get('/tu-khoa', 'MissionController@getMission');
   Route::get('/cancel-mission', 'MissionController@cancelmission');
 });
-Route::group(['middleware' => ['checkDomain']], function () {
-  Route::post('/generate-code', 'MissionController@generateCode');
-});
+Route::post('/generate-code', 'MissionController@generateCode');
+// Route::group(['middleware' => ['checkDomain']], function () {
+// });
 
 // Pages
 Route::group(['middleware' => ['checkLogin']], function () {
