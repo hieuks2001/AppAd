@@ -1,6 +1,6 @@
 @extends('layout')
 @section('login')
-    <div class="container px-5 md:px-0 md:w-1/3 mx-auto h-full grid place-items-center ">
+    <div class="container px-5 md:px-0 md:w-1/3 mx-auto h-screen grid place-items-center ">
         <div class="flex flex-col items-center">
             <h2 class="text-4xl mb-10">
                 Log-in to your account
