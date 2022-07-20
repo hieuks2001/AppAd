@@ -8,7 +8,7 @@
           type="text"
           placeholder="Search..."
           class="input input-ghost mr-3 w-full max-w-xs"
-        />
+        >
         <label
           for="modal-create"
           class="btn modal-button btn-accent gap-2"
@@ -31,21 +31,20 @@
         </label>
       </div>
     </div>
-    <br />
+    <br >
     <table class="table w-full">
       <!-- head -->
       <thead>
         <tr>
           <th>ID</th>
           <th>Tên</th>
-          <th>Số traffic tối đa / ngày</th>
+          <!-- <th>Số traffic tối đa / ngày</th> -->
         </tr>
       <tbody>
-        @foreach ($userTypes as $key => $value)
+        @foreach ($user_types as $key => $value)
           <tr>
             <td>{{ $value->id }}</td>
             <td>{{ $value->name }}</td>
-            <td>{{ $value->mission_need }}</td>
           </tr>
         @endforeach
       </tbody>
@@ -58,13 +57,12 @@
         type="text"
         placeholder="Search..."
         class="input input-ghost w-full max-w-xs"
-      />
+      >
     </div>
-    <br />
+    <br >
     <table
       class="table w-full"
-      id="table-users"
-    >
+      id="table-users">
       <!-- head -->
       <thead>
         <tr>
@@ -73,12 +71,13 @@
           <th>Loại</th>
           <th></th>
         </tr>
+      </thead>
       <tbody>
         @foreach ($users as $key => $value)
           <tr>
             <td>{{ $value->id }}</td>
             <td>{{ $value->username }}</td>
-            <td>{{ $value->pageType->name }}</td>
+            <td>{{ $value->userType->name }}</td>
             <td>
               <label
                 for="modal-edit"
@@ -110,7 +109,7 @@
     type="checkbox"
     id="modal-edit"
     class="modal-toggle"
-  />
+  >
   <div class="modal modal-bottom sm:modal-middle">
     <div class="modal-box relative">
       <label
@@ -125,7 +124,7 @@
         @csrf
         <p class="label-text font-bold">
           Tên người dùng:
-          <span class="item username font-normal"></span>
+          <span class="item font-normal username"></span>
         </p>
         <div class="form-control max-w-full">
           <label class="label">
@@ -134,17 +133,17 @@
           <div class="flex">
             <select
               name="user_type"
-              class="item select select-bordered user_type mb-3 w-full flex-1"
+              class="item select select-bordered  mb-3 w-full flex-1 user_type"
             >
               @foreach ($user_types as $item)
                 <option value="{{ $item->id }}">{{ $item->name }}</option>
               @endforeach
             </select>
-            <input
+            {{-- <input
               type="text"
               class="input input-bordered max_traffic ml-3 w-14 read-only:bg-slate-200"
               readonly
-            />
+            /> --}}
             <input
               name="user_id"
               type="hidden"
@@ -163,7 +162,7 @@
     type="checkbox"
     id="modal-create"
     class="modal-toggle"
-  />
+  >
   <div class="modal modal-bottom sm:modal-middle">
     <div class="modal-box relative">
       <label
@@ -182,14 +181,43 @@
           type="text"
           name="name"
           placeholder="Tên loại người dùng"
-          class="input input-bordered mb-3 w-full"
-        />
-        <input
-          type="text"
-          name="max_traffic"
-          placeholder="Giới hạn nhiệm vụ trong ngày"
-          class="input input-bordered mb-3 w-full"
-        />
+          class="input input-bordered w-full"
+        >
+        <div class="form-control mb-3">
+          <label class="label">
+            <span class="label-text">Số lượng cần của mỗi loại trang</span>
+          </label>
+          @foreach ($page_types as $key => $item)
+            @if ($key !== count($page_types) - 2)
+              <label class="input-group">
+                <div class="flex items-center w-full pl-4 bg-slate-200">Số lượng cần để lên
+                  <span class="font-bold">
+                    loại {{$item->name + 1}}
+                  </span>
+                </div>
+                <input type="text" placeholder="10" data-mission_need="{{$item->id}}" oninput="handleChange(this)" class="mission_need input input-bordered w-14" >
+              </label>
+            @endif
+          @endforeach
+        </div>
+        <div class="form-control mb-3">
+          <label class="label">
+            <span class="label-text">Tỉ lệ random của từng site</span>
+            <span class="label-text">%</span>
+          </label>
+          @foreach ($page_types as $item)
+            <label class="input-group">
+              <div class="flex items-center w-full pl-4 bg-slate-200">Số lượng cần để lên
+                <span class="font-bold">
+                  loại {{$item->name}}
+                </span>
+              </div>
+              <input type="text" placeholder="10" data-page_weight="{{$item->id}}" oninput="handleChange(this)" class="page_weight input input-bordered w-14" >
+            </label>
+          @endforeach
+        </div>
+        <input type="text" name="mission_need" hidden>
+        <input type="text" name="page_weight" hidden>
         <button
           type="submit"
           class="btn btn-block"
@@ -216,7 +244,9 @@
             item.value = user[key].id;
             const userTypeObj = user_types.find(type => type.id == user[key]
               .id);
-            maxTrafficEle.value = userTypeObj.max_traffic;
+          } else if (["user_type"].includes(key)) {
+            item.value = user[key];
+
           } else {
             item.textContent = user[key];
           }
@@ -226,7 +256,20 @@
     userTypeEle.addEventListener("change", function(e) {
       const userType = e.target.value;
       const userTypeObj = user_types.find(user => user.id == userType);
-      maxTrafficEle.value = userTypeObj.mission_need;
     });
+    const mission_need = {};
+    const page_weight = {};
+    const eleMissionNeed = document.getElementsByName("mission_need")[0];
+    const elePageWeight = document.getElementsByName("page_weight")[0];
+    function handleChange(ele) {
+      if ("mission_need" in ele.dataset) {
+        mission_need[ele.dataset.mission_need] = ele.value;
+        eleMissionNeed.value = JSON.stringify(mission_need);
+      }
+      if ("page_weight" in ele.dataset) {
+        page_weight[ele.dataset.page_weight] = ele.value;
+        elePageWeight.value = JSON.stringify(page_weight);
+      }
+    }
   </script>
 @endsection

@@ -157,13 +157,36 @@ class DashboardController extends Controller
 
   public function postCreateUserType(Request $request)
   {
-
+    // dd(json_decode($request->mission_need, true));
+    // validate data
     $validated = $request->validate([
       'name' => 'required|max:255',
-      'max_traffic' => 'required|numeric|gt:0'
+      'mission_need' => 'required',
+      'page_weight' => 'required'
     ]);
+    $name = $validated['name'];
+    $missionNeed = json_decode($validated['mission_need'], true);
+    $pageWeight = json_decode($validated['page_weight'], true);
 
-    $userType = new UserType($validated);
+    foreach ($pageWeight as $key => $value) {
+      $pageType = PageType::where('id', $key)->get();
+      if (!$pageType->first()) {
+        return redirect()->to('/management/users')->with("error", "Page type not correct id");
+      }
+    }
+    foreach ($missionNeed as $key => $value) {
+      if ($value < 0){
+        return redirect()->to('/management/users')->with("error", "Mission need must greater than zero");
+      }
+      $pageType = PageType::where('id', $key)->get();
+      if (!$pageType->first()) {
+        return redirect()->to('/management/users')->with("error", "Page type not correct id");
+      }
+    }
+    $userType = new UserType();
+    $userType->name = $name;
+    $userType->mission_need = $missionNeed;
+    $userType->page_weight = $pageWeight;
 
     $userType->save();
 
@@ -177,16 +200,12 @@ class DashboardController extends Controller
 
     $user = User::where('id', $id)->first();
     if ($user) {
-      $type = PageType::where('id', $userTypeID)
-        ->get(['id', 'mission_need'])
+      $type = UserType::where('id', $userTypeID)
+        ->get('id')
         ->first();
       if ($type) {
-        if ($type->id == $user->page_type_id) {
-          return redirect()->to('/management/users');
-        }
-        $user->page_type_id = $type->id;
-        $user->is_updated_page_type = true;
-        $user->mission_count = $type->mission_need;
+        $user->user_type_id = $type->id;
+        // $user->mission_count = $type->mission_need;
         $user->save();
       }
     }

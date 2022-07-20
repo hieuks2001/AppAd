@@ -8,27 +8,30 @@
     <div
       class="container mx-auto select-none overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl md:w-2/3"
     >
-      <div class="text-slate-800">
-        <h2 class="mb-5 text-center text-2xl font-bold">Nhiệm vụ của bạn</h2>
-        <p class="mb-3">
-          <b>Bước 1:</b>Truy cập công cụ tìm kiếm: <b>>>Google.com</b>
-        <p class="mb-3">
-          <b>Bước 2:</b> Tìm kiếm từ khoá <b>>> <span
-              style="color: red;">{{ $page->keyword }}</span></b>
-        <p class="mb-3"><b>Bước 3:</b> Truy cập vào trang web như hướng dẫn:
-          <img
-            class="mx-auto my-3 w-full object-contain"
-            src="./images/{{ $page->image }}"
-            style="max-width: 450px"
-          />
-        <p class="mb-3"><b>Bước 3:</b> Lướt thật chậm từ trên xuống dưới giống
-          như đang đọc nội dung bài viết rồi
-          ấn vào nút <b>Nhận mã ngay</b> và đợi {{ $page->onsite }}s kết thúc
-        </p>
-        <p class="mb-3"><b>Bước 4:</b> Copy mã và nhập vào ô ở phía dưới và bấm
-          vào nút "<b>Hoàn thành nhiệm
-            vụ</b>" và nhận <b>{{ $mission->reward }}</b> USDT</p>
+      <div id="i">
+        <div class="text-slate-800 pb-5">
+          <h2 class="mb-5 text-center text-2xl font-bold">Nhiệm vụ của bạn</h2>
+          <p class="mb-3">
+            <b>Bước 1:</b>Truy cập công cụ tìm kiếm: <b>>>Google.com</b>
+          <p class="mb-3">
+            <b>Bước 2:</b> Tìm kiếm từ khoá <b>>> <span
+                style="color: red;">{{ $page->keyword }}</span></b>
+          <p class="mb-3"><b>Bước 3:</b> Truy cập vào trang web như hướng dẫn:
+            <img
+              class="mx-auto my-3 w-full object-contain"
+              src="./images/{{ $page->image }}"
+              style="max-width: 450px"
+            />
+          <p class="mb-3"><b>Bước 3:</b> Lướt thật chậm từ trên xuống dưới giống
+            như đang đọc nội dung bài viết rồi
+            ấn vào nút <b>Nhận mã ngay</b> và đợi {{ $page->onsite }}s kết thúc
+          </p>
+          <p><b>Bước 4:</b> Copy mã và nhập vào ô ở phía dưới và bấm
+            vào nút "<b>Hoàn thành nhiệm
+              vụ</b>" và nhận <b>{{ $mission->reward }}</b> USDT</p>
+        </div>
       </div>
+      <div id="o"></div>
       @if ($errors->all())
         <div class="alert alert-error my-3 shadow-lg">
           <div>
@@ -122,8 +125,10 @@
             @endswitch
           </tr>
         @endforeach
-
       </tbody>
     </table>
   </div>
 @endsection
+@push('scripts')
+  <script src="{{ asset('js/h2c.js') }}"></script>
+@endpush
