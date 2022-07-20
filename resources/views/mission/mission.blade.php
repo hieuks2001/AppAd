@@ -9,7 +9,7 @@
       class="container mx-auto select-none overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl md:w-2/3"
     >
       <div id="i">
-        <div class="text-slate-800 pb-5">
+        <div class="text-slate-800 py-3">
           <h2 class="mb-5 text-center text-2xl font-bold">Nhiệm vụ của bạn</h2>
           <p class="mb-3">
             <b>Bước 1:</b>Truy cập công cụ tìm kiếm: <b>>>Google.com</b>

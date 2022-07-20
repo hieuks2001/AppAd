@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  appad:
+    image: appad
+    build:
+      context: .
+      dockerfile: ./Dockerfile
