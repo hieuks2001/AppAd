@@ -5,7 +5,10 @@ namespace App\Providers;
 use App\Constants\MissionStatusConstants;
 use App\Constants\OntimeTypeConstants;
 use App\Constants\PagePriorityConstants;
+use App\Constants\PageStatusConstants;
+use App\Constants\TransactionTypeConstants;
 use App\Models\Mission;
+use App\Models\Page;
 use App\Models\PageType;
 use App\Models\UserType;
 use Illuminate\Support\Facades\Auth;
@@ -33,6 +36,38 @@ class ContentServiceProvider extends ServiceProvider
   public function boot()
   {
     //
+    view()->composer('dashboard.index', function ($view) {
+      $user = Auth::user();
+      $statistical = Mission::where(['user_id' => $user->id, 'status' => MissionStatusConstants::COMPLETED])
+      ->groupBy('date')
+      ->orderBy('date', 'DESC')
+      ->limit(7)
+      ->get(array(
+          DB::raw('Date(created_at) as date'), DB::raw('sum(reward) as mission_reward')
+        )
+      );
+      $view->with('statistical', $statistical);
+    });
+    view()->composer('box.patternBox1', function ($view) {
+      $user = Auth::user();
+      $money = [];
+      $money["income"] = DB::table("log_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::REWARD])->sum("amount");
+      $money["balance"] = $user->wallet;
+      $money["commission"] = 0;
+      $money["sum"] = $user->wallet + $money["balance"] + $money["commission"];
+      $view->with('money', $money);
+    });
+    view()->composer('box.patternBox2', function ($view) {
+      $user = Auth::user();
+      $trafficQuery = Page::where("user_id", $user->id);
+      $boughtPage = (clone $trafficQuery)->where("status", PageStatusConstants::APPROVED)->pluck("id");
+      $traffic = [];
+      $traffic["bought"] = count($boughtPage);
+      $traffic["sum"] = (clone $trafficQuery)->count();
+      $traffic["totalCharge"] = (clone $trafficQuery)->where("status", PageStatusConstants::APPROVED)->sum("price");
+      $traffic["remaining"] = $traffic["totalCharge"]  - Mission::whereIn("page_id", $boughtPage)->where("status", MissionStatusConstants::COMPLETED)->sum("reward");
+      $view->with('traffic', $traffic);
+    });
     view()->composer('regispage.index', function ($view) {
       $onsite = PageType::all();
       $view->with('onsite', $onsite);
