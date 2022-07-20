@@ -116,15 +116,20 @@ class UserController extends Controller
         } else {
           $uMsCount[$pageTypeId->page_type_id] += 1;
         }
+        // Calculating reward (Admin hold %)
+        $page = Page::where('id', $msGet->page_id)->get(["price", "hold_percentage", "traffic_sum"])->first();
+        $reward = $page->price / $page->traffic_sum;
+        $commission = $reward * $page->hold_percentage / 100;
+        $reward -= $commission;
         $u->update([
-          'wallet' => $u->wallet + $msGet->reward,
+          'wallet' => $u->wallet + $reward,
           // 'mission_count' => $u->mission_count + 1,
           'mission_count' => $uMsCount,
           'mission_attempts' => 0
         ]);
         // Create log
         $log = new LogTransaction([
-          'amount' => $msGet->reward,
+          'amount' => $reward,
           'user_id' => $u->id,
           'type' => TransactionTypeConstants::REWARD,
         ]);
