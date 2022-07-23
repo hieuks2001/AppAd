@@ -83,7 +83,7 @@ class UserController extends Controller
       if ($user->is_admin) {
         return Redirect::to('/management/traffic');
       }
-      return view("dashboard.index");
+      return Redirect::to('/regispage');
     } else {
       return Redirect::to('/login');
     }
@@ -111,7 +111,7 @@ class UserController extends Controller
         $uMsCount = $u->mission_count;
         $pageTypeId = Page::where('id', $msGet->page_id)->get('page_type_id')->first();
         // Update mission count base on Type of page buy traffic.
-        if (!array_key_exists($pageTypeId->page_type_id, $uMsCount)){
+        if (!array_key_exists($pageTypeId->page_type_id, $uMsCount)) {
           $uMsCount[$pageTypeId->page_type_id] = 1;
         } else {
           $uMsCount[$pageTypeId->page_type_id] += 1;
