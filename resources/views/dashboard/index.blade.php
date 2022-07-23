@@ -16,11 +16,13 @@
                     <th class="bg-slate-200">Số tiền nhiệm vụ</th>
                 </tr>
             <tbody>
+               @foreach($statistical as $key => $value)
                 <tr>
-                    <td class="bg-white">a</td>
+                    <td class="bg-white">{{$value->date}}</td>
                     <td class="bg-white">b</td>
-                    <td class="bg-white">c</td>
+                    <td class="bg-white">{{$value->mission_reward}}</td>
                 </tr>
+               @endforeach
             </tbody>
         </table>
     </div>
