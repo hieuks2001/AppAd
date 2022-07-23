@@ -26,32 +26,32 @@ Route::get('/logout', 'UserController@logout');
 
 // usdt
 Route::group(['middleware' => ['checkLogin']], function () {
-  Route::get('/deposit', 'UserController@depositView');
-  Route::post('/deposit', 'UserController@deposit');
+  // Route::get('/deposit', 'UserController@depositView');
+  // Route::post('/deposit', 'UserController@deposit');
   Route::get('/withdraw', 'UserController@withdrawView');
   Route::post('/withdraw', 'UserController@withdraw');
 });
 
-// // Missions
-// Route::group(['middleware' => ['checkLogin']], function () {
-//   Route::post('/paste-key', 'UserController@pastekey');
-//   Route::post('/tu-khoa', 'MissionController@postMission');
-//   Route::get('/tu-khoa', 'MissionController@getMission');
-//   Route::get('/cancel-mission', 'MissionController@cancelmission');
-// });
-// Route::post('/generate-code', 'MissionController@generateCode');
+// Missions
+Route::group(['middleware' => ['checkLogin']], function () {
+  Route::post('/paste-key', 'UserController@pastekey');
+  Route::post('/tu-khoa', 'MissionController@postMission');
+  Route::get('/tu-khoa', 'MissionController@getMission');
+  Route::get('/cancel-mission', 'MissionController@cancelmission');
+});
+Route::post('/generate-code', 'MissionController@generateCode');
 // Route::group(['middleware' => ['checkDomain']], function () {
 // });
 
-// Pages
-Route::group(['middleware' => ['checkLogin']], function () {
-  Route::get('/regispage', 'PageController@getTrafficOrder');
-  Route::post('/add-page', 'PageController@postTrafficOrder');
-  Route::get('/regispage/tab-1', 'PageController@regispageTab1');
-  Route::get('/regispage/tab-2', 'PageController@regispageTab2');
-  Route::get('/regispage/tab-3', 'PageController@regispageTab3');
-  Route::get('/regispage/tab-4', 'PageController@regispageTab4');
-});
+// // Pages
+// Route::group(['middleware' => ['checkLogin']], function () {
+//   Route::get('/regispage', 'PageController@getTrafficOrder');
+//   Route::post('/add-page', 'PageController@postTrafficOrder');
+//   Route::get('/regispage/tab-1', 'PageController@regispageTab1');
+//   Route::get('/regispage/tab-2', 'PageController@regispageTab2');
+//   Route::get('/regispage/tab-3', 'PageController@regispageTab3');
+//   Route::get('/regispage/tab-4', 'PageController@regispageTab4');
+// });
 
 // Admin dashboard
 Route::group(['middleware' => ['checkAdmin']], function () {
