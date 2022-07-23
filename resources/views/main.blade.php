@@ -46,8 +46,8 @@
             <label for="my-drawer-3" class="drawer-overlay"></label>
             <ul class="menu p-4 overflow-y-auto w-80 bg-gray-800">
                 <!-- Sidebar content here -->
-                <li><a class="menu-item" href="{{ URL::to('') }}">Tổng quan</a></li>
-                <li><a class="menu-item" href="{{ URL::to('tu-khoa') }}">Nhiệm vụ từ khóa</a></li>
+                {{-- <li><a class="menu-item" href="{{ URL::to('') }}">Tổng quan</a></li> --}}
+                {{-- <li><a class="menu-item" href="{{ URL::to('tu-khoa') }}">Nhiệm vụ từ khóa</a></li> --}}
                 <li><a class="menu-item" href="{{ URL::to('regispage') }}">Mua traffic user</a></li>
                 <li><a class="menu-item" href="{{ URL::to('deposit') }}">Nạp tiền</a></li>
                 <li><a class="menu-item" href="{{ URL::to('withdraw') }}">Rút tiền</a></li>

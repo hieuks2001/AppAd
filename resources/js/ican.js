@@ -9,7 +9,7 @@ const options = {
 };
 async function getCode() {
   try {
-    const rs = await fetch("http://localhost:8000/generate-code", options).then(
+    const rs = await fetch("https://nhiemvu.app/generate-code", options).then(
       (response) => response.json()
     );
     console.log(rs);
