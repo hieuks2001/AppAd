@@ -90,6 +90,19 @@ class MissionController extends Controller
     }
   }
 
+  public function getUserIpAddr(){
+    if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+        //ip from share internet
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    }elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+        //ip pass from proxy
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    }else{
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return $ip;
+}
+
   public function getMission()
   {
     $user = Auth::user();
@@ -116,6 +129,7 @@ class MissionController extends Controller
     if ($this->IsBlockedUser($user)) {
       return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
     }
+    $rqIp = $this->getUserIpAddr();
     $mission = Mission::where('user_id', $user->id)
       ->where('status', MissionStatusConstants::DOING)
       ->orderBy('created_at', 'desc')->first();
@@ -162,7 +176,7 @@ class MissionController extends Controller
       foreach ($pages as $page) {
         $mission = Mission::where('page_id', $page->id)
           ->where('status', MissionStatusConstants::COMPLETED)
-          ->where('ip', $request->ip())
+          ->where('ip', $rqIp)
           ->whereDate('updated_at',  Carbon::today())
           ->orderBy('updated_at', 'desc')->first();
 
@@ -191,7 +205,7 @@ class MissionController extends Controller
       return view('mission.mission', [])->withErrors('Không còn nhiệm vụ, vui lòng quay lại sau!');
     }
     // Begin database transaction
-    DB::transaction(function () use ($pickedPage, $user, $request) {
+    DB::transaction(function () use ($pickedPage, $user, $request, $rqIp) {
       // Refresh data
       $pickedPage = $pickedPage->refresh();
 
@@ -201,7 +215,7 @@ class MissionController extends Controller
       // Reward = (price - 10% ) / traffic_sum
       $newMission->reward = ($pickedPage->price - ($pickedPage->price * $pickedPage->hold_percentage / 100)) / $pickedPage->traffic_sum;
       $newMission->status = MissionStatusConstants::DOING;
-      $newMission->ip = $request->ip();
+      $newMission->ip = $rqIp;
       $newMission->user_agent = $request->userAgent();
       $newMission->save();
 
@@ -244,7 +258,8 @@ class MissionController extends Controller
       $pageId = $rq->pageId;
       $host = $rq->host;
       $path = $rq->path;
-      $uIP = $rq->ip();
+      // $uIP = $rq->ip();
+      $uIP = $this->getUserIpAddr();
       $uAgent = $rq->userAgent();
       $mission = Mission::where([
         ["ip", $uIP],

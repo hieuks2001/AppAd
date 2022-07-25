@@ -23,6 +23,21 @@ use Web3\Utils;
 
 class UserController extends Controller
 {
+  // Helper funcs
+  public function getUserIpAddr()
+  {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+      //ip from share internet
+      $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+      //ip pass from proxy
+      $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+      $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return $ip;
+  }
+
   public function login(Request $request)
   {
     if (Auth::check()) {
@@ -93,13 +108,14 @@ class UserController extends Controller
   public function pastekey(Request $request)
   {
     $user = Auth::user();
+    $uIP = $this->getUserIpAddr();
     if ($user->status == 0) {
       // check if user is blocked
       return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
     }
     //rule here
     $ms = Missions::where('user_id', $user->id)->where([
-      ["ip", $request->ip()],
+      ["ip", $uIP],
       ["user_agent", $request->userAgent()],
       ["status", 0]
     ]);
@@ -111,7 +127,7 @@ class UserController extends Controller
         $uMsCount = $u->mission_count;
         $pageTypeId = Page::where('id', $msGet->page_id)->get('page_type_id')->first();
         // Update mission count base on Type of page buy traffic.
-        if (!array_key_exists($pageTypeId->page_type_id, $uMsCount)){
+        if (!array_key_exists($pageTypeId->page_type_id, $uMsCount)) {
           $uMsCount[$pageTypeId->page_type_id] = 1;
         } else {
           $uMsCount[$pageTypeId->page_type_id] += 1;
