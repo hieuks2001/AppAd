@@ -23,6 +23,21 @@ use Web3\Utils;
 
 class UserController extends Controller
 {
+  // Helper funcs
+  public function getUserIpAddr()
+  {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+      //ip from share internet
+      $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+      //ip pass from proxy
+      $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+      $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return $ip;
+  }
+
   public function login(Request $request)
   {
     if (Auth::check()) {
@@ -52,15 +67,15 @@ class UserController extends Controller
       if ($request->password != $request->re_password) {
         return Redirect::to('/register')->with('error', 'Mật khẩu không trùng khớp!');
       } else {
-        $type =  UserType::where('is_default', 1)->get('id')->first();
+        // $type =  UserType::where('is_default', 1)->get('id')->first();
         $user = new User();
         $user->username = $request->username;
         $user->password = bcrypt($request->password);
         $user->is_admin = 0;
         $user->status = 1;
         $user->wallet = 0;
-        $user->user_type_id = $type->id;
-        $user->commission = 0;
+        // $user->user_type_id = $type->id;
+        // $user->commission = 0;
         $user->save();
         return Redirect::to('/login')->with('message', 'Đăng ký thành công!');
       }
@@ -83,7 +98,7 @@ class UserController extends Controller
       if ($user->is_admin) {
         return Redirect::to('/management/traffic');
       }
-      return Redirect::to('/regispage');
+      return view("dashboard.index");
     } else {
       return Redirect::to('/login');
     }
@@ -93,6 +108,7 @@ class UserController extends Controller
   public function pastekey(Request $request)
   {
     $user = Auth::user();
+    $uIP = $this->getUserIpAddr();
     if ($user->status == 0) {
       // check if user is blocked
       return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");

@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        $type =  DB::table('user_types')->where('is_default', 1)->first();
+        // $type =  DB::table('user_types')->where('is_default', 1)->first();
         $data = [
             [
                 'id' => Str::uuid(),
@@ -23,8 +23,8 @@ class UserSeeder extends Seeder
                 'status' => 1,
                 'is_admin' => 1,
                 'wallet' => 0,
-                'user_type_id' => $type->id,
-                'mission_count' => json_encode(array()),
+                // 'user_type_id' => $type->id,
+                // 'mission_count' => json_encode(array()),
             ],
             [
                 'id' => Str::uuid(),
@@ -34,11 +34,11 @@ class UserSeeder extends Seeder
                 'status' => 1,
                 'is_admin' => 0,
                 'wallet' => 99999999,
-                'user_type_id' => $type->id,
-                'mission_count' => json_encode(array()),
+                // 'user_type_id' => $type->id,
+                // 'mission_count' => json_encode(array()),
             ]
         ];
 
-        DB::table('users')->insert($data);
+        DB::table('user_traffics')->insert($data);
     }
 }
