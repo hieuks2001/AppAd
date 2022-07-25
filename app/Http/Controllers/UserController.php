@@ -98,7 +98,7 @@ class UserController extends Controller
       if ($user->is_admin) {
         return Redirect::to('/management/traffic');
       }
-      return view("dashboard.index");
+      return Redirect::to('/regispage');
     } else {
       return Redirect::to('/login');
     }
