@@ -39,7 +39,7 @@ class User extends Authenticatable
   ];
 
   protected $primaryKey = 'id';
-  protected $table = 'users';
+  protected $table = 'user_missions';
 
 
   // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
