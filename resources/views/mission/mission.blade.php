@@ -31,7 +31,15 @@
               vụ</b>" và nhận <b>{{ $mission->reward }}</b> USDT</p>
         </div>
       </div>
-      <div id="o"></div>
+      <div id="o">
+        <div id="btn-copy-kw" class="tooltip tooltip-left absolute right-5" data-tip="sao chép từ khóa">
+          <button class="btn btn-square">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </button>
+        </div>
+      </div>
       @if ($errors->all())
         <div class="alert alert-error my-3 shadow-lg">
           <div>
@@ -76,6 +84,11 @@
           vụ</a>
       </form>
     </div>
+    <script>
+      document.getElementById("btn-copy-kw").addEventListener("click",(e)=>{
+        navigator.clipboard.writeText({!!json_encode($page->keyword)!!})
+      })
+    </script>
   @endif
   <br />
   <br />
