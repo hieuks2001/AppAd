@@ -15,7 +15,7 @@ class CreatePagesTable extends Migration
     {
         Schema::create('pages', function (Blueprint $table) {
             $table->uuid('id')->primary()->unique();
-            $table->foreignUuid('user_mission_id')->constrained();
+            $table->foreignUuid('user_id')->constrained('user_traffics');
             $table->string('keyword')->nullable();
             $table->string('image')->nullable();
             $table->string('url');
