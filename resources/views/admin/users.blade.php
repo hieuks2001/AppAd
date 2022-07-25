@@ -78,7 +78,7 @@
             <td>{{ $value->id }}</td>
             <td>{{ $value->username }}</td>
             <td>{{ $user_types[array_search($value->user_type_id, array_column(json_decode(json_encode($user_types),TRUE), 'id'))]->name }}</td>
-            {{-- <td>
+            <td>
               <label
                 for="modal-edit"
                 class="btn btn-square btn-outline btn-sm"
@@ -99,7 +99,7 @@
                   />
                 </svg>
               </label>
-            </td> --}}
+            </td>
           </tr>
         @endforeach
       </tbody>

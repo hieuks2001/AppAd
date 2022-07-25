@@ -52,8 +52,8 @@ class DashboardController extends Controller
         $log->amount  = $page->price;
         $log->type = TransactionTypeConstants::PAY;
 
-        DB::table('users')->where('id', $page->user_id)->decrement('wallet', $page->price);
-
+        // DB::table('users')->where('id', $page->user_id)->decrement('wallet', $page->price);
+        DB::table('user_traffics')->where('id', $page->user_id)->decrement('wallet', $page->price);
         $page->save();
         $log->save();
       });
@@ -198,15 +198,17 @@ class DashboardController extends Controller
     // Edit user user_type
     $userTypeID = $request['user_type'];
 
-    $user = User::where('id', $id)->first();
+    // $user = User::where('id', $id)->first();
+    $user = DB::table('user_missions')->where('id', $id)->first();
     if ($user) {
       $type = UserType::where('id', $userTypeID)
         ->get('id')
         ->first();
       if ($type) {
-        $user->user_type_id = $type->id;
+        // $user->user_type_id = $type->id;
         // $user->mission_count = $type->mission_need;
-        $user->save();
+        // $user->save();
+        DB::table('user_missions')->where('id', $id)->update(['user_type_id' => $type->id]);
       }
     }
     return redirect()->to('/management/users');
