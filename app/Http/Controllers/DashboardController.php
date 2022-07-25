@@ -150,7 +150,7 @@ class DashboardController extends Controller
   public function managementUsers()
   {
     $userTypes = DB::table('page_types')->get();
-    $users = User::where('status', 1)->get();
+    $users = DB::table('user_missions')->where('status', 1)->get();
 
     return view('admin.users', compact(['userTypes', 'users']));
   }
@@ -175,7 +175,7 @@ class DashboardController extends Controller
       }
     }
     foreach ($missionNeed as $key => $value) {
-      if ($value < 0){
+      if ($value < 0) {
         return redirect()->to('/management/users')->with("error", "Mission need must greater than zero");
       }
       $pageType = PageType::where('id', $key)->get();

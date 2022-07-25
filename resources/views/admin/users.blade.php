@@ -69,7 +69,7 @@
           <th>ID</th>
           <th>Username</th>
           <th>Loại</th>
-          <th></th>
+          {{-- <th></th> --}}
         </tr>
       </thead>
       <tbody>
@@ -77,8 +77,8 @@
           <tr>
             <td>{{ $value->id }}</td>
             <td>{{ $value->username }}</td>
-            <td>{{ $value->userType->name }}</td>
-            <td>
+            <td>{{ $user_types[array_search($value->user_type_id, array_column(json_decode(json_encode($user_types),TRUE), 'id'))]->name }}</td>
+            {{-- <td>
               <label
                 for="modal-edit"
                 class="btn btn-square btn-outline btn-sm"
@@ -99,7 +99,7 @@
                   />
                 </svg>
               </label>
-            </td>
+            </td> --}}
           </tr>
         @endforeach
       </tbody>
