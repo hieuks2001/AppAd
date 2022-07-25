@@ -125,6 +125,7 @@ class MissionController extends Controller
   {
     // Update UserType
     $pageType = $this->UpdateUserType();
+    $excludePriority = [];
     $user = Auth::user();
     if ($this->IsBlockedUser($user)) {
       return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
@@ -152,7 +153,8 @@ class MissionController extends Controller
       $pageQuery->where('traffic_remain', '>', 0)
         ->where('status', PageStatusConstants::APPROVED)
         // ->whereIn('page_type_id', $pageTypeIdArr);
-        ->where('page_type_id', $pageTypeId);
+        ->where('page_type_id', $pageTypeId)
+        ->whereNotIn('priority', $excludePriority);
 
       // Query pages by Priority (HIGH -> MEDIUM -> LOW)
       $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::HIGH)->get();
@@ -196,7 +198,8 @@ class MissionController extends Controller
       }
 
       if (!$pickedPage) {
-        unset($pageType[$pageTypeId]);
+        array_push($excludePriority, $pages[0]->priority);
+        // unset($pageType[$pageTypeId]);
       }
     }
 
