@@ -149,9 +149,8 @@ class DashboardController extends Controller
 
   public function managementUsers()
   {
-    $userTypes = DB::table('page_types')->get();
-    $users = User::where('status', 1)->get();
-
+    $userTypes = DB::table('user_types')->get();
+    $users = DB::table('user_missions')->where('status', 1)->get();
     return view('admin.users', compact(['userTypes', 'users']));
   }
 
@@ -175,7 +174,7 @@ class DashboardController extends Controller
       }
     }
     foreach ($missionNeed as $key => $value) {
-      if ($value < 0){
+      if ($value < 0) {
         return redirect()->to('/management/users')->with("error", "Mission need must greater than zero");
       }
       $pageType = PageType::where('id', $key)->get();
@@ -196,17 +195,16 @@ class DashboardController extends Controller
   public function postChangeUserType(Request $request, $id)
   {
     // Edit user user_type
-    $userTypeID = $request['user_type'];
+    $userTypeID = $request['user_type_id'];
 
-    $user = User::where('id', $id)->first();
-    if ($user) {
+    $user = DB::table("user_missions")->where('id', $id);
+    if ($user->first()) {
       $type = UserType::where('id', $userTypeID)
         ->get('id')
         ->first();
       if ($type) {
-        $user->user_type_id = $type->id;
         // $user->mission_count = $type->mission_need;
-        $user->save();
+        $user->update(["user_type_id"=>$userTypeID]);
       }
     }
     return redirect()->to('/management/users');

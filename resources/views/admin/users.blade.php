@@ -69,7 +69,7 @@
           <th>ID</th>
           <th>Username</th>
           <th>Loại</th>
-          <th></th>
+          {{-- <th></th> --}}
         </tr>
       </thead>
       <tbody>
@@ -77,7 +77,7 @@
           <tr>
             <td>{{ $value->id }}</td>
             <td>{{ $value->username }}</td>
-            <td>{{ $value->userType->name }}</td>
+            <td>{{ $user_types[array_search($value->user_type_id, array_column(json_decode(json_encode($user_types),TRUE), 'id'))]->name }}</td>
             <td>
               <label
                 for="modal-edit"
@@ -132,8 +132,8 @@
           </label>
           <div class="flex">
             <select
-              name="user_type"
-              class="item select select-bordered  mb-3 w-full flex-1 user_type"
+              name="user_type_id"
+              class="item select select-bordered  mb-3 w-full flex-1 user_type_id"
             >
               @foreach ($user_types as $item)
                 <option value="{{ $item->id }}">{{ $item->name }}</option>
@@ -230,7 +230,7 @@
     const user_types = {!! json_encode($user_types->toArray(), JSON_HEX_TAG) !!}
     const formEdit = document.getElementById('form-edit');
     const items = document.querySelectorAll('#form-edit .item');
-    const userTypeEle = document.querySelector("#form-edit .user_type");
+    const userTypeEle = document.querySelector("#form-edit .user_type_id");
     const maxTrafficEle = document.querySelector("#form-edit .max_traffic");
 
     function onClickUser(uid) {
@@ -240,23 +240,14 @@
       items.forEach(item => {
         let key = item.classList[item.classList.length - 1];
         if (key in user) {
-          if (key === "user_type") {
-            item.value = user[key].id;
-            const userTypeObj = user_types.find(type => type.id == user[key]
-              .id);
-          } else if (["user_type"].includes(key)) {
+          if (key === "user_type_id") {
             item.value = user[key];
-
           } else {
             item.textContent = user[key];
           }
         }
       })
     }
-    userTypeEle.addEventListener("change", function(e) {
-      const userType = e.target.value;
-      const userTypeObj = user_types.find(user => user.id == userType);
-    });
     const mission_need = {};
     const page_weight = {};
     const eleMissionNeed = document.getElementsByName("mission_need")[0];
