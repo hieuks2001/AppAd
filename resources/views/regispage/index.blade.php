@@ -131,10 +131,16 @@
             <label
               for="my-modal"
               class="btn btn-block"
-            >Hoàn thành</label>
+              id="btn-copy-script"
+            >Sao chép và Hoàn thành</label>
           </div>
         </div>
       </div>
+      <script>
+      document.getElementById("btn-copy-script").addEventListener("click",()=>{
+        navigator.clipboard.writeText(document.getElementsByTagName("code")[0].textContent)
+      })
+      </script>
     @endif
     <form
       action="/add-page"
@@ -191,6 +197,7 @@
           class="select select-bordered mb-5 w-full"
         >
           <option
+            value=""
             selected
             disabled
           > Vui lòng chọn gói Onsite </option>
@@ -281,6 +288,8 @@
         selectSiteTypeOnsiteEle.removeChild(selectSiteTypeOnsiteEle
           .lastChild);
       }
+      selectSiteTypeOnsiteEle.value = ""
+      priceEle.textContent = "0.00 USDT"
       const siteType = siteTypes.find(siteType => siteType.id == e.target
         .value);
       for (const k in siteType.onsite) {
@@ -303,7 +312,6 @@
       const trafficSum = trafficSumValue;
       const timeOnsite = siteTypes.find(site => site.id == siteType).onsite[
         timeOnsiteValue];
-      console.log(timeOnsite, trafficSum);
       priceEle.textContent = `${(timeOnsite * trafficSum).toFixed(2)} USDT`;
     }
     window.scrollTo(0, document.body.scrollHeight);
