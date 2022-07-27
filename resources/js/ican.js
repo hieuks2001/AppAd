@@ -37,18 +37,19 @@ window.addEventListener("DOMContentLoaded", async () => {
     } else {
       //nếu chưa có code sẽ check là google
       if (
-        "https://www.google.com/".includes(document.referrer) &&
+        document.referrer.includes("https://www.google.com") &&
         document.referrer != ""
       ) {
+        getCodeBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          getCodeBtn.disabled = true;
+          run(result.onsite);
+        });
+      } else {
         getCodeBtn.textContent = "";
         getCodeBtn.disabled = true;
         throw "Lỗi";
       }
-      getCodeBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        getCodeBtn.disabled = true;
-        run(result.onsite);
-      });
     }
   } catch (error) {}
 });
