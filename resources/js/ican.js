@@ -40,15 +40,16 @@ window.addEventListener("DOMContentLoaded", async () => {
         "https://www.google.com/".includes(document.referrer) &&
         document.referrer != ""
       ) {
+        getCodeBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          getCodeBtn.disabled = true;
+          run(result.onsite);
+        });
+      } else {
         getCodeBtn.textContent = "";
         getCodeBtn.disabled = true;
         throw "Lỗi";
       }
-      getCodeBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        getCodeBtn.disabled = true;
-        run(result.onsite);
-      });
     }
   } catch (error) {}
 });
