@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Constants\PagePriorityConstants;
 use App\Constants\PageStatusConstants;
+use App\Constants\TransactionStatusConstants;
 use App\Constants\MissionStatusConstants;
 use App\Constants\TransactionTypeConstants;
-use App\Models\LogTransaction;
+use App\Models\LogMissionTransaction;
+use App\Models\LogTrafficTransaction;
 use Illuminate\Http\Request;
 use App\Models\Page;
 use App\Models\PageType;
@@ -110,10 +112,11 @@ class DashboardController extends Controller
       DB::transaction(function () use ($page, $user) {
         $page->status = PageStatusConstants::APPROVED;
 
-        $log = new LogTransaction();
+        $log = new LogTrafficTransaction();
         $log->user_id = $page->user_id;
-        $log->amount  = $page->price;
+        $log->amount  = $page->price * -1;
         $log->type = TransactionTypeConstants::PAY;
+        $log->status = TransactionStatusConstants::APPROVED;
 
         // DB::table('users')->where('id', $page->user_id)->decrement('wallet', $page->price);
         DB::table('user_traffics')->where('id', $page->user_id)->decrement('wallet', $page->price);
@@ -188,10 +191,11 @@ class DashboardController extends Controller
     DB::transaction(function () use ($page, $user) {
       $page->status = PageStatusConstants::CANCEL;
 
-      $log = new LogTransaction();
+      $log = new LogTrafficTransaction();
       $log->user_id = $page->user_id;
       $log->amount  = $page->price;
       $log->type = TransactionTypeConstants::REFUND;
+      $log->status = TransactionStatusConstants::APPROVED;
 
       // Delete image file
       if (!empty($page->image)) {
@@ -290,5 +294,65 @@ class DashboardController extends Controller
       $user->save();
     }
     return redirect()->to('/management/users');
+  }
+
+  public function postApproveTrafficTransaction(Request $rq, $id)
+  {
+    $transaction = LogTrafficTransaction::where([
+      'id' => $id,
+      'status' => TransactionStatusConstants::PENDING,
+    ]);
+    if (!$transaction){
+      return;
+    }
+    DB::transaction(function () use ($transaction) {
+        $rs = DB::table('user_traffics')->where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
+        $transaction->status = TransactionStatusConstants::APPROVED;
+    });
+    return;
+  }
+
+  public function postCancelTrafficTransaction(Request $rq, $id)
+  {
+    $transaction = LogTrafficTransaction::where([
+      'id' => $id,
+      'status' => TransactionStatusConstants::PENDING,
+    ]);
+    if (!$transaction){
+      return;
+    }
+    $transaction->status = TransactionStatusConstants::CANCELED;
+    $transaction->save();
+    return;
+  }
+
+  public function postApproveMissionTransaction(Request $rq, $id)
+  {
+    $transaction = LogMissionTransaction::where([
+      'id' => $id,
+      'status' => TransactionStatusConstants::PENDING,
+    ]);
+    if (!$transaction){
+      return;
+    }
+    DB::transaction(function () use ($transaction) {
+        $rs = DB::table('user_missions')->where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
+        $transaction->status = TransactionStatusConstants::APPROVED;
+    });
+    return;
+  }
+
+  public function postCancelMissionTransaction(Request $rq, $id)
+  {
+    $transaction = LogMissionTransaction::where([
+      'id' => $id,
+      'status' => TransactionStatusConstants::PENDING,
+    ]);
+    if (!$transaction){
+      return;
+    }
+    $transaction->status = TransactionStatusConstants::CANCELED;
+    $transaction->save();
+    return;
   }
 }

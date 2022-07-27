@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Constants\MissionStatusConstants;
+use App\Constants\TransactionStatusConstants;
 use App\Constants\TransactionTypeConstants;
-use App\Models\LogTransaction;
+use App\Constants\UserConstants;
+use App\Models\LogTrafficTransaction;
 use App\Models\Missions;
 use App\Models\Otp;
 use App\Models\User;
@@ -256,7 +258,7 @@ class UserController extends Controller
           'mission_attempts' => 0
         ]);
         // Create log
-        $log = new LogTransaction([
+        $log = new LogTrafficTransaction([
           'amount' => $reward,
           'user_id' => $u->id,
           'type' => TransactionTypeConstants::REWARD,
@@ -388,7 +390,15 @@ class UserController extends Controller
     $user = Auth::user();
     $amount = $request->amount;
     $wallet = User::where('id', $user->id)->first();
-    $rs = $wallet->update(['wallet' => $wallet->wallet + $amount]);
+    DB::transaction(function () use ($wallet, $amount) {
+      // Create log
+      $log = new LogTrafficTransaction();
+      $log->amount = $amount;
+      $log->user_id = $wallet->id;
+      $log->type = TransactionTypeConstants::TOPUP;
+      $log->status = TransactionStatusConstants::PENDING;
+      $log->save();
+    });
     return Redirect::to("/deposit");
   }
 
@@ -410,6 +420,24 @@ class UserController extends Controller
 
   public function withdraw(Request $request)
   {
+    $user = Auth::user();
+    $amount = $request->amount;
+    $wallet = User::where('id', $user->id)->first();
+
+    if ($amount > $wallet) {
+      return view("usdt.deposit")->with(["error" => "Không đủ số dư trong tài khoản!"]);
+    }
+    $rs = DB::transaction(function () use ($wallet, $amount) {
+      // $rs = $wallet->update(['wallet' => $wallet->wallet - $amount]);
+      // Create log
+      $log = new LogTrafficTransaction();
+      $log->amount = $amount * -1;
+      $log->user_id = $wallet->id;
+      $log->type = TransactionTypeConstants::WITHDRAW;
+      $log->status = TransactionStatusConstants::PENDING;
+      $log->save();
+    });
+
     return view("usdt.deposit");
   }
 }

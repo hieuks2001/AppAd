@@ -13,7 +13,7 @@ use App\Constants\OntimePriceConstants;
 use App\Constants\PageStatusConstants;
 use App\Constants\MissionStatusConstants;
 use App\Constants\TransactionTypeConstants;
-use App\Models\LogTransaction;
+use App\Models\LogTrafficTransaction;
 use App\Models\PageType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
@@ -46,8 +46,8 @@ class PageController extends Controller
         // Cal the price (onsite price * traffic sum)
         $page->price = $page->traffic_sum * $page->price_per_traffic;
 
-        // //Add log 
-        // $log = new LogTransaction();
+        // //Add log
+        // $log = new LogTrafficTransaction();
         // $log->user_id = $user->id;
         // $log->amount  = $page->price;
         // $log->type = TransactionTypeConstants::PAY;
