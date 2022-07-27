@@ -24,34 +24,30 @@ async function getCode() {
 
 const getCodeBtn = document.getElementById("getCode");
 window.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const result = await getCode();
-    if ("code" in result) {
-      getCodeBtn.textContent = result.code;
-      getCodeBtn.title = "Click để sao chép code";
+  const result = await getCode();
+  if ("code" in result) {
+    getCodeBtn.textContent = result.code;
+    getCodeBtn.title = "Click để sao chép code";
+    getCodeBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      navigator.clipboard.writeText(result.code);
+      getCodeBtn.title = "Đã sao chép";
+    });
+  } else {
+    //nếu chưa có code sẽ check là google
+    if (
+      document.referrer.includes("https://www.google.com") &&
+      document.referrer != ""
+    ) {
       getCodeBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        navigator.clipboard.writeText(result.code);
-        getCodeBtn.title = "Đã sao chép";
+        getCodeBtn.disabled = true;
+        run(result.onsite);
       });
     } else {
-      //nếu chưa có code sẽ check là google
-      if (
-        document.referrer.includes("https://www.google.com") &&
-        document.referrer != ""
-      ) {
-        getCodeBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          getCodeBtn.disabled = true;
-          run(result.onsite);
-        });
-      } else {
-        throw "Lỗi";
-      }
+      getCodeBtn.textContent = "";
+      getCodeBtn.disabled = true;
     }
-  } catch (error) {
-    getCodeBtn.textContent = "";
-    getCodeBtn.disabled = true;
   }
 });
 
