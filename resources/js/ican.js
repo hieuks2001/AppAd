@@ -12,33 +12,46 @@ async function getCode() {
     const rs = await fetch("https://nhiemvu.app/generate-code", options).then(
       (response) => response.json()
     );
-    console.log(rs);
     if ("code" in rs || "onsite" in rs) {
       return rs;
     } else if ("error" in rs) {
-      throw rs.error;
+      // throw rs.error;
     }
   } catch (error) {
-    getCodeBtn.textContent = error;
+    // getCodeBtn.textContent = error;
   }
 }
 
 const getCodeBtn = document.getElementById("getCode");
 window.addEventListener("DOMContentLoaded", async () => {
-  const result = await getCode();
-  if ("code" in result) {
-    getCodeBtn.textContent = result.code;
-    getCodeBtn.title = "Click để copy code";
-    getCodeBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      navigator.clipboard.writeText(result.code);
-    });
-  } else {
-    getCodeBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      getCodeBtn.disabled = true;
-      run(result.onsite);
-    });
+  try {
+    const result = await getCode();
+    if ("code" in result) {
+      getCodeBtn.textContent = result.code;
+      getCodeBtn.title = "Click để sao chép code";
+      getCodeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        navigator.clipboard.writeText(result.code);
+        getCodeBtn.title = "Đã sao chép";
+      });
+    } else {
+      //nếu chưa có code sẽ check là google
+      if (
+        document.referrer.includes("https://www.google.com") &&
+        document.referrer != ""
+      ) {
+        getCodeBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          getCodeBtn.disabled = true;
+          run(result.onsite);
+        });
+      } else {
+        throw "Lỗi";
+      }
+    }
+  } catch (error) {
+    getCodeBtn.textContent = "";
+    getCodeBtn.disabled = true;
   }
 });
 
