@@ -37,7 +37,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     } else {
       //nếu chưa có code sẽ check là google
       if (
-        "https://www.google.com/".includes(document.referrer) &&
+        document.referrer.includes("https://www.google.com") &&
         document.referrer != ""
       ) {
         getCodeBtn.addEventListener("click", (e) => {
