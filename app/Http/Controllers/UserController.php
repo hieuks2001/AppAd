@@ -14,6 +14,7 @@ use App\Models\Page;
 use App\Models\PageType;
 use App\Models\UserType;
 use Carbon\Carbon;
+use App\Notifications\TelegramNotification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -390,7 +391,7 @@ class UserController extends Controller
     $user = Auth::user();
     $amount = $request->amount;
     $wallet = User::where('id', $user->id)->first();
-    DB::transaction(function () use ($wallet, $amount) {
+    DB::transaction(function () use ($wallet, $amount, $user) {
       // Create log
       $log = new LogTrafficTransaction();
       $log->amount = $amount;
@@ -398,6 +399,8 @@ class UserController extends Controller
       $log->type = TransactionTypeConstants::TOPUP;
       $log->status = TransactionStatusConstants::PENDING;
       $log->save();
+
+      $log->notify(new TelegramNotification($log, $user));
     });
     return Redirect::to("/deposit");
   }
@@ -427,7 +430,7 @@ class UserController extends Controller
     if ($amount > $wallet) {
       return view("usdt.deposit")->with(["error" => "Không đủ số dư trong tài khoản!"]);
     }
-    $rs = DB::transaction(function () use ($wallet, $amount) {
+    $rs = DB::transaction(function () use ($wallet, $amount, $user) {
       // $rs = $wallet->update(['wallet' => $wallet->wallet - $amount]);
       // Create log
       $log = new LogTrafficTransaction();
@@ -436,6 +439,8 @@ class UserController extends Controller
       $log->type = TransactionTypeConstants::WITHDRAW;
       $log->status = TransactionStatusConstants::PENDING;
       $log->save();
+
+      $log->notify(new TelegramNotification($log, $user));
     });
 
     return view("usdt.deposit");
