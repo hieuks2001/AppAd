@@ -16,12 +16,13 @@ class CreateMissionsTable extends Migration
     Schema::create('missions', function (Blueprint $table) {
       $table->uuid('id')->primary()->unique();
       $table->uuid('page_id');
-      $table->uuid('user_id');
-      $table->decimal('reward', 5, 4);
+      $table->uuid('user_id')->nullable();
+      $table->decimal('reward', 5, 4)->nullable();
       $table->string('ip')->default('');
       $table->string('user_agent')->default('');
       $table->tinyInteger('status');
       $table->string('code')->default('');
+      $table->string('origin_url')->default('');
       $table->timestamps();
     });
   }
