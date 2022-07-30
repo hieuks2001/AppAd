@@ -177,6 +177,7 @@ class MissionController extends Controller
 
       foreach ($pages as $page) {
         $mission = Mission::where('page_id', $page->id)
+          ->where('user_id', $user->id)
           ->where('status', MissionStatusConstants::COMPLETED)
           ->where('ip', $rqIp)
           ->whereDate('updated_at',  Carbon::today())
