@@ -31,7 +31,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     getCodeBtn.addEventListener("click", (e) => {
       e.preventDefault();
       navigator.clipboard.writeText(result.code);
-      getCodeBtn.title = "Đã sao chép";
+      alert("Đã sao chép");
     });
   } else {
     //nếu chưa có code sẽ check là google

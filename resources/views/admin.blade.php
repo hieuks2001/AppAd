@@ -38,6 +38,7 @@
             <div class="container px-5 py-5">
                 @yield('management-traffic')
                 @yield('management-users')
+                @yield('management-missions')
             </div>
         </div>
         <div class="drawer-side text-white">
@@ -46,6 +47,7 @@
                 <!-- Sidebar content here -->
                 <li><a class="menu-item" href="{{ URL::to('management/traffic') }}">Quản lý traffic</a></li>
                 <li><a class="menu-item" href="{{ URL::to('management/users') }}">Quản lý người dùng</a></li>
+                <li><a class="menu-item" href="{{ URL::to('management/missions') }}">Nhiệm vụ đã hoàn thành</a></li>
             </ul>
         </div>
     </div>

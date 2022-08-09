@@ -4,36 +4,21 @@
         <!-- head -->
         <thead class="bg-white">
             <tr>
-                <th class="bg-slate-200">URL</th>
-                <th class="bg-slate-200">Từ khóa</th>
-                <th class="bg-slate-200">Onsite (giây)</th>
-                <th class="bg-slate-200">Mỗi ngày</th>
-                <th class="bg-slate-200">Tổng</th>
-                <th class="bg-slate-200">Số tiền</th>
-                <th class="bg-slate-200">Trạng thái</th>
+                <th class="bg-slate-200">Trang traffic</th>
+                <th class="bg-slate-200">IP người làm</th>
+                <th class="bg-slate-200">Thưởng</th>
+                <th class="bg-slate-200">Ngày hoàn thành</th>
             </tr>
+        </thead>
         <tbody>
-        @foreach($pages as $key => $value)
+          @foreach($missions as $key => $value)
             <tr>
                 <td class="bg-white">{{$value->url}}</td>
-                <td class="bg-white">{{$value->keyword}}</td>
-                <td class="bg-white">{{$value->onsite}}</td>
-                <td class="bg-white">{{$value->traffic_per_day}}</td>
-                <td class="bg-white">{{$value->traffic_sum}}</td>
-                <td class="bg-white">{{$value->price}}</td>
-                @switch($value->status)
-                    @case (0)
-                        <td class="bg-white">Đang chờ</td>
-                        @break
-                    @case (1)
-                        <td class="bg-white">Đã duyệt</td>
-                        @break
-                    @case (-1)
-                        <td class="bg-white">Đã huỷ</td>
-                        @break
-                @endswitch
+                <td class="bg-white">{{$value->ip}}</td>
+                <td class="bg-white">{{number_format(((float)$value->price_per_traffic) * (100 - (float)$value->hold_percentage) / 100, 3)}}</td>
+                <td class="bg-white">{{$value->updated_at}}</td>
             </tr>
-            @endforeach
+          @endforeach
         </tbody>
     </table>
 @endsection

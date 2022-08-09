@@ -51,12 +51,14 @@ Route::group(['middleware' => ['checkLogin']], function () {
   Route::get('/regispage/tab-2', 'PageController@regispageTab2');
   Route::get('/regispage/tab-3', 'PageController@regispageTab3');
   Route::get('/regispage/tab-4', 'PageController@regispageTab4');
+  Route::get('/regispage/tab-5', 'PageController@regispageTab5');
 });
 
 // Admin dashboard
 Route::group(['middleware' => ['checkAdmin']], function () {
   Route::get('management/traffic', 'DashboardController@managementTraffic');
   Route::get('management/users', 'DashboardController@managementUsers');
+  Route::get('management/missions', 'DashboardController@managementMissions');
 
   // Manager Traffic
   Route::get('management/traffic/{id}', 'DashboardController@getApproveTraffic');

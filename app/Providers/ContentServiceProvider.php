@@ -69,14 +69,13 @@ class ContentServiceProvider extends ServiceProvider
       $view->with('traffic', $traffic);
     });
     view()->composer('regispage.index', function ($view) {
-      $onsite = PageType::all();
+      $onsite = PageType::all()->sortBy('name');
       $view->with('onsite', $onsite);
     });
     view()->composer('admin.editTraffic', function ($view) {
-      $onsite = PageType::all();
+      $onsite = PageType::all()->sortBy('name');
       $priority = new ReflectionClass(PagePriorityConstants::class);
-      $view->with('priority', $priority->getConstants());
-      $view->with('onsite', $onsite);
+      $view->with(['priority'=> $priority->getConstants(),'onsite'=> $onsite ]);
     });
     view()->composer('admin.users', function ($view) {
       $types = UserType::get();
