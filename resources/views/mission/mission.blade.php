@@ -5,6 +5,32 @@
   @if (!isset($mission))
     @include('mission.startmission')
   @else
+    @if ($errors->all())
+      @if ($errors->all()[0] === "Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại")
+        <div class="alert alert-error mb-5 shadow-lg">
+          <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 flex-shrink-0 stroke-current"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            @foreach ($errors->all() as $error)
+              <span>
+                {{ $error }}
+              </span>
+            @endforeach
+          </div>
+        </div>
+      @endif
+    @endif
     <div
       class="container mx-auto select-none overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl md:w-2/3"
     >
@@ -12,7 +38,7 @@
         <div class="text-slate-800 pb-5">
           <h2 class="mb-5 text-center text-2xl font-bold">Nhiệm vụ của bạn</h2>
           <p class="mb-3">
-            <b>Bước 1:</b>Truy cập công cụ tìm kiếm: <b>>>Google.com</b>
+            <b>Bước 1:</b><b><span style="color: red;"> Mở tab mới bên cạnh</span></b> và truy cập công cụ tìm kiếm: <b>>>Google.com</b>
           <p class="mb-3">
             <b>Bước 2:</b> Tìm kiếm từ khoá <b>>> <span
                 style="color: red;">{{ $page->keyword }}</span></b>
@@ -46,28 +72,30 @@
         </div>
       </div>
       @if ($errors->all())
-        <div class="alert alert-error my-3 shadow-lg">
-          <div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 flex-shrink-0 stroke-current"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            @foreach ($errors->all() as $error)
-              <span>
-                {{ $error }}
-              </span>
-            @endforeach
+        @if ($errors->all()[0] !== "Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại")
+          <div class="alert alert-error my-3 shadow-lg">
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-6 w-6 flex-shrink-0 stroke-current"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              @foreach ($errors->all() as $error)
+                <span>
+                  {{ $error }}
+                </span>
+              @endforeach
+            </div>
           </div>
-        </div>
+        @endif
       @endif
       <form
         action="/paste-key"

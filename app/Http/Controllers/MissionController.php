@@ -103,9 +103,11 @@ class MissionController extends Controller
     return $ip;
 }
 
-  public function getMission()
+  public function getMission(Request $rq)
   {
     $user = Auth::user();
+    $uIP = $this->getUserIpAddr();
+    $uAgent = $rq->userAgent();
     if ($this->IsBlockedUser($user)) {
       return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
     }
@@ -114,7 +116,10 @@ class MissionController extends Controller
       ->orderBy('created_at', 'desc')->first();
     if ($mission) {
       $page = Page::where('id', $mission->page_id)
-        ->where('status', PageStatusConstants::APPROVED)->first();
+      ->where('status', PageStatusConstants::APPROVED)->first();
+      if ($mission->ip !== $uIP || $mission->user_agent !== $uAgent) {
+        return view('mission.mission', ['mission' => $mission, 'page' => $page])->withErrors("Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại");
+      }
       return view('mission.mission', ['mission' => $mission, 'page' => $page]);
     } else {
       return view('mission.mission', [])->withErrors("Bạn chưa nhận nhiệm vụ!");

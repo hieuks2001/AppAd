@@ -33,8 +33,9 @@ class MissionController extends Controller
   public function getMission(Request $request)
   {
     $userIP = $this->getUserIpAddr();
+    $userAgent = $request->userAgent();
     $mission = Mission::where('ip', $userIP)
-      ->where('user_agent', $request->userAgent())
+      ->where('user_agent', $userAgent)
       ->where('status', MissionStatusConstants::DOING)
       ->orderBy('created_at', 'desc')->first();
     if (!$mission) { // There is mission existed!
@@ -42,6 +43,9 @@ class MissionController extends Controller
     }
     $page = Page::where('id', $mission->page_id)
       ->where('status', 1)->first();
+    if ($mission->ip !== $userIP || $mission->user_agent !== $userAgent) {
+      return response()->json(["mission" => $page, "error"=>"Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại"]);
+    }
     return response()->json(["mission" => $page]);
   }
 
@@ -58,7 +62,7 @@ class MissionController extends Controller
     if ($mission) { // There is mission existed!
       $page = Page::where('id', $mission->page_id)
         ->where('status', PageStatusConstants::APPROVED)->get(['keyword', 'onsite', 'image', 'url'])->first();
-      return response()->json(["mission1" => $page]);
+      return response()->json(["mission" => $page]);
     }
     // NO MISSION CURRENTLY DOING
     $pickedPage = null;

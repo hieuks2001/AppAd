@@ -18,7 +18,22 @@ async function getCode() {
       throw rs.error;
     }
   } catch (error) {
-    getCodeBtn.textContent = "";
+    getCodeBtn.textContent = "Lấy mã";
+    getCodeBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      let errorCode = 0;
+      if (error === "Traffic của site chưa sẵn sàng") {
+        errorCode = 1;
+      }
+      if (error === "Lỗi, nhúng không đúng site") {
+        errorCode = 2;
+      }
+      if (error === "Lỗi") {
+        errorCode = 3;
+      }
+      alert(`vui lòng kiểm tra lại thao tác của bạn, Lỗi code #${errorCode}`);
+    });
+    // getCodeBtn.disabled = true;
   }
 }
 
@@ -28,10 +43,10 @@ window.addEventListener("DOMContentLoaded", async () => {
   if ("code" in result) {
     getCodeBtn.textContent = result.code;
     getCodeBtn.title = "Click để sao chép code";
-    getCodeBtn.addEventListener("click", (e) => {
+    getCodeBtn.addEventListener("click", async (e) => {
       e.preventDefault();
-      navigator.clipboard.writeText(result.code);
-      getCodeBtn.title = "Đã sao chép";
+      await navigator.clipboard.writeText(result.code);
+      alert("Đã sao chép");
     });
   } else {
     //nếu chưa có code sẽ check là google
@@ -42,8 +57,12 @@ window.addEventListener("DOMContentLoaded", async () => {
         run(result.onsite);
       });
     } else {
-      getCodeBtn.textContent = "";
-      getCodeBtn.disabled = true;
+      getCodeBtn.textContent = "Lấy mã";
+      getCodeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        alert(`vui lòng kiểm tra lại thao tác của bạn, Lỗi code #4`);
+      });
+      // getCodeBtn.disabled = true;
     }
   }
 });
