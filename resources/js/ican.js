@@ -15,43 +15,56 @@ async function getCode() {
     if ("code" in rs || "onsite" in rs) {
       return rs;
     } else if ("error" in rs) {
-      // throw rs.error;
+      throw rs.error;
     }
   } catch (error) {
-    // getCodeBtn.textContent = error;
+    getCodeBtn.textContent = "Lấy mã";
+    getCodeBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      let errorCode = 0;
+      if (error === "Traffic của site chưa sẵn sàng") {
+        errorCode = 1;
+      }
+      if (error === "Lỗi, nhúng không đúng site") {
+        errorCode = 2;
+      }
+      if (error === "Lỗi") {
+        errorCode = 3;
+      }
+      alert(`vui lòng kiểm tra lại thao tác của bạn, Lỗi code #${errorCode}`);
+    });
+    // getCodeBtn.disabled = true;
   }
 }
 
 const getCodeBtn = document.getElementById("getCode");
 window.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const result = await getCode();
-    if ("code" in result) {
-      getCodeBtn.textContent = result.code;
-      getCodeBtn.title = "Click để sao chép code";
+  const result = await getCode();
+  if ("code" in result) {
+    getCodeBtn.textContent = result.code;
+    getCodeBtn.title = "Click để sao chép code";
+    getCodeBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      await navigator.clipboard.writeText(result.code);
+      alert("Đã sao chép");
+    });
+  } else {
+    //nếu chưa có code sẽ check là google
+    if (document.referrer.includes("https://www.google.com")) {
       getCodeBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        navigator.clipboard.writeText(result.code);
-        getCodeBtn.title = "Đã sao chép";
+        getCodeBtn.disabled = true;
+        run(result.onsite);
       });
     } else {
-      //nếu chưa có code sẽ check là google
-      if (
-        document.referrer.includes("https://www.google.com") &&
-        document.referrer != ""
-      ) {
-        getCodeBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          getCodeBtn.disabled = true;
-          run(result.onsite);
-        });
-      } else {
-        getCodeBtn.textContent = "";
-        getCodeBtn.disabled = true;
-        throw "Lỗi";
-      }
+      getCodeBtn.textContent = "Lấy mã";
+      getCodeBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        alert(`vui lòng kiểm tra lại thao tác của bạn, Lỗi code #4`);
+      });
+      // getCodeBtn.disabled = true;
     }
-  } catch (error) {}
+  }
 });
 
 const countdown = document.getElementById("countdown");

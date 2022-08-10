@@ -43,7 +43,7 @@ class UserController extends Controller
     if (Auth::check()) {
       return Redirect::to('/');
     }
-    if (isset($request->username)) {
+    if (isset($request->username) && isset($request->password)) {
       if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
         //Check is Admin -> Redirect to admin site
         return Redirect::to('/')->with("isAdmin", Auth::user()->isAdmin);
@@ -63,25 +63,30 @@ class UserController extends Controller
 
   public function register(Request $request)
   {
-    if (isset($request->username)) {
-      if ($request->password != $request->re_password) {
-        return Redirect::to('/register')->with('error', 'Mật khẩu không trùng khớp!');
-      } else {
-        $type =  UserType::where('is_default', 1)->get('id')->first();
-        $user = new User();
-        $user->username = $request->username;
-        $user->password = bcrypt($request->password);
-        $user->is_admin = 0;
-        $user->status = 1;
-        $user->wallet = 0;
-        $user->user_type_id = $type->id;
-        $user->commission = 0;
-        $user->save();
-        return Redirect::to('/login')->with('message', 'Đăng ký thành công!');
-      }
-    } else {
+    if (!isset($request->username)) {
       return view('procedure.register');
     }
+    if (!isset($request->password) && !isset($request->re_password)){
+      return Redirect::to('/register')->with('error', 'Không đầy đủ thông tin cần thiết!');
+    }
+    if ($request->password != $request->re_password) {
+      return Redirect::to('/register')->with('error', 'Mật khẩu không trùng khớp!');
+    }
+    $checkUser = User::where('username', $request->username);
+    if ($checkUser->count() != 0){
+      return Redirect::to('/register')->with('error', 'Tên tài khoản đã có người sử dụng!');
+    }
+    $type =  UserType::where('is_default', 1)->get('id')->first();
+    $user = new User();
+    $user->username = $request->username;
+    $user->password = bcrypt($request->password);
+    $user->is_admin = 0;
+    $user->status = 1;
+    $user->wallet = 0;
+    $user->user_type_id = $type->id;
+    $user->commission = 0;
+    $user->save();
+    return Redirect::to('/login')->with('message', 'Đăng ký thành công!');
   }
 
   public function index()
