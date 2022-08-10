@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@2.20.0/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <button class="btn" id="btn-get-mission" data-id="1">Nhận nhiệm vụ mới</button>
+      <button class="btn" id="btn-get-mission" data-id="2">Nhận nhiệm vụ mới</button>
+      <button class="btn" id="btn-get-mission" data-id="3">Nhận nhiệm vụ mới</button>
+      <button class="btn" id="btn-get-mission" data-id="4">Nhận nhiệm vụ mới</button>
+    </div>
+    <input type="checkbox" id="checkbox-modal-mission-detail" class="modal-toggle" readonly />
+    <div id="modal-mission-detail" class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box text-slate-800 bg-white">
+        <h2 class="mb-5 text-center text-2xl font-bold">Nhiệm vụ của bạn</h2>
+        <p class="mb-3"><b>Bước 1:</b>Truy cập công cụ tìm kiếm: <span class="text-rose-500 font-bold">Google.com</span></p>
+        <p class="mb-3">
+          <b>Bước 2:</b> Tìm kiếm từ khoá
+          <span class="ms-keyword text-rose-500 font-bold"></span>
+        </p>
+        <p class="mb-3">
+          <b>Bước 3:</b> Truy cập vào trang web như hướng dẫn:
+          <img class="ms-image mx-auto my-3 w-full object-contain" />
+        </p>
+        <p class="mb-3">
+          <b>Bước 4:</b> Lướt thật chậm từ trên xuống dưới giống như đang đọc nội dung bài viết rồi ấn vào nút <b>Nhận mã ngay</b> và đợi
+          <span class="ms-onsite text-rose-500 font-bold"></span> kết thúc
+        </p>
+        <p><b>Bước 5:</b> Copy mã và nhập vào ô ở phía dưới và bấm vào nút "<b>Hoàn thành nhiệm vụ</b>"</p>
+        <input type="text" name="key" value="" placeholder="Nhập mã của bạn vào đây..." class="ms-code input input-bordered my-3 w-full text-white" />
+        <button id="btn-submit-code" class="btn btn-block">Hoàn thành nhiệm vụ</button>
+      </div>
+    </div>
+    <script type="module">
+      window.VITE_URL_API = 'https://nhiemvu.app/api';
+    </script>
+    <script src="https://nhiemvu.app/general.js"></script>
+  </body>
+</html>
