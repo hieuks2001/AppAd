@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Constants\PagePriorityConstants;
 use App\Constants\PageStatusConstants;
+use App\Constants\MissionStatusConstants;
 use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
 use Illuminate\Http\Request;
@@ -26,6 +27,21 @@ class DashboardController extends Controller
     $pages = Page::where('status', PageStatusConstants::APPROVED)->get();
     $notApprovedPages = Page::where('status', PageStatusConstants::PENDING)->get();
     return view('admin.traffic', compact(['pages', 'notApprovedPages']));
+  }
+
+  public function managementMissions()
+  {
+    $missions = Page::join("missions","missions.page_id","=","pages.id")
+    ->where([
+      ['pages.status',"=", PageStatusConstants::APPROVED],
+      ['missions.status',"=", MissionStatusConstants::COMPLETED],
+    ])
+    ->orderBy("pages.price_per_traffic", "DESC")
+    ->get([
+      "missions.id", "missions.ip", "missions.origin_url", "missions.updated_at", "missions.reward",
+      "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
+    ]);
+    return view('admin.missions')->with('missions', $missions);
   }
 
   public function getApproveTraffic($id)

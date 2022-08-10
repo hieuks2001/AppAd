@@ -15,10 +15,10 @@ async function getCode() {
     if ("code" in rs || "onsite" in rs) {
       return rs;
     } else if ("error" in rs) {
-      // throw rs.error;
+      throw rs.error;
     }
   } catch (error) {
-    // getCodeBtn.textContent = error;
+    getCodeBtn.textContent = "";
   }
 }
 
@@ -31,14 +31,11 @@ window.addEventListener("DOMContentLoaded", async () => {
     getCodeBtn.addEventListener("click", (e) => {
       e.preventDefault();
       navigator.clipboard.writeText(result.code);
-      getCodeBtn.title = "Đã sao chép";
+      alert("Đã sao chép");
     });
   } else {
     //nếu chưa có code sẽ check là google
-    if (
-      document.referrer.includes("https://www.google.com") &&
-      document.referrer != ""
-    ) {
+    if (document.referrer.includes("https://www.google.com")) {
       getCodeBtn.addEventListener("click", (e) => {
         e.preventDefault();
         getCodeBtn.disabled = true;

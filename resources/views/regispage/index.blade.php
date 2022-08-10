@@ -94,8 +94,8 @@
               &lt;script&gt;
               var value = &quot;{{ Session::get('pageId') }}&quot;;
               &lt;/script&gt;
-              &lt;script
-              src=&quot;{{ asset('ican.js') }}&quot;&gt;&lt;/script&gt; </code>
+              &lt;script 
+              src=&quot;https://nhiemvu.app/ican.js&quot;&gt;&lt;/script&gt; </code>
           </div>
           <p>
             + Copy toàn bộ code này và gắn vào Footer của website
@@ -236,7 +236,7 @@
       />
     </div>
     @php
-      $tabs = ['Đang chờ', 'Đang chạy', 'Hoàn thành', 'Lỗi'];
+      $tabs = ['Đang chờ', 'Đang chạy', "Người làm nhiệm vụ", 'Hoàn thành', 'Lỗi'];
     @endphp
     <div class="tabs tabs-boxed my-3 bg-transparent">
       @foreach ($tabs as $index => $tab)
@@ -251,9 +251,10 @@
     @yield('tab2-blade')
     @yield('tab3-blade')
     @yield('tab4-blade')
+    @yield('tab5-blade')
   </div>
   <script>
-    const siteTypes = {!! json_encode($onsite->toArray(), JSON_HEX_TAG) !!}
+    const siteTypes = Object.entries({!! json_encode($onsite->toArray(), JSON_HEX_TAG) !!}).map(([key, value]) =>value)
     var output = document.getElementById('output');
     var fileUpload = document.getElementById('fileUpload');
     fileUpload?.addEventListener('change', (event) => {
@@ -290,8 +291,8 @@
       }
       selectSiteTypeOnsiteEle.value = ""
       priceEle.textContent = "0.00 USDT"
-      const siteType = siteTypes.find(siteType => siteType.id == e.target
-        .value);
+      console.log(siteTypes);
+      const siteType = siteTypes.find(siteType => siteType.id == e.target.value);
       for (const k in siteType.onsite) {
         const option = document.createElement("option");
         option.value = k;

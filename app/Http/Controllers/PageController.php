@@ -11,6 +11,7 @@ use ReflectionClass;
 use App\Constants\OntimeTypeConstants;
 use App\Constants\OntimePriceConstants;
 use App\Constants\PageStatusConstants;
+use App\Constants\MissionStatusConstants;
 use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
 use App\Models\PageType;
@@ -80,17 +81,32 @@ class PageController extends Controller
   }
   public function regispageTab3()
   {
+    $missions = Page::join("missions","missions.page_id","=","pages.id")
+    ->where([
+      ['pages.user_id',"=", Auth::user()->id],
+      ['pages.status',"=", PageStatusConstants::APPROVED],
+      ['missions.status',"=", MissionStatusConstants::COMPLETED],
+    ])
+    ->orderBy("pages.price_per_traffic", "DESC")
+    ->get([
+      "missions.id", "missions.ip", "missions.updated_at",
+      "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
+    ]);
+    return view('regispage.tab3')->with('missions', $missions);
+  }
+  public function regispageTab4()
+  {
     // Completed Traffic order (Approved page)
     $pages = Page::where('status', PageStatusConstants::APPROVED)
       ->where('user_id', Auth::user()->id)
       ->where('traffic_remain', 0)->limit(5)->get();
-    return view('regispage.tab3')->with('pages', $pages);
+    return view('regispage.tab4')->with('pages', $pages);
   }
-  public function regispageTab4()
+  public function regispageTab5()
   {
     // Canceled Traffic order (Error)
     $pages = Page::where('status', PageStatusConstants::CANCEL)
       ->where('user_id', Auth::user()->id)->limit(5)->get();
-    return view('regispage.tab4')->with('pages', $pages);
+    return view('regispage.tab5')->with('pages', $pages);
   }
 }
