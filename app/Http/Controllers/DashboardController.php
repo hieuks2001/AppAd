@@ -24,8 +24,8 @@ class DashboardController extends Controller
 {
   public function managementTraffic()
   {
-    $pages = Page::where('status', PageStatusConstants::APPROVED)->get();
-    $notApprovedPages = Page::where('status', PageStatusConstants::PENDING)->get();
+    $pages = Page::where('status', PageStatusConstants::APPROVED)->simplePaginate(10);
+    $notApprovedPages = Page::where('status', PageStatusConstants::PENDING)->simplePaginate(5);
     return view('admin.traffic', compact(['pages', 'notApprovedPages']));
   }
 
@@ -37,10 +37,12 @@ class DashboardController extends Controller
       ['missions.status',"=", MissionStatusConstants::COMPLETED],
     ])
     ->orderBy("pages.price_per_traffic", "DESC")
-    ->get([
-      "missions.id", "missions.ip", "missions.origin_url", "missions.updated_at", "missions.reward",
-      "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
-    ]);
+    ->simplePaginate(
+      $perPage = 20, $columns = [
+        "missions.id", "missions.ip", "missions.origin_url", "missions.updated_at", "missions.reward",
+        "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
+      ]
+    );
     return view('admin.missions')->with('missions', $missions);
   }
 
@@ -166,7 +168,7 @@ class DashboardController extends Controller
   public function managementUsers()
   {
     $userTypes = DB::table('user_types')->get();
-    $users = DB::table('user_missions')->where('status', 1)->get();
+    $users = DB::table('user_missions')->where('status', 1)->simplePaginate(10);
     return view('admin.users', compact(['userTypes', 'users']));
   }
 

@@ -104,6 +104,10 @@
         @endforeach
       </tbody>
     </table>
+    <div class="btn-group flex justify-center mt-5">
+      <a class="btn btn-outline btn-sm {{$users->onFirstPage() ? 'btn-disabled' : ''}}" href="{{$users->previousPageUrl()}}">Previous</a>
+      <a class="btn btn-outline btn-sm {{!$users->hasMorePages() ? 'btn-disabled' : ''}}" href="{{$users->nextPageUrl()}}">Next</a>
+    </div>
   </div>
   <input
     type="checkbox"

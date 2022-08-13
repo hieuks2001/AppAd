@@ -41,6 +41,10 @@
         @endforeach
       </tbody>
     </table>
+    <div class="btn-group flex justify-center mt-5">
+      <a class="btn btn-outline btn-sm {{$pages->onFirstPage() ? 'btn-disabled' : ''}}" href="{{$pages->previousPageUrl()}}">Previous</a>
+      <a class="btn btn-outline btn-sm {{!$pages->hasMorePages() ? 'btn-disabled' : ''}}" href="{{$pages->nextPageUrl()}}">Next</a>
+    </div>
   </div>
   <div class="overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
     <div class="flex items-center justify-between">
@@ -106,6 +110,10 @@
         @endforeach
       </tbody>
     </table>
+    <div class="btn-group flex justify-center mt-5">
+      <a class="btn btn-outline btn-sm {{$notApprovedPages->onFirstPage() ? 'btn-disabled' : ''}}" href="{{$notApprovedPages->previousPageUrl()}}">Previous</a>
+      <a class="btn btn-outline btn-sm {{!$notApprovedPages->hasMorePages() ? 'btn-disabled' : ''}}" href="{{$notApprovedPages->nextPageUrl()}}">Next</a>
+    </div>
   </div>
   <input
     type="checkbox"
