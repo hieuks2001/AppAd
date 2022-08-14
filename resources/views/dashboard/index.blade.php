@@ -25,5 +25,9 @@
                @endforeach
             </tbody>
         </table>
+        <div class="btn-group flex justify-center mt-5">
+          <a class="btn btn-outline btn-sm {{$statistical->onFirstPage() ? 'btn-disabled' : ''}}" href="{{$statistical->previousPageUrl()}}">Previous</a>
+          <a class="btn btn-outline btn-sm {{!$statistical->hasMorePages() ? 'btn-disabled' : ''}}" href="{{$statistical->nextPageUrl()}}">Next</a>
+        </div>
     </div>
 @endsection
