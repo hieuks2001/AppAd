@@ -68,3 +68,8 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::post('admin/users/{id}', 'DashboardController@postChangeUserType');
   Route::post('management/usertypes', 'DashboardController@postCreateUserType');
 });
+
+// Verify user
+Route::post('/verify/renew', 'UserController@verifyRenewOtp');
+Route::post('/verify', 'UserController@verifyOtpToken');
+Route::get('/verify', 'UserController@verifyOtp');
