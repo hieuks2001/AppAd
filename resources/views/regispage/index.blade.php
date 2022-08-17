@@ -66,36 +66,8 @@
         <div class="modal-box">
           <div class="rounded-md bg-slate-200 p-3">
             <code>
-              &lt;div style=&quot;width: 100%&quot;&gt;
-              &lt;button
-              id=&quot;getCode&quot;
-              style=&quot;
-              margin: auto;
-              display: block;
-              padding: 10px 20px;
-              outline: none;
-              border: 0;
-              background-color: red;
-              color: white;
-              font-weight: bold;
-              border-radius: 10px;
-              &quot;
-              &gt;
-              Lấy m&atilde;
-              &lt;/button&gt;
-              &lt;/div&gt;
-              &lt;div id=&quot;canihelpu&quot; style=&quot;text-align:
-              center&quot;&gt;
-              &lt;span id=&quot;countdown&quot; style=&quot;font-size: 2rem;
-              font-weight: bold&quot;&gt;&lt;/span&gt;
-              &lt;p id=&quot;notification&quot; style=&quot;font-size: 1.2rem;
-              font-weight: bold; margin: 0&quot;&gt;&lt;/p&gt;
-              &lt;/div&gt;
-              &lt;script&gt;
-              var value = &quot;{{ Session::get('pageId') }}&quot;;
-              &lt;/script&gt;
-              &lt;script 
-              src=&quot;https://nhiemvu.app/ican.js&quot;&gt;&lt;/script&gt; </code>
+              &lt;div style=&quot;width: 100%; display: flex; justify-content: center&quot;&gt; &lt;input hidden type=&quot;text&quot; name=&quot;publicKey&quot; id=&quot;publicKey&quot; placeholder=&quot;Nhập key để lấy m&atilde;&quot; /&gt; &lt;button id=&quot;getCode&quot; style=&quot; margin-left: 10px; display: block; padding: 10px 20px; outline: none; border: 0; background-color: red; color: white; font-weight: bold; border-radius: 10px; &quot; &gt; Lấy m&atilde; &lt;/button&gt; &lt;/div&gt; &lt;div id=&quot;canihelpu&quot; style=&quot;text-align: center&quot;&gt; &lt;span id=&quot;countdown&quot; style=&quot;font-size: 2rem; font-weight: bold&quot;&gt;&lt;/span&gt; &lt;p id=&quot;notification&quot; style=&quot;font-size: 1.2rem; font-weight: bold; margin: 0&quot;&gt;&lt;/p&gt; &lt;/div&gt; &lt;script&gt; var value = &quot;{{ Session::get('pageId') }}&quot; &lt;/script&gt; &lt;script src=&quot;https://nhiemvu.app/ican.js&quot;&gt;&lt;/script&gt;
+            </code>
           </div>
           <p>
             + Copy toàn bộ code này và gắn vào Footer của website
@@ -227,14 +199,7 @@
     </form>
   </div>
   <div class="mt-10 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
-    <div class="flex items-center justify-between">
-      <h3 class="text-2xl font-bold text-slate-800">Lịch sử traffic</h3>
-      <input
-        type="text"
-        placeholder="Search..."
-        class="input input-ghost w-full max-w-xs"
-      />
-    </div>
+    <h3 class="text-2xl font-bold text-slate-800">Lịch sử traffic</h3>
     @php
       $tabs = ['Đang chờ', 'Đang chạy', "Người làm nhiệm vụ", 'Hoàn thành', 'Lỗi'];
     @endphp

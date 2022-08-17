@@ -20,6 +20,8 @@ class CreateMissionsTable extends Migration
       $table->decimal('reward', 5, 4)->nullable();
       $table->string('ip')->default('');
       $table->string('user_agent')->default('');
+      $table->string('key');
+      $table->json('check');
       $table->tinyInteger('status');
       $table->string('code')->default('');
       $table->string('origin_url')->default('');
