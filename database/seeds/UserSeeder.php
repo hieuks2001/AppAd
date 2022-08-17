@@ -23,6 +23,7 @@ class UserSeeder extends Seeder
                 'status' => 1,
                 'is_admin' => 1,
                 'wallet' => 0,
+                'verified' => 1,
                 // 'user_type_id' => $type->id,
                 // 'mission_count' => json_encode(array()),
             ],
@@ -34,6 +35,7 @@ class UserSeeder extends Seeder
                 'status' => 1,
                 'is_admin' => 0,
                 'wallet' => 99999999,
+                'verified' => 1,
                 // 'user_type_id' => $type->id,
                 // 'mission_count' => json_encode(array()),
             ]
