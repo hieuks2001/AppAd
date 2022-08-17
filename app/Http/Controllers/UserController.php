@@ -6,14 +6,17 @@ use App\Constants\MissionStatusConstants;
 use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
 use App\Models\Missions;
+use App\Models\Otp;
 use App\Models\User;
 use App\Models\Page;
 use App\Models\PageType;
 use App\Models\UserType;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
@@ -36,6 +39,21 @@ class UserController extends Controller
       $ip = $_SERVER['REMOTE_ADDR'];
     }
     return $ip;
+  }
+
+  public function sendOTP($phoneNumber, $otp)
+  {
+    $url = "https://safeotp.com/api/message";
+    $data = [
+      'token' => '6070d3e6-d221-40b0-b254-f7b39bf06611',
+      'data' => ['otp' => $otp],
+      'recipients' => [
+        $phoneNumber
+      ]
+    ];
+    $response = Http::withBody(json_encode($data), 'application/json')
+      ->post($url);
+    return $response->successful();
   }
 
   public function login(Request $request)
@@ -66,27 +84,119 @@ class UserController extends Controller
     if (!isset($request->username)) {
       return view('procedure.register');
     }
-    if (!isset($request->password) && !isset($request->re_password)){
+    if (!isset($request->password) && !isset($request->re_password)) {
       return Redirect::to('/register')->with('error', 'Không đầy đủ thông tin cần thiết!');
     }
     if ($request->password != $request->re_password) {
       return Redirect::to('/register')->with('error', 'Mật khẩu không trùng khớp!');
     }
     $checkUser = User::where('username', $request->username);
-    if ($checkUser->count() != 0){
+    if ($checkUser->count() != 0) {
       return Redirect::to('/register')->with('error', 'Tên tài khoản đã có người sử dụng!');
     }
-    $type =  UserType::where('is_default', 1)->get('id')->first();
-    $user = new User();
-    $user->username = $request->username;
-    $user->password = bcrypt($request->password);
-    $user->is_admin = 0;
-    $user->status = 1;
-    $user->wallet = 0;
-    $user->user_type_id = $type->id;
-    $user->commission = 0;
-    $user->save();
-    return Redirect::to('/login')->with('message', 'Đăng ký thành công!');
+    $request->validate([
+      'username' => 'required|digits:10',
+      'password' => 'required'
+    ], [
+      'username.digits' => 'SĐT không phù hợp'
+    ]);
+    $input = $request->all();
+    $otp = DB::transaction(function () use ($input) {
+      $type =  UserType::where('is_default', 1)->get('id')->first();
+      $user = new User();
+      $user->username = $input['username'];
+      $user->password = bcrypt($input['password']);
+      $user->is_admin = 0;
+      $user->status = 0; // Set status to inactive / unverfied
+      $user->wallet = 0;
+      $user->verified = 0;
+      $user->user_type_id = $type->id;
+      $user->commission = 0;
+      $user->save();
+
+      $otp = new Otp();
+      $otp->user_id = $user->id;
+      $otp->user = 'mission';
+      $otp->otp = Str::random(5);
+      $otp->expire = Carbon::now()->addMinutes(5);
+      $otp->save();
+      return $otp;
+    });
+
+    // Send otp sms
+    $this->sendOTP($input['username'], $otp->otp);
+    return Redirect::to('/login')->with('message', 'Đăng ký thành công! Vui lòng đăng nhập lại và xác minh mã OTP để kích hoạt tài khoản!');
+  }
+
+  public function verifyOtp()
+  {
+    if (!Auth::check()) {
+      return Redirect::to('/login');
+    }
+    $user = Auth::user();
+    if ($user->verified) {
+      return Redirect::to('/');
+    }
+    return view('procedure.otp');
+  }
+
+  public function verifyOtpToken(Request $request)
+  {
+    if (!Auth::check()) {
+      return Redirect::to('/login');
+    }
+    $user = Auth::user();
+    if ($user->verified) {
+      return Redirect::to('/');
+    }
+    $otp = OTP::where([
+      'user_id' => $user->id,
+      'otp' => $request->otp,
+      'user' => 'mission'
+    ])->get(['created_at', 'id', 'otp', 'expire'])->first();
+    if (!$otp) {
+      return Redirect::to('/verify')->with(['error' => 'OTP sai, vui lòng kiểm tra lại!', 'getCode' => false]);
+    }
+    // Check if otp expired
+    $check = Carbon::now()->gt($otp->expire);
+    if ($check) {
+      $otp->delete();
+      return Redirect::to('/verify')->with(['error' => 'OTP đã hết hạn, vui vòng nhận lại!', 'getCode' => true]);
+    }
+    DB::table('user_missions')->where('id', $user->id)->update(['verified' => 1, 'status' => 1]); // Set user to active status
+    $otp->delete();
+    return Redirect::to('/');
+  }
+
+  public function verifyRenewOtp(Request $request)
+  {
+    if (!Auth::check()) {
+      return Redirect::to('/login');
+    }
+    $user = Auth::user();
+    if ($user->verified) {
+      return Redirect::to('/regispage');
+    }
+    $rs = Otp::where([
+      'user_id' => $user->id,
+      'user' => 'mission'
+    ])->get()->first();
+    if ($rs) {
+      $check = Carbon::now()->lt($rs->expire);
+      if ($check) {
+        return Redirect::to('/verify')->with(['error' => 'Vui lòng đợi sau 5\'!']);
+      } else {
+        $rs->delete();
+      }
+    }
+    $otp = new Otp();
+    $otp->otp = Str::random(5);
+    $otp->expire = Carbon::now()->addMinutes(5);
+    $otp->user = 'mission';
+    $otp->user_id = $user->id;
+    $otp->save();
+    $this->sendOTP($user->username, $otp->otp);
+    return Redirect::to('/verify');
   }
 
   public function index()
