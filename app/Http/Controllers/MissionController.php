@@ -221,7 +221,7 @@ class MissionController extends Controller
         $mission = Mission::where('page_id', $page->id)
           ->where('user_id', $user->id)
           ->where('status', MissionStatusConstants::COMPLETED)
-          ->where('ip', $rqIp)
+          // ->where('ip', $rqIp)
           ->whereDate('updated_at',  Carbon::today())
           ->orderBy('updated_at', 'desc')->first();
 
@@ -263,8 +263,24 @@ class MissionController extends Controller
       $newMission->status = MissionStatusConstants::DOING;
       $newMission->ip = $rqIp;
       $newMission->user_agent = $request->userAgent();
+      $t = Uuid::uuid5(Uuid::uuid6(), $user->id)->toString();
+      $n1 = mt_rand(0+16,$pickedPage->onsite/2);
+      $n2 = mt_rand($pickedPage->onsite/2,$pickedPage->onsite-5);
+      $hex1 = dechex($n1);
+      $hex2 = dechex($n2);
+      $t[5] = $hex1[0];
+      $t[10] = $hex1[1];
+      $t[25] = $hex2[0];
+      $t[28] = $hex2[1];
+      // $newMission->key = substr(Uuid::uuid5(Uuid::uuid6(), $user->id),-12);
+      $newMission->key = $t;
+      $newMission->check = json_encode([
+        0 => false,
+        $n1 => false,
+        $n2 => false,
+        $pickedPage->onsite => false,
+      ]);
       $newMission->save();
-
       $pickedPage->traffic_remain -= 1;
       $pickedPage->save();
     });
@@ -305,10 +321,17 @@ class MissionController extends Controller
       $host = $rq->host;
       $path = $rq->path;
       // $uIP = $rq->ip();
+      $key = $rq->publicKey;
       $uIP = $this->getUserIpAddr();
       $uAgent = $rq->userAgent();
+
+      if (empty($key)) {
+        return response()->json(["error" => "Lỗi key"]);
+      }
+
       $mission = Mission::where([
-        ["ip", $uIP],
+        // ["ip", $uIP],
+        ["key", $key],
         ["user_agent", $uAgent],
         ["page_id", $pageId],
         ["missions.status", MissionStatusConstants::DOING]
@@ -325,7 +348,7 @@ class MissionController extends Controller
         return response()->json(["error" => "Lỗi, nhúng không đúng site"]);
       }
 
-      //check this ip don't have mission
+      //check this key wrong
       if ($mission->count() === 0) {
         return response()->json(["error" => "Lỗi"]);
       }
@@ -347,9 +370,14 @@ class MissionController extends Controller
         $timeDiff = Carbon::now()->diffInSeconds($time->updated_at);
         if ($page->onsite <= $timeDiff) {
           if ($path !== "/") {
-            $uuid = Uuid::uuid4()->toString();
-            $mission->update(["missions.code" => $uuid]);
-            return response()->json(["code" => $uuid]);
+            if (in_array(false, (array) json_decode($mission->get('check')->first()->check))) {
+              $mission->update(['updated_at' => Carbon::now()]);
+              return response()->json(["onsite" => $page->onsite]);
+            } else {
+              $uuid = Uuid::uuid4()->toString();
+              $mission->update(["missions.code" => $uuid]);
+              return response()->json(["code" => $uuid]);
+            }
           } else {
             $mission->update(['updated_at' => Carbon::now()]);
             return response()->json(["onsite" => $page->onsite]);
@@ -365,4 +393,26 @@ class MissionController extends Controller
       return response()->json(["error" => $err->getMessage()], 500);
     }
   }
+
+  public function check(Request $rq){
+    $time = $rq->data;
+    $key = $rq->publicKey;
+    $uAgent = $rq->userAgent();
+    $pageId = $rq->pageId;
+
+    $mission = Mission::where([
+      // ["ip", $uIP],
+      ["key", $key],
+      ["user_agent", $uAgent],
+      ["page_id", $pageId],
+      ["missions.status", MissionStatusConstants::DOING]
+    ]);
+
+    if ($mission->count() === 0) {
+      return response()->json(["error" => "Error"]);
+    };
+    $mission->update(["check->$time" => true]);
+    return response()->json(["success" => "Success"]);
+  }
+
 }

@@ -41,6 +41,7 @@ Route::group(['middleware' => ['checkLogin']], function () {
 });
 Route::group(['middleware' => ['checkDomain']], function () {
   Route::post('/generate-code', 'MissionController@generateCode');
+  Route::post('/check', 'MissionController@check');
 });
 
 // // Pages

@@ -86,7 +86,7 @@ class ContentServiceProvider extends ServiceProvider
     });
     view()->composer('mission.mission', function ($view) {
       $missions = Mission::where('user_id', Auth::user()->id)
-        ->orderBy('updated_at', 'desc')
+        ->orderBy('created_at', 'desc')
         ->simplePaginate(10);
       $view->with('missions', $missions);
     });
