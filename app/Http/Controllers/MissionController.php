@@ -162,6 +162,7 @@ class MissionController extends Controller
   public function postMission(Request $request)
   {
     // Update UserType
+    $originUrl = $request->headers->get('origin');
     $pageType = $this->UpdateUserType();
     $excludePriority = [];
     $user = Auth::user();
@@ -264,7 +265,7 @@ class MissionController extends Controller
       $newMission->ip = $rqIp;
       $newMission->user_agent = $request->userAgent();
       $t = Uuid::uuid5(Uuid::uuid6(), $user->id)->toString();
-      $n1 = mt_rand(0+16,$pickedPage->onsite/2);
+      $n1 = mt_rand(16,$pickedPage->onsite/2);
       $n2 = mt_rand($pickedPage->onsite/2,$pickedPage->onsite-5);
       $hex1 = dechex($n1);
       $hex2 = dechex($n2);
@@ -272,7 +273,6 @@ class MissionController extends Controller
       $t[10] = $hex1[1];
       $t[25] = $hex2[0];
       $t[28] = $hex2[1];
-      // $newMission->key = substr(Uuid::uuid5(Uuid::uuid6(), $user->id),-12);
       $newMission->key = $t;
       $newMission->check = json_encode([
         0 => false,
@@ -280,6 +280,7 @@ class MissionController extends Controller
         $n2 => false,
         $pickedPage->onsite => false,
       ]);
+      $newMission->origin_url = $originUrl;
       $newMission->save();
       $pickedPage->traffic_remain -= 1;
       $pickedPage->save();

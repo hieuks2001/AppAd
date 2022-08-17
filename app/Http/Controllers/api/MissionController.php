@@ -33,8 +33,10 @@ class MissionController extends Controller
   public function getMission(Request $request)
   {
     $userIP = $this->getUserIpAddr();
+    $keyMission = $request->ms;
     $userAgent = $request->userAgent();
-    $mission = Mission::where('ip', $userIP)
+    // $mission = Mission::where('ip', $userIP)
+    $mission = Mission::where('key', $keyMission)
       ->where('user_agent', $userAgent)
       ->where('status', MissionStatusConstants::DOING)
       ->orderBy('created_at', 'desc')->first();
@@ -44,26 +46,31 @@ class MissionController extends Controller
     $page = Page::where('id', $mission->page_id)
       ->where('status', 1)->first();
     if ($mission->ip !== $userIP || $mission->user_agent !== $userAgent) {
-      return response()->json(["mission" => $page, "error"=>"Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại"]);
+      return response()->json(["mission"=>$mission,"page" => $page, "error"=>"Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại"]);
     }
-    return response()->json(["mission" => $page]);
+    return response()->json(["mission"=>$mission,"page" => $page]);
   }
 
   public function postMission(Request $request)
   {
     $originUrl = $request->headers->get('origin');
     $userIP = $this->getUserIpAddr();
-    $mission = Mission::where([
-      'ip' => $userIP,
-      'user_agent' => $request->userAgent(),
-      'status' => MissionStatusConstants::DOING,
-    ])
-      ->orderBy('created_at', 'desc')->first();
-    if ($mission) { // There is mission existed!
-      $page = Page::where('id', $mission->page_id)
-        ->where('status', PageStatusConstants::APPROVED)->get(['keyword', 'onsite', 'image', 'url'])->first();
-      return response()->json(["mission" => $page]);
+    $keyMission = $request->ms;
+    if (!empty($keyMission)) {
+      $mission = Mission::where([
+        // 'ip' => $userIP,
+        'key' => $keyMission,
+        'user_agent' => $request->userAgent(),
+        'status' => MissionStatusConstants::DOING
+        ])->orderBy('created_at', 'desc')->first();
+      if ($mission) { // There is mission existed!
+        $page = Page::where('id', $mission->page_id)
+          ->where('status', PageStatusConstants::APPROVED)->get(['keyword', 'onsite', 'image', 'url'])->first();
+        return response()->json(["mission"=>$mission,"page" => $page]);
+      }
     }
+
+
     // NO MISSION CURRENTLY DOING
     $pickedPage = null;
     $excludePageId = [];
@@ -78,7 +85,8 @@ class MissionController extends Controller
       }
       $mission = Mission::where('page_id', $page->id)
         ->where('status', MissionStatusConstants::COMPLETED)
-        ->where('ip', $userIP)
+        // ->where('ip', $userIP)
+        ->where('key', $keyMission)
         ->whereDate('updated_at',  Carbon::today())
         ->orderBy('updated_at', 'desc')->first();
       if (!$mission) {
@@ -103,8 +111,21 @@ class MissionController extends Controller
       // No page available -> comback later
       return response()->json(["error" => "No mission available"]);
     }
+
+    $t = Uuid::uuid5(Uuid::uuid6(), $userIP)->toString();
+    error_log($t);
+    $n1 = mt_rand(16,$pickedPage->onsite/2);
+    $n2 = mt_rand($pickedPage->onsite/2,$pickedPage->onsite-5);
+    $hex1 = dechex($n1);
+    $hex2 = dechex($n2);
+    $t[5] = $hex1[0];
+    $t[10] = $hex1[1];
+    $t[25] = $hex2[0];
+    $t[28] = $hex2[1];
+    error_log($t);
+
     // Begin database transaction
-    DB::transaction(function () use ($pickedPage, $request, $userIP, $originUrl) {
+    DB::transaction(function () use ($pickedPage, $request, $t, $n1, $n2, $userIP, $originUrl) {
       // Refresh data
       $pickedPage = $pickedPage->refresh();
 
@@ -113,22 +134,33 @@ class MissionController extends Controller
       $newMission->status = MissionStatusConstants::DOING;
       $newMission->ip = $userIP;
       $newMission->user_agent = $request->userAgent();
+      error_log($t);
+      $newMission->key = $t;
+      $newMission->check = json_encode([
+        0 => false,
+        $n1 => false,
+        $n2 => false,
+        $pickedPage->onsite => false,
+      ]);
       $newMission->save();
       $newMission->origin_url = $originUrl;
 
       $pickedPage->traffic_remain -= 1;
       $pickedPage->save();
     });
-
-    return response()->json(["mission" => $pickedPage]);
+    $ms = new \stdClass();
+    $ms->key = $t;
+    return response()->json(["mission"=> $ms, "page" => $pickedPage]);
   }
 
   public function cancelMission(Request $request)
   {
     $userIP = $this->getUserIpAddr();
+    $keyMission = $request->ms;
     // Cancel current mission
     $mission = Mission::where([
-      'ip' => $userIP,
+      // 'ip' => $userIP,
+      'key' => $keyMission,
       'user_agent' => $request->userAgent()
     ])
       ->where('status', MissionStatusConstants::DOING)

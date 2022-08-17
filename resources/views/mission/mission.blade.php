@@ -38,7 +38,7 @@
         <div class="text-slate-800 pb-5">
           <h2 class="mb-5 text-center text-2xl font-bold">Nhiệm vụ của bạn</h2>
           <p class="mb-3">
-            <b>Bước 1:</b> Hãy sao chép<b><span style="color: red;"> key bên dưới</span></b>
+            <b>Bước 1:</b> Hãy sao chép<b><span style="color: red"> key nhận mã</span></b> bên dưới
           </p>
           <p class="mb-3">
             <b>Bước 2:</b><b><span style="color: red;"> Mở tab mới bên cạnh</span></b> và truy cập công cụ tìm kiếm: <b>>>Google.com</b>
@@ -144,14 +144,14 @@
     </div>
     <script>
       document.getElementById("btn-copy-kw").addEventListener("change",(e)=>{
-        if (event.currentTarget.checked) {
+        if (e.currentTarget.checked) {
           navigator.clipboard.writeText({!!json_encode($page->keyword)!!})
         } else {
           document.getElementById("btn-copy-kw").checked = true
         }
       })
       document.getElementById("btn-copy-key").addEventListener("change",(e)=>{
-        if (event.currentTarget.checked) {
+        if (e.currentTarget.checked) {
           navigator.clipboard.writeText({!!json_encode($mission->key)!!})
         } else {
           document.getElementById("btn-copy-key").checked = true
