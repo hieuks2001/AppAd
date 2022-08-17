@@ -73,8 +73,6 @@ Route::group(['middleware' => ['checkAdmin']], function () {
 
 
 // Verify user
-Route::group(['middleware' => ['checkLogin']], function () {
-  Route::get('/verify', 'UserController@verifyOtp');
-  Route::post('/verify', 'UserController@verifyOtpToken');
-  Route::post('/verify/renew', 'UserController@verifyRenewOtp');
-});
+Route::get('/verify', 'UserController@verifyOtp');
+Route::post('/verify', 'UserController@verifyOtpToken');
+Route::post('/verify/renew', 'UserController@verifyRenewOtp');

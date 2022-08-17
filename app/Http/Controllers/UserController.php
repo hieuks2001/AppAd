@@ -127,6 +127,9 @@ class UserController extends Controller
 
   public function verifyOtp()
   {
+    if (!Auth::check()) {
+      return Redirect::to('/login');
+    }
     $user = Auth::user();
     if ($user->verified) {
       return Redirect::to('/regispage');
@@ -136,6 +139,9 @@ class UserController extends Controller
 
   public function verifyOtpToken(Request $request)
   {
+    if (!Auth::check()) {
+      return Redirect::to('/login');
+    }
     $user = Auth::user();
     if ($user->verified) {
       return Redirect::to('/regispage');
@@ -154,24 +160,29 @@ class UserController extends Controller
       $otp->delete();
       return Redirect::to('/verify')->with(['error' => 'OTP đã hết hạn, vui vòng nhận lại!', 'getCode' => true]);
     }
-    DB::table('user_traffics')->where('id', $user->id)->update(['verified' => 1]);
+    DB::table('user_traffics')->where('id', $user->id)->update(['verified' => 1, 'status' => 1]);
     $otp->delete();
     return Redirect::to('/regispage');
   }
 
   public function verifyRenewOtp(Request $request)
   {
+    if (!Auth::check()) {
+      return Redirect::to('/login');
+    }
     $user = Auth::user();
-    if ($user->verify){
+    if ($user->verify) {
       return Redirect::to('/regispage');
     }
-    $rs = Otp::where('user_id', $user->id)->get()->first();
+    $rs = Otp::where([
+      'user_id' => $user->id,
+      'user' => 'traffic'
+    ])->get()->first();
     if ($rs) {
       $check = Carbon::now()->lt($rs->expire);
-      if ($check){
+      if ($check) {
         return Redirect::to('/verify')->with(['error' => 'Vui lòng đợi sau 5\'!']);
-      }
-      else {
+      } else {
         $rs->delete();
       }
     }
