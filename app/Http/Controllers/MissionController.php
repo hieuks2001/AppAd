@@ -252,7 +252,7 @@ class MissionController extends Controller
       return view('mission.mission', [])->withErrors('Không còn nhiệm vụ, vui lòng quay lại sau!');
     }
     // Begin database transaction
-    DB::transaction(function () use ($pickedPage, $user, $request, $rqIp) {
+    DB::transaction(function () use ($pickedPage, $user, $request, $rqIp, $originUrl) {
       // Refresh data
       $pickedPage = $pickedPage->refresh();
 

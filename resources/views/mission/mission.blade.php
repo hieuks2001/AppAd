@@ -164,11 +164,11 @@
   <div class="overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
     <div class="flex items-center justify-between">
       <h3 class="text-2xl font-bold text-slate-800">Nhiệm vụ đã thực hiện</h3>
-      <input
+      {{-- <input
         type="text"
         placeholder="Search..."
         class="input input-ghost w-full max-w-xs"
-      />
+      /> --}}
     </div>
     <br />
     <table class="table w-full bg-white">
