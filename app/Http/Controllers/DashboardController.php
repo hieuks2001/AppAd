@@ -31,8 +31,11 @@ class DashboardController extends Controller
 
   public function searchTrafficApproved(Request $request){
     $key = $request->data;
-    $pages = Page::where('status', PageStatusConstants::APPROVED)
-    ->where('url','LIKE',"%{$key}%")
+    $pages = Page::whereHas('user', function($query) use ($key){
+      $query->where('url','LIKE',"%{$key}%");
+      $query->orWhere('username', 'LIKE', "%{$key}%");
+    })
+    ->where('status',PageStatusConstants::APPROVED)
     ->simplePaginate(10);
     $notApprovedPages = Page::where('status', PageStatusConstants::PENDING)->simplePaginate(5);
     return view('admin.traffic', compact(['pages', 'notApprovedPages']));
@@ -41,7 +44,12 @@ class DashboardController extends Controller
   public function searchTrafficNotApproved(Request $request){
     $key = $request->data;
     $pages = Page::where('status', PageStatusConstants::APPROVED)->simplePaginate(10);
-    $notApprovedPages = Page::where('status', PageStatusConstants::PENDING)->where('url','LIKE',"%{$key}%")->simplePaginate(5);
+    $notApprovedPages = Page::whereHas('user', function($query) use ($key){
+      $query->where('url','LIKE',"%{$key}%");
+      $query->orWhere('username', 'LIKE', "%{$key}%");
+    })
+    ->where('status', PageStatusConstants::PENDING)
+    ->simplePaginate(5);
     return view('admin.traffic', compact(['pages', 'notApprovedPages']));
   }
 
