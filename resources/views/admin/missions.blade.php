@@ -3,11 +3,15 @@
   <div class="mb-10 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
     <div class="flex items-center justify-between">
       <h3 class="text-2xl font-bold text-slate-800">Nhiệm vụ đã hoàn thành</h3>
-      <input
-        type="text"
-        placeholder="Search..."
-        class="input w-full max-w-xs"
-      />
+      <form action="{{action('DashboardController@searchMission')}}" method="post">
+        @csrf
+        <input
+          type="text"
+          name="data"
+          placeholder="Tìm kiếm theo url traffic, trang nhận"
+          class="input w-full max-w-xs"
+        />
+      </form>
     </div>
     <br />
     <table class="table w-full">

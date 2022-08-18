@@ -29,6 +29,22 @@ class DashboardController extends Controller
     return view('admin.traffic', compact(['pages', 'notApprovedPages']));
   }
 
+  public function searchTrafficApproved(Request $request){
+    $key = $request->data;
+    $pages = Page::where('status', PageStatusConstants::APPROVED)
+    ->where('url','LIKE',"%{$key}%")
+    ->simplePaginate(10);
+    $notApprovedPages = Page::where('status', PageStatusConstants::PENDING)->simplePaginate(5);
+    return view('admin.traffic', compact(['pages', 'notApprovedPages']));
+  }
+
+  public function searchTrafficNotApproved(Request $request){
+    $key = $request->data;
+    $pages = Page::where('status', PageStatusConstants::APPROVED)->simplePaginate(10);
+    $notApprovedPages = Page::where('status', PageStatusConstants::PENDING)->where('url','LIKE',"%{$key}%")->simplePaginate(5);
+    return view('admin.traffic', compact(['pages', 'notApprovedPages']));
+  }
+
   public function managementMissions()
   {
     $missions = Page::join("missions","missions.page_id","=","pages.id")
@@ -44,6 +60,27 @@ class DashboardController extends Controller
       ]
     );
     return view('admin.missions')->with('missions', $missions);
+  }
+
+  public function searchMission(Request $request){
+    $key = $request->data;
+    $missions = Page::join("missions","missions.page_id","=","pages.id")
+    ->where([
+      ['pages.status',"=", PageStatusConstants::APPROVED],
+      ['missions.status',"=", MissionStatusConstants::COMPLETED],
+    ])
+    ->where(function($query) use ($key){
+      $query->where('url','LIKE',"%{$key}%");
+      $query->orWhere('origin_url', 'LIKE', "%{$key}%");
+    })
+    ->orderBy("pages.price_per_traffic", "DESC")
+    ->simplePaginate(
+      $perPage = 20, $columns = [
+        "missions.id", "missions.ip", "missions.origin_url", "missions.updated_at", "missions.reward",
+        "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
+      ]
+    );
+    return view('admin.missions', compact(['missions']));
   }
 
   public function getApproveTraffic($id)
@@ -170,6 +207,12 @@ class DashboardController extends Controller
     $userTypes = DB::table('user_types')->get();
     $users = DB::table('user_missions')->where('status', 1)->simplePaginate(10);
     return view('admin.users', compact(['userTypes', 'users']));
+  }
+
+  public function searchUser(Request $request){
+    $sdt = $request->data;
+    $users = DB::table('user_missions')->where('username','LIKE',"%{$sdt}%")->simplePaginate(10);
+    return view('admin.users', compact(['users']));
   }
 
   public function postCreateUserType(Request $request)

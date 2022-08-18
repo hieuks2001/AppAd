@@ -6,11 +6,15 @@
   <div class="mb-10 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
     <div class="flex items-center justify-between">
       <h3 class="text-2xl font-bold text-slate-800">Kho Traffic</h3>
-      <input
-        type="text"
-        placeholder="Search..."
-        class="input w-full max-w-xs"
-      />
+      <form action="{{action('DashboardController@searchTrafficApproved')}}" method="post">
+        @csrf
+        <input
+          type="text"
+          name="data"
+          placeholder="Tìm kiếm url, sđt"
+          class="input w-full max-w-xs"
+        />
+      </form>
     </div>
     <br />
     <table class="table w-full">
@@ -18,7 +22,7 @@
       <thead>
         <tr>
           <th>URL</th>
-          <th>Username</th>
+          <th>SĐT</th>
           <th>Tổng traffic</th>
           <th>traffic/ngày</th>
           <th>Time onsite(s)</th>
@@ -49,11 +53,16 @@
   <div class="overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
     <div class="flex items-center justify-between">
       <h3 class="text-2xl font-bold text-slate-800">Traffic cần duyệt</h3>
-      <input
-        type="text"
-        placeholder="Search..."
-        class="input w-full max-w-xs"
-      />
+      <form action="{{action('DashboardController@searchTrafficNotApproved')}}" method="post">
+        @csrf
+        <input
+          type="text"
+          name="data"
+          placeholder="Tìm kiếm url, sđt"
+          class="input w-full max-w-xs"
+        />
+        <input type="submit" hidden>
+      </form>
     </div>
     <br />
     <table class="table w-full">
@@ -61,7 +70,7 @@
       <thead>
         <tr>
           <th>URL</th>
-          <th>Username</th>
+          <th>SĐT</th>
           <th>Wallet (USDT)</th>
           <th>Tổng traffic</th>
           <th>traffic/ngày</th>

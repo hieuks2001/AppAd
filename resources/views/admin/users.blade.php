@@ -4,11 +4,11 @@
     <div class="flex items-center justify-between">
       <h3 class="text-2xl font-bold text-slate-800">Loại người dùng</h3>
       <div class="flex">
-        <input
+        {{-- <input
           type="text"
           placeholder="Search..."
           class="input input-ghost mr-3 w-full max-w-xs"
-        >
+        > --}}
         <label
           for="modal-create"
           class="btn modal-button btn-accent gap-2"
@@ -53,11 +53,16 @@
   <div class="overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
     <div class="flex items-center justify-between">
       <h3 class="text-2xl font-bold text-slate-800">Danh sách người dùng</h3>
-      <input
-        type="text"
-        placeholder="Search..."
-        class="input input-ghost w-full max-w-xs"
-      >
+      <form action="{{action('DashboardController@searchUser')}}" method="post">
+        @csrf
+        <input
+          type="text"
+          name="data"
+          placeholder="Tìm kiếm sđt"
+          class="input input-ghost w-full max-w-xs"
+        >
+        <input type="submit" hidden>
+      </form>
     </div>
     <br >
     <table
@@ -67,9 +72,10 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Username</th>
+          <th>SĐT</th>
           <th>Loại</th>
-          {{-- <th></th> --}}
+          <th></th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -99,6 +105,24 @@
                   />
                 </svg>
               </label>
+            </td>
+            <td>
+              @if ($value->status)
+                <!-- volume on icon -->
+                <svg class="swap-on fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z" />
+                </svg>
+              @else
+                <form class="mb-0" action="{{action('DashboardController@postUnblockUser',$value->id)}}" method="post">
+                  @csrf
+                  <button type="submit">
+                    <!-- volume off icon -->
+                    <svg class="swap-off fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                    </svg>                  
+                  </button>
+                </form>
+              @endif
             </td>
           </tr>
         @endforeach
@@ -236,9 +260,8 @@
     const items = document.querySelectorAll('#form-edit .item');
     const userTypeEle = document.querySelector("#form-edit .user_type_id");
     const maxTrafficEle = document.querySelector("#form-edit .max_traffic");
-
     function onClickUser(uid) {
-      const user = users.find(user => user.id == uid)
+      const user = users.data.find(user => user.id == uid)
       /* Setting the action attribute of the form to the url of the user. */
       formEdit.action = `/admin/users/${uid}`;
       items.forEach(item => {

@@ -57,7 +57,7 @@
             menu[0].classList.add("active")
         }
         menu.forEach(m => {
-            if (window.location.href === m.getAttribute('href')) {
+            if (m.getAttribute('href').includes(window.location.pathname)) {
                 m.classList.add("active")
             }
         });

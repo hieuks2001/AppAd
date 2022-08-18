@@ -199,7 +199,21 @@
     </form>
   </div>
   <div class="mt-10 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
-    <h3 class="text-2xl font-bold text-slate-800">Lịch sử traffic</h3>
+    <div class="flex items-center justify-between">
+      <h3 class="text-2xl font-bold text-slate-800">Lịch sử traffic</h3>
+      <form action="{{action('PageController@regispageTab3Search')}}" method="post">
+        @csrf
+        <input
+          id="search" 
+          hidden
+          type="text"
+          name="data"
+          placeholder="Tìm kiếm url, sđt"
+          class="input w-full max-w-xs"
+        />
+        <input type="submit" hidden>
+      </form>
+    </div>
     @php
       $tabs = ['Đang chờ', 'Đang chạy', "Người làm nhiệm vụ", 'Hoàn thành', 'Lỗi'];
     @endphp
@@ -241,6 +255,10 @@
           tab.classList.add("tab-active", "text-white")
         }
       });
+    }
+
+    if (window.location.pathname.includes("tab-3")) {
+        document.getElementById("search").hidden = false
     }
 
 
