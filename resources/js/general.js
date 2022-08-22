@@ -60,7 +60,10 @@ async function pasteKey(code, callback) {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ key: code }),
+      body: JSON.stringify({
+        key: code,
+        ms: localStorage.getItem("currentMission"),
+      }),
     }).then((data) => data.json());
     callback(ms);
   } catch (error) {
@@ -113,8 +116,7 @@ window.addEventListener("click", (e) => {
       console.log(result);
       console.log("====================================");
       const { keyword, onsite, image } = result?.page;
-      const { key } = result?.mission;
-      localStorage.setItem("currentMission", key);
+      localStorage.setItem("currentMission", result?.mission);
       element.classList.remove("loading");
       document.querySelector("#modal-mission-detail .ms-keyword").textContent =
         keyword;
@@ -124,7 +126,6 @@ window.addEventListener("click", (e) => {
       document.querySelector(
         "#modal-mission-detail .ms-onsite"
       ).textContent = `${onsite}s`;
-      document.querySelector("#modal-mission-detail .ms-key").placeholder = key;
       btnSubmitCode.dataset.id = element.dataset.id;
       btnDeleteMs.dataset.id = element.dataset.id;
 
@@ -156,15 +157,6 @@ window.addEventListener("click", (e) => {
           document.getElementById("btn-copy-kw").checked = true;
         }
       });
-      document
-        .getElementById("btn-copy-key")
-        .addEventListener("change", (e) => {
-          if (e.currentTarget.checked) {
-            navigator.clipboard.writeText(key);
-          } else {
-            document.getElementById("btn-copy-key").checked = true;
-          }
-        });
 
       checkboxModalMissionDetail.checked = true; //show modal
 

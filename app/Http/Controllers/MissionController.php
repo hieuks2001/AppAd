@@ -146,9 +146,9 @@ class MissionController extends Controller
     if ($mission) {
       $page = Page::where('id', $mission->page_id)
         ->where('status', PageStatusConstants::APPROVED)->first();
-      if ($mission->ip !== $uIP || $mission->user_agent !== $uAgent) {
-        return view('mission.mission', ['mission' => $mission, 'page' => $page])->withErrors("Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại");
-      }
+      // if ($mission->ip !== $uIP || $mission->user_agent !== $uAgent) {
+      //   return view('mission.mission', ['mission' => $mission, 'page' => $page])->withErrors("Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại");
+      // }
       if ($this->isMissionExpried($mission)) {
         $this->setMissionStatusCancel($mission);
         return view('mission.mission')->withErrors("Nhiệm vụ bị quá hạn và đã huỷ, vui lòng nhận nhiệm vụ mới!");
@@ -264,22 +264,6 @@ class MissionController extends Controller
       $newMission->status = MissionStatusConstants::DOING;
       $newMission->ip = $rqIp;
       $newMission->user_agent = $request->userAgent();
-      $t = Uuid::uuid5(Uuid::uuid6(), $user->id)->toString();
-      $n1 = mt_rand(16,$pickedPage->onsite/2);
-      $n2 = mt_rand($pickedPage->onsite/2,$pickedPage->onsite-5);
-      $hex1 = dechex($n1);
-      $hex2 = dechex($n2);
-      $t[5] = $hex1[0];
-      $t[10] = $hex1[1];
-      $t[25] = $hex2[0];
-      $t[28] = $hex2[1];
-      $newMission->key = $t;
-      $newMission->check = json_encode([
-        0 => false,
-        $n1 => false,
-        $n2 => false,
-        $pickedPage->onsite => false,
-      ]);
       $newMission->origin_url = $originUrl;
       $newMission->save();
       $pickedPage->traffic_remain -= 1;
@@ -415,5 +399,4 @@ class MissionController extends Controller
     $mission->update(["check->$time" => true]);
     return response()->json(["success" => "Success"]);
   }
-
 }

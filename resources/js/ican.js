@@ -12,49 +12,50 @@ const options2 = (k, d) => ({
   method: "POST",
   headers: { "content-type": "application/json" },
   body: JSON.stringify({
-    pageId: value,
-    publicKey: k,
+    id: value,
+    key: k,
     data: d,
+    path: window.location.pathname,
   }),
 });
+const options3 = {
+  method: "POST",
+  headers: { "content-type": "application/json" },
+  body: JSON.stringify({
+    id: value,
+  }),
+};
 
 function handleError(error) {
   let errorCode = 0;
   if (error === "Traffic của site chưa sẵn sàng") {
     errorCode = 1;
   }
-  if (error === "Lỗi, nhúng không đúng site") {
+  if (error === "Site url not correct!") {
     errorCode = 2;
   }
-  if (error === "Lỗi") {
+  if (error === "Error") {
     errorCode = 3;
-  }
-  if (error === "Lỗi key") {
-    errorCode = 5;
   }
   alert(`vui lòng kiểm tra lại thao tác của bạn, Lỗi code #${errorCode}`);
 }
 
-async function getCode() {
-  const rs = await fetch(
-    // "http://localhost:8001/generate-code",
-    "https://nhiemvu.app/generate-code",
-    options(localStorage.getItem("publicKey"))
-  ).then((response) => response.json());
-  if (rs?.code || rs?.onsite) {
+async function initPage() {
+  const rs = await fetch(`${URL_API}/page-init`, options3).then((response) =>
+    response.json()
+  );
+  if (rs?.onsite && rs?.key) {
     return rs;
   } else if (rs?.error) {
     throw rs.error;
   }
 }
-async function check(data) {
+async function getCode(k, d) {
   try {
-    const rs = await fetch(
-      // "http://localhost:8001/check",
-      "https://nhiemvu.app/check",
-      options2(localStorage.getItem("publicKey"), data)
-    ).then((response) => response.json());
-    if (rs?.success) {
+    const rs = await fetch(`${URL_API}/generate-code`, options2(k, d)).then(
+      (response) => response.json()
+    );
+    if (rs?.code) {
       return rs;
     } else if (rs?.error) {
       throw rs.error;
@@ -65,9 +66,12 @@ async function check(data) {
 const publicKey = document.getElementById("publicKey");
 const getCodeBtn = document.getElementById("getCode");
 window.addEventListener("DOMContentLoaded", async () => {
-  const result = await getCode().catch((e) => {});
+  const result = await getCode(localStorage.getItem("publicKey"), null).catch(
+    (e) => {
+      handleError(e);
+    }
+  );
   if (result?.code) {
-    publicKey.hidden = true;
     getCodeBtn.textContent = result.code;
     getCodeBtn.title = "Click để sao chép code";
     getCodeBtn.addEventListener("click", async (e) => {
@@ -76,22 +80,19 @@ window.addEventListener("DOMContentLoaded", async () => {
       alert("Đã sao chép");
     });
   } else {
-    publicKey.hidden = false;
     // localStorage.removeItem("publicKey");
     //nếu chưa có code sẽ check là google
     if (document.referrer.includes("https://www.google.com")) {
       getCodeBtn.addEventListener("click", async (e) => {
         e.preventDefault();
-        localStorage.setItem("publicKey", publicKey.value);
-        const rs = await getCode().catch((error) => {
+        const rs = await initPage().catch((error) => {
           getCodeBtn.textContent = "Lấy mã";
           handleError(error);
-          console.log(error);
         });
-        // getCodeBtn.disabled = true;
+        getCodeBtn.disabled = true;
         if (rs?.onsite) {
-          publicKey.hidden = true;
-          run(rs.onsite);
+          localStorage.setItem("publicKey", rs?.key);
+          run(rs.onsite, rs.key);
         }
       });
     } else {
@@ -107,19 +108,19 @@ window.addEventListener("DOMContentLoaded", async () => {
 
 const countdown = document.getElementById("countdown");
 
-function decodeGetTimes(onsite) {
-  const main = publicKey.value;
+function decodeGetTimes(onsite, key) {
   return [
     0,
-    parseInt(main[5] + main[10], 16),
-    parseInt(main[25] + main[28], 16),
+    parseInt(key[5] + key[10], 16),
+    parseInt(key[25] + key[28], 16),
     onsite,
   ];
 }
 
-function run(onsite) {
+function run(onsite, key) {
   let cd = onsite;
   let timer = null;
+
   function name() {
     timer = setInterval(async () => {
       getCodeBtn.textContent = `Vui lòng đợi giây lát ${cd > -1 ? cd : 0}`;
@@ -127,8 +128,8 @@ function run(onsite) {
         clearInterval(timer);
         getCodeBtn.textContent = "Click link bất kỳ trong trang để nhận code";
       }
-      if (decodeGetTimes(onsite).includes(cd)) {
-        await check(cd);
+      if (decodeGetTimes(onsite, key).includes(cd)) {
+        await getCode(key, cd);
       }
       if (cd > -1) {
         cd--;
@@ -144,4 +145,8 @@ function run(onsite) {
     };
     name();
   }
+}
+
+function getRandomArbitrary(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
 }

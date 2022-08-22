@@ -9,6 +9,7 @@ use App\Models\Missions;
 use App\Models\Otp;
 use App\Models\User;
 use App\Models\Page;
+use App\Models\Code;
 use App\Models\PageType;
 use App\Models\UserType;
 use Carbon\Carbon;
@@ -230,14 +231,19 @@ class UserController extends Controller
     }
     //rule here
     $ms = Missions::where('user_id', $user->id)->where([
-      ["ip", $uIP],
+      // ["ip", $uIP],
       ["user_agent", $request->userAgent()],
-      ["status", 0]
+      ["status", MissionStatusConstants::DOING]
+    ]);
+    $code = Code::where([
+      ["code",$request->key],
+      ["status",0]
     ]);
     $msGet = ($ms)->get(["code", "reward", "page_id"])->first();
-    if (!empty($msGet->code) and $msGet->code == $request->key) {
-      DB::transaction(function () use ($ms, $user, $msGet) {
-        $ms->update(["status" => 1]);
+    if (!is_null($code->first())) {
+      DB::transaction(function () use ($ms, $user, $msGet, $request, $code) {
+        $ms->update(["status" => 1,"code"=>$request->key]);
+        $code->update(["status" => 1]);
         $u = User::where('id', $user->id)->first();
         $uMsCount = $u->mission_count;
         $pageTypeId = Page::where('id', $msGet->page_id)->get('page_type_id')->first();
@@ -267,7 +273,7 @@ class UserController extends Controller
         $log->save();
       });
       return Redirect::to('/tu-khoa');
-    } else if (empty($msGet->code) or (!empty($msGet->code) and $msGet->code != $request->key)) {
+    } else{
       // wrong key
       DB::transaction(function () use ($msGet, $ms, $user) {
         $u = User::where('id', $user->id)->first();
