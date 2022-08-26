@@ -39,19 +39,20 @@ class ContentServiceProvider extends ServiceProvider
     view()->composer('dashboard.index', function ($view) {
       $user = Auth::user();
       $statistical = Mission::where(['user_id' => $user->id, 'status' => MissionStatusConstants::COMPLETED])
-      ->groupBy('date')
-      ->orderBy('date', 'DESC')
-      ->limit(7)
-      ->get(array(
-          DB::raw('Date(created_at) as date'), DB::raw('sum(reward) as mission_reward')
-        )
-      );
+        ->groupBy('date')
+        ->orderBy('date', 'DESC')
+        ->limit(7)
+        ->get(
+          array(
+            DB::raw('Date(created_at) as date'), DB::raw('sum(reward) as mission_reward')
+          )
+        );
       $view->with('statistical', $statistical);
     });
     view()->composer('box.patternBox1', function ($view) {
       $user = Auth::user();
       $money = [];
-      $money["income"] = DB::table("log_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::REWARD])->sum("amount");
+      $money["income"] = DB::table("log_traffic_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::REWARD])->sum("amount");
       $money["balance"] = $user->wallet;
       $money["commission"] = 0;
       $money["sum"] = $user->wallet + $money["balance"] + $money["commission"];
@@ -68,6 +69,14 @@ class ContentServiceProvider extends ServiceProvider
       $traffic["remaining"] = $traffic["totalCharge"]  - Mission::whereIn("page_id", $boughtPage)->where("status", MissionStatusConstants::COMPLETED)->sum("reward");
       $view->with('traffic', $traffic);
     });
+    view()->composer('box.patternBox3', function ($view) {
+      $user = Auth::user();
+      $money = [];
+      $money["balance"] = $user->wallet;
+      $money["withdrawing"] = DB::table("log_traffic_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::WITHDRAW, "status" => 0])->sum("amount");
+      $money["withdrawed"] = DB::table("log_traffic_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::WITHDRAW, "status" => 1])->sum("amount");
+      $view->with('money', $money);
+    });
     view()->composer('regispage.index', function ($view) {
       $onsite = PageType::all()->sortBy('name');
       $view->with('onsite', $onsite);
@@ -75,7 +84,7 @@ class ContentServiceProvider extends ServiceProvider
     view()->composer('admin.editTraffic', function ($view) {
       $onsite = PageType::all()->sortBy('name');
       $priority = new ReflectionClass(PagePriorityConstants::class);
-      $view->with(['priority'=> $priority->getConstants(),'onsite'=> $onsite ]);
+      $view->with(['priority' => $priority->getConstants(), 'onsite' => $onsite]);
     });
     view()->composer('admin.users', function ($view) {
       $types = UserType::get();
