@@ -19,14 +19,29 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Ramsey\Uuid\Uuid;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 class MissionController extends Controller
 {
   public function test(Request $rq)
   {
-    $host = request()->headers->get('origin');
-    error_log("/test-code >> " . $host);
-    return response()->json($host);
+    $activities = Telegram::getUpdates();
+    if (count($activities) > 0) {
+      foreach ($activities as $key => $value) {
+        if (isset($value['callback_query'])) {
+          $record = json_decode($value->callback_query);
+          echo $record->data;
+          $old_text = $record->message->text;
+
+          Telegram::editMessageText([
+            'parse_mode' => 'HTML',
+            'chat_id' => env('TELEGRAM_ADMIN'),
+            'text' => $old_text . "\n<b>Đã duyệt</b>\n",
+            'message_id' => $record->message->message_id
+          ]);
+        }
+      };
+    };
   }
 
   // Helper function
@@ -238,7 +253,8 @@ class MissionController extends Controller
     }
     return Redirect::to('/tu-khoa');
   }
-  public function pageInit(Request $request){
+  public function pageInit(Request $request)
+  {
     $pageId = $request->id;
     $page = Page::where([
       ["id", $pageId],
@@ -248,18 +264,19 @@ class MissionController extends Controller
       return response()->json(["error" => "Traffic của site chưa sẵn sàng"]);
     }
     $uuid = Uuid::uuid5(Uuid::uuid6(), $request->userAgent() . $pageId)->toString();
-    $n1 = mt_rand(16,$page->onsite/2);
-    $n2 = mt_rand($page->onsite/2,$page->onsite-5);
+    $n1 = mt_rand(16, $page->onsite / 2);
+    $n2 = mt_rand($page->onsite / 2, $page->onsite - 5);
     $hex1 = dechex($n1);
     $hex2 = dechex($n2);
     $uuid[5] = $hex1[0];
     $uuid[10] = $hex1[1];
     $uuid[25] = $hex2[0];
     $uuid[28] = $hex2[1];
-    return response()->json(["onsite" => $page->onsite, "key"=>$uuid]);
+    return response()->json(["onsite" => $page->onsite, "key" => $uuid]);
   }
 
-  public function generateCode(Request $rq){
+  public function generateCode(Request $rq)
+  {
     try {
       $encrypted = hex2bin($rq->key1);
       $key = hex2bin($rq->key2);
@@ -270,7 +287,7 @@ class MissionController extends Controller
       $key = $data->key;
       $time = $data->data;
       $path = $data->path;
-      
+
       error_log($pageId);
 
       $result = Code::where([
@@ -289,8 +306,8 @@ class MissionController extends Controller
         $newCode->id = $key;
         $newCode->keys = json_encode([
           $page->onsite => true, //time start countdown
-          hexdec($key[5].$key[10]) => false,
-          hexdec($key[25].$key[28]) => false,
+          hexdec($key[5] . $key[10]) => false,
+          hexdec($key[25] . $key[28]) => false,
           0 => false,
         ]);
         $newCode->save();
@@ -303,19 +320,19 @@ class MissionController extends Controller
 
       if (!in_array(false, (array) json_decode($result->get('keys')->first()->keys))) {
         //already return code
-        if ($path!=="/") {//completed countdown and return code
-          $code = Uuid::uuid5(Uuid::uuid6(), $key[5].$key[10].$key[25].$key[28])->toString();
-          $result->update(["code"=>$code]);
+        if ($path !== "/") { //completed countdown and return code
+          $code = Uuid::uuid5(Uuid::uuid6(), $key[5] . $key[10] . $key[25] . $key[28])->toString();
+          $result->update(["code" => $code]);
           return response()->json(["code" => $code]);
         }
         return response()->json(["code" => $result->code]);
-      } 
+      }
 
       if (is_int($time)) {
         # code...
         $result->update(["keys->$time" => true]);
         return response()->json(["success" => "Success"]);
-      }else{
+      } else {
         return response()->json(["error" => "Error"]);
       }
       return response()->json(["success" => "Success"]);

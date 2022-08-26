@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
+use Telegram\Bot\Laravel\Facades\Telegram;
 use Web3\Web3;
 use Web3\Contract;
 use Web3\Utils;
@@ -391,17 +392,49 @@ class UserController extends Controller
     $user = Auth::user();
     $amount = $request->amount;
     $wallet = User::where('id', $user->id)->first();
-    DB::transaction(function () use ($wallet, $amount, $user) {
-      // Create log
-      $log = new LogTrafficTransaction();
-      $log->amount = $amount;
-      $log->user_id = $wallet->id;
-      $log->type = TransactionTypeConstants::TOPUP;
-      $log->status = TransactionStatusConstants::PENDING;
-      $log->save();
+    // DB::transaction(function () use ($wallet, $amount, $user) {
+    // Create log
+    $old_log = LogTrafficTransaction::where([
+      'user_id' => $user->id,
+      'status' => TransactionStatusConstants::PENDING,
+      'type' => TransactionTypeConstants::TOPUP
+    ])->get();
+    if (count($old_log) > 0) {
+      return view("usdt.deposit")->with(["error" => "Bạn đang có yêu cầu nạp chưa được duyệt, vui lòng đợi và thử lại sau!"]);
+    }
+    $log = new LogTrafficTransaction();
+    $log->amount = $amount;
+    $log->user_id = $wallet->id;
+    $log->type = TransactionTypeConstants::TOPUP;
+    $log->status = TransactionStatusConstants::PENDING;
+    $log->save();
 
-      $log->notify(new TelegramNotification($log, $user));
-    });
+    $inline_keyboard = json_encode([
+      'inline_keyboard' => [
+        [
+          ['text' => 'Đồng ý', 'callback_data' => json_encode(['type' => TransactionStatusConstants::APPROVED, 'id_request' => $log->id, 'from' => 'traffic'])],
+          ['text' => 'Từ chối', 'callback_data' => json_encode(['type' => TransactionStatusConstants::CANCELED, 'id_request' => $log->id, 'from' => 'traffic'])],
+        ],
+      ]
+    ]);
+
+    // $log->notify(new TelegramNotification($log, $user));
+    $text = "Một thông báo mới từ nhiemvu.app\n"
+      . "<b>New update (Chỉ cần bấm vào 2 nút Đồng ý hoặc Từ chối) </b> \n"
+      . "<b>SDT người yêu cầu: </b> \n"
+      . "$user->username \n"
+      . "<b>Loại: </b>Yêu cầu nạp tiền \n"
+      . "<b>Số tiền yêu cầu: </b>\n"
+      . "<b>$log->amount</b> USDT\n";
+
+    Telegram::sendMessage([
+      'chat_id' => env('TELEGRAM_ADMIN'),
+      'parse_mode' => 'HTML',
+      'text' => $text,
+      'reply_markup' => $inline_keyboard,
+    ]);
+
+    // });
     return Redirect::to("/deposit");
   }
 
@@ -425,24 +458,56 @@ class UserController extends Controller
   {
     $user = Auth::user();
     $amount = $request->amount;
-    $wallet = User::where('id', $user->id)->first();
+    $wallet = $user->wallet;
 
     if ($amount > $wallet) {
-      return view("usdt.deposit")->with(["error" => "Không đủ số dư trong tài khoản!"]);
+      return view("usdt.withdraw")->with(["error" => "Không đủ số dư trong tài khoản!"]);
     }
-    $rs = DB::transaction(function () use ($wallet, $amount, $user) {
-      // $rs = $wallet->update(['wallet' => $wallet->wallet - $amount]);
-      // Create log
-      $log = new LogTrafficTransaction();
-      $log->amount = $amount * -1;
-      $log->user_id = $wallet->id;
-      $log->type = TransactionTypeConstants::WITHDRAW;
-      $log->status = TransactionStatusConstants::PENDING;
-      $log->save();
 
-      $log->notify(new TelegramNotification($log, $user));
-    });
+    $old_log = LogTrafficTransaction::where([
+      'user_id' => $user->id,
+      'status' => TransactionStatusConstants::PENDING,
+      'type' => TransactionTypeConstants::WITHDRAW,
+    ])->get();
+    if (count($old_log) > 0) {
+      return view("usdt.withdraw")->with(["error" => "Bạn đang có yêu cầu rút chưa được duyệt, vui lòng đợi và thử lại sau!"]);
+    }
+    // $rs = DB::transaction(function () use ($wallet, $amount, $user) {
+    // $rs = $wallet->update(['wallet' => $wallet->wallet - $amount]);
+    // Create log
+    $log = new LogTrafficTransaction();
+    $log->amount = $amount;
+    $log->user_id = $wallet->id;
+    $log->type = TransactionTypeConstants::WITHDRAW;
+    $log->status = TransactionStatusConstants::PENDING;
+    $log->save();
 
-    return view("usdt.deposit");
+    $inline_keyboard = json_encode([
+      'inline_keyboard' => [
+        [
+          ['text' => 'Đồng ý', 'callback_data' => json_encode(['type' => TransactionStatusConstants::APPROVED, 'id_request' => $log->id, 'from' => 'traffic'])],
+          ['text' => 'Từ chối', 'callback_data' => json_encode(['type' => TransactionStatusConstants::CANCELED, 'id_request' => $log->id, 'from' => 'traffic'])],
+        ],
+      ]
+    ]);
+
+    // $log->notify(new TelegramNotification($log, $user));
+    $text = "Một thông báo mới từ nhiemvu.app \n"
+      . "<b>New update (Chỉ cần bấm vào 2 nút Đồng ý hoặc Từ chối) </b> \n"
+      . "<b>SDT người yêu cầu: </b> \n"
+      . "$user->username \n"
+      . "<b>Loại: </b>Yêu cầu rút tiền\n"
+      . "<b>Số tiền yêu cầu: </b>\n"
+      . "<b>$log->amount</b> USDT\n";
+
+    Telegram::sendMessage([
+      'chat_id' => env('TELEGRAM_ADMIN'),
+      'parse_mode' => 'HTML',
+      'text' => $text,
+      'reply_markup' => $inline_keyboard,
+    ]);
+    // });
+
+    return view("usdt.withdraw");
   }
 }
