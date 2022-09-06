@@ -271,13 +271,11 @@ class MissionController extends Controller
       $time = $data->data;
       $path = $data->path;
       
-      error_log($pageId);
-
       $result = Code::where([
         ["id", $key],
         ["status", 0],
       ]);
-      if (($result->count() === 0) && (is_int($time))) {
+      if (!($result->first()) and (is_int($time))) {
         $page = Page::where([
           ["id", $pageId],
           ["status", PageStatusConstants::APPROVED],
