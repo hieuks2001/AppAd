@@ -28,13 +28,27 @@
                     <th class="bg-slate-200">Trạng thái</th>
                 </tr>
             <tbody>
-                <tr>
-                    <td class="bg-white">a</td>
-                    <td class="bg-white">a</td>
-                    <td class="bg-white">a</td>
-                    <td class="bg-white">b</td>
-                    <td class="bg-white">c</td>
-                </tr>
+              @if (isset($data))
+              @foreach ($data as $item)
+              <tr>
+                  <td class="bg-white">{{$item->created_at}}</td>
+                  <td class="bg-white">momo</td>
+                  <td class="bg-white">{{$item->amount}}</td>
+                  <td class="bg-white"></td>
+                  <td class="bg-white">
+                    @if ($item->status == 0)
+                        Đang duyệt
+                    @else
+                        @if ($item->status == 1)
+                            Đã duyệt
+                        @else
+                            Đã huỷ
+                        @endif
+                    @endif
+                  </td>
+              </tr>
+              @endforeach
+              @endif
             </tbody>
         </table>
     </div>

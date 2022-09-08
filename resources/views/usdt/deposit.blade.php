@@ -27,12 +27,16 @@
                     <th class="bg-slate-200">Ghi chú</th>
                 </tr>
             <tbody>
-                <tr>
-                    <td class="bg-white">a</td>
-                    <td class="bg-white">b</td>
-                    <td class="bg-white">b</td>
-                    <td class="bg-white">c</td>
-                </tr>
+              @if (isset($data))
+              @foreach ($data as $key)
+              <tr>
+                  <td class="bg-white">{{$key->updated_at}}</td>
+                  <td class="bg-white">{{$key->amount}}</td>
+                  <td class="bg-white">momo</td>
+                  <td class="bg-white"></td>
+              </tr>
+              @endforeach
+              @endif
             </tbody>
         </table>
     </div>

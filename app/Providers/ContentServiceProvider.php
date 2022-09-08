@@ -98,5 +98,13 @@ class ContentServiceProvider extends ServiceProvider
         ->get();
       $view->with('missions', $missions);
     });
+    view()->composer('usdt.deposit', function ($view) {
+      $data = DB::table('log_traffic_transactions')->where(['user_id' => Auth::user()->id, 'status' => 1, 'type' => TransactionTypeConstants::TOPUP])->get();
+      $view->with('data', $data);
+    });
+    view()->composer('usdt.withdraw', function ($view) {
+      $data = DB::table('log_traffic_transactions')->where(['user_id' => Auth::user()->id, 'type' => TransactionTypeConstants::WITHDRAW])->get();
+      $view->with('data', $data);
+    });
   }
 }
