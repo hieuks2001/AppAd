@@ -477,7 +477,7 @@ class UserController extends Controller
     // Create log
     $log = new LogTrafficTransaction();
     $log->amount = $amount;
-    $log->user_id = $wallet->id;
+    $log->user_id = $user->id;
     $log->type = TransactionTypeConstants::WITHDRAW;
     $log->status = TransactionStatusConstants::PENDING;
     $log->save();
