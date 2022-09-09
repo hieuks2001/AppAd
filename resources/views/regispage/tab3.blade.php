@@ -21,4 +21,8 @@
           @endforeach
         </tbody>
     </table>
+    <div class="btn-group flex justify-center mt-5">
+      <a class="btn btn-outline btn-sm {{$missions->onFirstPage() ? 'btn-disabled' : ''}}" href="{{$missions->previousPageUrl()}}">Previous</a>
+      <a class="btn btn-outline btn-sm {{!$missions->hasMorePages() ? 'btn-disabled' : ''}}" href="{{$missions->nextPageUrl()}}">Next</a>
+    </div>
 @endsection

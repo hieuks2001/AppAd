@@ -8,6 +8,7 @@ use App\Constants\PageStatusConstants;
 use App\Models\Mission;
 use App\Models\Missions;
 use App\Models\Page;
+use App\Models\Code;
 use App\Models\PageType;
 use App\Models\User;
 use Carbon\Carbon;
@@ -237,69 +238,85 @@ class MissionController extends Controller
     }
     return Redirect::to('/tu-khoa');
   }
+  public function pageInit(Request $request){
+    $pageId = $request->id;
+    $page = Page::where([
+      ["id", $pageId],
+      ["status", PageStatusConstants::APPROVED],
+    ])->get(["onsite"])->first();
+    if (empty($page)) {
+      return response()->json(["error" => "Traffic của site chưa sẵn sàng"]);
+    }
+    $uuid = Uuid::uuid5(Uuid::uuid6(), $request->userAgent() . $pageId)->toString();
+    $n1 = mt_rand(16,$page->onsite/2);
+    $n2 = mt_rand($page->onsite/2,$page->onsite-5);
+    $hex1 = dechex($n1);
+    $hex2 = dechex($n2);
+    $uuid[5] = $hex1[0];
+    $uuid[10] = $hex1[1];
+    $uuid[25] = $hex2[0];
+    $uuid[28] = $hex2[1];
+    return response()->json(["onsite" => $page->onsite, "key"=>$uuid]);
+  }
 
-  public function generateCode(Request $rq)
-  {
+  public function generateCode(Request $rq){
     try {
-      $pageId = $rq->pageId;
-      $host = $rq->host;
-      $path = $rq->path;
-      $uIP = $rq->ip();
-      $uAgent = $rq->userAgent();
-      $mission = Mission::where([
-        ["ip", $uIP],
-        ["user_agent", $uAgent],
-        ["page_id", $pageId],
-        ["missions.status", MissionStatusConstants::DOING]
+      $encrypted = hex2bin($rq->key1);
+      $key = hex2bin($rq->key2);
+      $iv = hex2bin($rq->key3);
+      $data = json_decode(openssl_decrypt($encrypted, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv));
+
+      $pageId = $data->id;
+      $key = $data->key;
+      $time = $data->data;
+      $path = $data->path;
+      
+      $result = Code::where([
+        ["id", $key],
+        ["status", 0],
       ]);
-      //rule here
-      $page = Page::where([
-        ["id", $pageId],
-        ["status", 1],
-      ])->get(["onsite", "url"])->first();
-      if (empty($page)) {
-        return response()->json(["error" => "Traffic của site chưa sẵn sàng"]);
-      }
-      if (!str_contains($page->url, $host)) {
-        return response()->json(["error" => "Lỗi, nhúng không đúng site"]);
-      }
-
-      //check this ip don't have mission
-      if ($mission->count() === 0) {
-        return response()->json(["error" => "Lỗi"]);
-      }
-
-      //first count down
-      $time = $mission->get('updated_at')->first();
-      if (empty($time->updated_at)) {
-        $mission->update(['updated_at' => Carbon::now()]);
-        return response()->json(["onsite" => $page->onsite]);
-      }
-
-      // f5 - or click anything link
-      $code = $mission->get('code')->first();
-      //check code is exist
-      if (empty($code->code)) {
-        //generateCode
-
-        //check rule
-        $timeDiff = Carbon::now()->diffInSeconds($time->updated_at);
-        if ($page->onsite <= $timeDiff) {
-          if ($path !== "/") {
-            $uuid = Uuid::uuid4()->toString();
-            $mission->update(["missions.code" => $uuid]);
-            return response()->json(["code" => $uuid]);
-          } else {
-            $mission->update(['updated_at' => Carbon::now()]);
-            return response()->json(["onsite" => $page->onsite]);
-          }
-        } else {
-          $mission->update(['updated_at' => Carbon::now()]);
-          return response()->json(["onsite" => $page->onsite]);
+      if (!($result->first()) and (is_int($time))) {
+        $page = Page::where([
+          ["id", $pageId],
+          ["status", PageStatusConstants::APPROVED],
+        ])->get(["onsite"])->first();
+        if ($page->onsite !== $time) {
+          return response()->json(["error" => "Error"]);
         }
-      } else {
-        return response()->json($code);
+        $newCode = new Code();
+        $newCode->id = $key;
+        $newCode->keys = json_encode([
+          $page->onsite => true, //time start countdown
+          hexdec($key[5].$key[10]) => false,
+          hexdec($key[25].$key[28]) => false,
+          0 => false,
+        ]);
+        $newCode->save();
+        return response()->json(["success" => "Success"]);
+      };
+
+      if ($result->first()->code) {
+        return response()->json(["code" => $result->first()->code]);
       }
+
+      if (!in_array(false, (array) json_decode($result->get('keys')->first()->keys))) {
+        //already return code
+        if ($path!=="/") {//completed countdown and return code
+          $code = Uuid::uuid5(Uuid::uuid6(), $key[5].$key[10].$key[25].$key[28])->toString();
+          $result->update(["code"=>$code]);
+          return response()->json(["code" => $code]);
+        }
+        return response()->json(["code" => $result->code]);
+      } 
+
+      if (is_int($time)) {
+        # code...
+        $result->update(["keys->$time" => true]);
+        return response()->json(["success" => "Success"]);
+      }else{
+        return response()->json(["error" => "Error"]);
+      }
+      return response()->json(["success" => "Success"]);
     } catch (Exception $err) {
       return response()->json(["error" => $err->getMessage()], 500);
     }

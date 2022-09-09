@@ -36,4 +36,8 @@
             @endforeach
         </tbody>
     </table>
+    <div class="btn-group flex justify-center mt-5">
+      <a class="btn btn-outline btn-sm {{$pages->onFirstPage() ? 'btn-disabled' : ''}}" href="{{$pages->previousPageUrl()}}">Previous</a>
+      <a class="btn btn-outline btn-sm {{!$pages->hasMorePages() ? 'btn-disabled' : ''}}" href="{{$pages->nextPageUrl()}}">Next</a>
+    </div>
 @endsection

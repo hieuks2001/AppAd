@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 
 class checkLogin
@@ -19,8 +20,12 @@ class checkLogin
     {
         if (!Auth::check()) {
             return redirect()->route('login');
+        } else {
+          if (!Auth::user()->verified){
+            return Redirect::to('/verify');
+          }
         }
-        
+
         return $next($request);
     }
 }

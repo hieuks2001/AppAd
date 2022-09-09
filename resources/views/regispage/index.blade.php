@@ -66,36 +66,36 @@
         <div class="modal-box">
           <div class="rounded-md bg-slate-200 p-3">
             <code>
-              &lt;div style=&quot;width: 100%&quot;&gt;
-              &lt;button
-              id=&quot;getCode&quot;
-              style=&quot;
-              margin: auto;
-              display: block;
-              padding: 10px 20px;
-              outline: none;
-              border: 0;
-              background-color: red;
-              color: white;
-              font-weight: bold;
-              border-radius: 10px;
-              &quot;
-              &gt;
-              Lấy m&atilde;
-              &lt;/button&gt;
-              &lt;/div&gt;
-              &lt;div id=&quot;canihelpu&quot; style=&quot;text-align:
-              center&quot;&gt;
-              &lt;span id=&quot;countdown&quot; style=&quot;font-size: 2rem;
-              font-weight: bold&quot;&gt;&lt;/span&gt;
-              &lt;p id=&quot;notification&quot; style=&quot;font-size: 1.2rem;
-              font-weight: bold; margin: 0&quot;&gt;&lt;/p&gt;
-              &lt;/div&gt;
-              &lt;script&gt;
-              var value = &quot;{{ Session::get('pageId') }}&quot;;
-              &lt;/script&gt;
-              &lt;script 
-              src=&quot;https://nhiemvu.app/ican.js&quot;&gt;&lt;/script&gt; </code>
+              &#x3C;div style=&#x22;width: 100%; display: flex; justify-content: center&#x22;&#x3E;
+                &#x3C;button
+                  id=&#x22;getCode&#x22;
+                  style=&#x22;
+                    margin-left: 10px;
+                    display: block;
+                    padding: 10px 20px;
+                    outline: none;
+                    border: 0;
+                    background-color: red;
+                    color: white;
+                    font-weight: bold;
+                    border-radius: 10px;
+                  &#x22;
+                &#x3E;
+                  L&#x1EA5;y m&#xE3;
+                &#x3C;/button&#x3E;
+              &#x3C;/div&#x3E;
+              &#x3C;div id=&#x22;canihelpu&#x22; style=&#x22;text-align: center&#x22;&#x3E;
+                &#x3C;span id=&#x22;countdown&#x22; style=&#x22;font-size: 2rem; font-weight: bold&#x22;&#x3E;&#x3C;/span&#x3E;
+                &#x3C;p id=&#x22;notification&#x22; style=&#x22;font-size: 1.2rem; font-weight: bold; margin: 0&#x22;&#x3E;&#x3C;/p&#x3E;
+              &#x3C;/div&#x3E;
+              &#x3C;script&#x3E;
+                var value = &#x27;{{ Session::get('pageId') }}&#x27;;
+              &#x3C;/script&#x3E;
+              &#x3C;script&#x3E;
+                const URL_API = &#x27;{{env("APP_URL")}}&#x27;;
+              &#x3C;/script&#x3E;
+              &#x3C;script src=&#x22;{{ asset('js/ican.js') }}&#x22;&#x3E;&#x3C;/script&#x3E;
+            </code>
           </div>
           <p>
             + Copy toàn bộ code này và gắn vào Footer của website
@@ -229,11 +229,18 @@
   <div class="mt-10 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
     <div class="flex items-center justify-between">
       <h3 class="text-2xl font-bold text-slate-800">Lịch sử traffic</h3>
-      <input
-        type="text"
-        placeholder="Search..."
-        class="input input-ghost w-full max-w-xs"
-      />
+      <form action="{{action('PageController@regispageTab3Search')}}" method="post">
+        @csrf
+        <input
+          id="search" 
+          hidden
+          type="text"
+          name="data"
+          placeholder="Tìm kiếm url, sđt"
+          class="input w-full max-w-xs"
+        />
+        <input type="submit" hidden>
+      </form>
     </div>
     @php
       $tabs = ['Đang chờ', 'Đang chạy', "Người làm nhiệm vụ", 'Hoàn thành', 'Lỗi'];
@@ -276,6 +283,10 @@
           tab.classList.add("tab-active", "text-white")
         }
       });
+    }
+
+    if (window.location.pathname.includes("tab-3")) {
+        document.getElementById("search").hidden = false
     }
 
 
