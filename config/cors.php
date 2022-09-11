@@ -15,7 +15,7 @@ return [
     |
     */
 
-  'paths' => ['api/*', "/info-site", "/generate-code"],
+  'paths' => ['api/*', "/generate-code", "/check","/images/*"],
 
   'allowed_methods' => ['*'],
 

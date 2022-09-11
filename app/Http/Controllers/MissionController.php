@@ -90,18 +90,47 @@ class MissionController extends Controller
     }
   }
 
-  public function getUserIpAddr(){
-    if(!empty($_SERVER['HTTP_CLIENT_IP'])){
-        //ip from share internet
-        $ip = $_SERVER['HTTP_CLIENT_IP'];
-    }elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
-        //ip pass from proxy
-        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    }else{
-        $ip = $_SERVER['REMOTE_ADDR'];
+  public function getUserIpAddr()
+  {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+      //ip from share internet
+      $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+      //ip pass from proxy
+      $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+      $ip = $_SERVER['REMOTE_ADDR'];
     }
     return $ip;
-}
+  }
+
+  public function isMissionExpried(Mission $ms)
+  {
+    // Check if mission haven't completed after 3 hours -> CANCEL
+    $now = Carbon::now();
+    $lastMissionTime = new Carbon($ms->created_at);
+    $time = $now->diff($lastMissionTime);
+    if ((int)$time->format('%a') < 1) { // Greater than 1 day
+      if ((int)$time->format('%h') < 3) { // After 3 hours
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public function setMissionStatusCancel(Mission $mission)
+  {
+    DB::transaction(function () use ($mission) {
+      $mission->status = MissionStatusConstants::CANCEL;
+      $mission->save();
+      $page = Page::where('id', $mission->page_id)->first();
+      if ($page->traffic_remain < $page->traffic_sum) {
+        $page->traffic_remain += 1;
+        $page->save();
+      }
+    });
+    return true;
+  }
 
   public function getMission(Request $rq)
   {
@@ -116,9 +145,13 @@ class MissionController extends Controller
       ->orderBy('created_at', 'desc')->first();
     if ($mission) {
       $page = Page::where('id', $mission->page_id)
-      ->where('status', PageStatusConstants::APPROVED)->first();
-      if ($mission->ip !== $uIP || $mission->user_agent !== $uAgent) {
-        return view('mission.mission', ['mission' => $mission, 'page' => $page])->withErrors("Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại");
+        ->where('status', PageStatusConstants::APPROVED)->first();
+      // if ($mission->ip !== $uIP || $mission->user_agent !== $uAgent) {
+      //   return view('mission.mission', ['mission' => $mission, 'page' => $page])->withErrors("Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại");
+      // }
+      if ($this->isMissionExpried($mission)) {
+        $this->setMissionStatusCancel($mission);
+        return view('mission.mission')->withErrors("Nhiệm vụ bị quá hạn và đã huỷ, vui lòng nhận nhiệm vụ mới!");
       }
       return view('mission.mission', ['mission' => $mission, 'page' => $page]);
     } else {
@@ -129,6 +162,7 @@ class MissionController extends Controller
   public function postMission(Request $request)
   {
     // Update UserType
+    $originUrl = $request->headers->get('origin');
     $pageType = $this->UpdateUserType();
     $excludePriority = [];
     $user = Auth::user();
@@ -140,9 +174,13 @@ class MissionController extends Controller
       ->where('status', MissionStatusConstants::DOING)
       ->orderBy('created_at', 'desc')->first();
     if ($mission) { // There is mission existed!
-      $page = Page::where('id', $mission->page_id)
-        ->where('status', PageStatusConstants::APPROVED)->first();
-      return view('mission.mission', ['mission' => $mission, 'page' => $page]);
+      if ($this->isMissionExpried($mission)) {
+        $this->setMissionStatusCancel($mission);
+      } else {
+        $page = Page::where('id', $mission->page_id)
+          ->where('status', PageStatusConstants::APPROVED)->first();
+        return view('mission.mission', ['mission' => $mission, 'page' => $page]);
+      }
     }
 
     // NO MISSION CURRENTLY DOING
@@ -184,7 +222,7 @@ class MissionController extends Controller
         $mission = Mission::where('page_id', $page->id)
           ->where('user_id', $user->id)
           ->where('status', MissionStatusConstants::COMPLETED)
-          ->where('ip', $rqIp)
+          // ->where('ip', $rqIp)
           ->whereDate('updated_at',  Carbon::today())
           ->orderBy('updated_at', 'desc')->first();
 
@@ -214,7 +252,7 @@ class MissionController extends Controller
       return view('mission.mission', [])->withErrors('Không còn nhiệm vụ, vui lòng quay lại sau!');
     }
     // Begin database transaction
-    DB::transaction(function () use ($pickedPage, $user, $request, $rqIp) {
+    DB::transaction(function () use ($pickedPage, $user, $request, $rqIp, $originUrl) {
       // Refresh data
       $pickedPage = $pickedPage->refresh();
 
@@ -226,8 +264,8 @@ class MissionController extends Controller
       $newMission->status = MissionStatusConstants::DOING;
       $newMission->ip = $rqIp;
       $newMission->user_agent = $request->userAgent();
+      $newMission->origin_url = $originUrl;
       $newMission->save();
-
       $pickedPage->traffic_remain -= 1;
       $pickedPage->save();
     });
@@ -268,10 +306,17 @@ class MissionController extends Controller
       $host = $rq->host;
       $path = $rq->path;
       // $uIP = $rq->ip();
+      $key = $rq->publicKey;
       $uIP = $this->getUserIpAddr();
       $uAgent = $rq->userAgent();
+
+      if (empty($key)) {
+        return response()->json(["error" => "Lỗi key"]);
+      }
+
       $mission = Mission::where([
-        ["ip", $uIP],
+        // ["ip", $uIP],
+        ["key", $key],
         ["user_agent", $uAgent],
         ["page_id", $pageId],
         ["missions.status", MissionStatusConstants::DOING]
@@ -288,7 +333,7 @@ class MissionController extends Controller
         return response()->json(["error" => "Lỗi, nhúng không đúng site"]);
       }
 
-      //check this ip don't have mission
+      //check this key wrong
       if ($mission->count() === 0) {
         return response()->json(["error" => "Lỗi"]);
       }
@@ -310,9 +355,14 @@ class MissionController extends Controller
         $timeDiff = Carbon::now()->diffInSeconds($time->updated_at);
         if ($page->onsite <= $timeDiff) {
           if ($path !== "/") {
-            $uuid = Uuid::uuid4()->toString();
-            $mission->update(["missions.code" => $uuid]);
-            return response()->json(["code" => $uuid]);
+            if (in_array(false, (array) json_decode($mission->get('check')->first()->check))) {
+              $mission->update(['updated_at' => Carbon::now()]);
+              return response()->json(["onsite" => $page->onsite]);
+            } else {
+              $uuid = Uuid::uuid4()->toString();
+              $mission->update(["missions.code" => $uuid]);
+              return response()->json(["code" => $uuid]);
+            }
           } else {
             $mission->update(['updated_at' => Carbon::now()]);
             return response()->json(["onsite" => $page->onsite]);
@@ -327,5 +377,26 @@ class MissionController extends Controller
     } catch (Exception $err) {
       return response()->json(["error" => $err->getMessage()], 500);
     }
+  }
+
+  public function check(Request $rq){
+    $time = $rq->data;
+    $key = $rq->publicKey;
+    $uAgent = $rq->userAgent();
+    $pageId = $rq->pageId;
+
+    $mission = Mission::where([
+      // ["ip", $uIP],
+      ["key", $key],
+      ["user_agent", $uAgent],
+      ["page_id", $pageId],
+      ["missions.status", MissionStatusConstants::DOING]
+    ]);
+
+    if ($mission->count() === 0) {
+      return response()->json(["error" => "Error"]);
+    };
+    $mission->update(["check->$time" => true]);
+    return response()->json(["success" => "Success"]);
   }
 }

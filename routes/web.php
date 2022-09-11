@@ -41,6 +41,7 @@ Route::group(['middleware' => ['checkLogin']], function () {
 });
 Route::group(['middleware' => ['checkDomain']], function () {
   Route::post('/generate-code', 'MissionController@generateCode');
+  Route::post('/check', 'MissionController@check');
 });
 
 // // Pages
@@ -68,3 +69,8 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::post('admin/users/{id}', 'DashboardController@postChangeUserType');
   Route::post('management/usertypes', 'DashboardController@postCreateUserType');
 });
+
+// Verify user
+Route::post('/verify/renew', 'UserController@verifyRenewOtp');
+Route::post('/verify', 'UserController@verifyOtpToken');
+Route::get('/verify', 'UserController@verifyOtp');

@@ -21,6 +21,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('/ms', 'api\MissionController@getMission');
 Route::post('/ms', 'api\MissionController@postMission');
-Route::post('/code', 'api\MissionController@generateCode');
 Route::post('/key', 'api\MissionController@pasteKey');
 Route::post('/cancel', 'api\MissionController@cancelMission');

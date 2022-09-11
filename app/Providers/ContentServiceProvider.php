@@ -42,7 +42,8 @@ class ContentServiceProvider extends ServiceProvider
       ->groupBy('date')
       ->orderBy('date', 'DESC')
       ->limit(7)
-      ->get(array(
+      ->simplePaginate(
+        $perPage = 10, $columns = array(
           DB::raw('Date(created_at) as date'), DB::raw('sum(reward) as mission_reward')
         )
       );
@@ -85,9 +86,8 @@ class ContentServiceProvider extends ServiceProvider
     });
     view()->composer('mission.mission', function ($view) {
       $missions = Mission::where('user_id', Auth::user()->id)
-        ->orderBy('updated_at', 'desc')
-        ->limit(10)
-        ->get();
+        ->orderBy('created_at', 'desc')
+        ->simplePaginate(10);
       $view->with('missions', $missions);
     });
   }
