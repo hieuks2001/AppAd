@@ -51,6 +51,7 @@
                 {{-- <li><a class="menu-item" href="{{ URL::to('regispage') }}">Mua traffic user</a></li> --}}
                 {{-- <li><a class="menu-item" href="{{ URL::to('deposit') }}">Nạp tiền</a></li> --}}
                 <li><a class="menu-item" href="{{ URL::to('withdraw') }}">Rút tiền</a></li>
+                <li><a class="menu-item" href="{{ URL::to('ref') }}">Mã giới thiệu</a></li>
             </ul>
         </div>
     </div>

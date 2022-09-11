@@ -8,4 +8,5 @@ final class TransactionTypeConstants {
     public const PAY = 'pay';
     public const REFUND = 'refund';
     public const REWARD = 'reward';
+    public const COMMISSION = 'commission';
 }

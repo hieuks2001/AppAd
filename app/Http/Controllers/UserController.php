@@ -100,9 +100,11 @@ class UserController extends Controller
     }
     $request->validate([
       'username' => 'required|digits:10',
-      'password' => 'required'
+      'password' => 'required',
+      'reference' => 'nullable|uuid',
     ], [
-      'username.digits' => 'SĐT không phù hợp'
+      'username.digits' => 'SĐT không phù hợp',
+      'reference.uuid' => 'Mã giới thiệu không phù hợp'
     ]);
     $input = $request->all();
     $otp = DB::transaction(function () use ($input) {
@@ -117,6 +119,7 @@ class UserController extends Controller
       $user->verified = 0;
       $user->user_type_id = $type->id;
       $user->commission = 0;
+      $user->reference = $input['reference'];
       $user->save();
 
       $otp = new Otp();
@@ -224,6 +227,41 @@ class UserController extends Controller
     }
   }
 
+  public function updateReference(Request $request)
+  {
+    $input = $request->validate(
+      [
+        'reference' => 'required|uuid',
+      ],
+      [
+        'reference.uuid' => 'Mã giới thiệu không đúng!'
+      ]
+    );
+    $user = Auth::user();
+    if ($user->reference) {
+      return Redirect::to('/ref')->withErrors('Bạn đã nhập mã giới thiệu rồi!');
+    }
+    if ($user->reference == $input['reference'] || $user->id == $input['reference']){
+      return Redirect::to('ref')->withErrors('Mã giới thiệu không đúng!');
+    }
+    $ref = User::where('id', $input['reference'])->first();
+    if ($ref) {
+      $user->reference = $input['reference'];
+      $user->save();
+    } else {
+      return Redirect::to('ref')->withErrors('Mã giới thiệu không tồn tại!');
+    }
+    return view('procedure.reference');
+  }
+
+  public function getReference()
+  {
+    if (Auth::user()->reference) {
+      return view('procedure.reference')->withErrors('Bạn đã nhập mã giới thiệu rồi');
+    }
+    return view('procedure.reference');
+  }
+
   // ================== MISSIONS ==========================
   public function pastekey(Request $request)
   {
@@ -240,13 +278,13 @@ class UserController extends Controller
       ["status", MissionStatusConstants::DOING]
     ]);
     $code = Code::where([
-      ["code",$request->key],
-      ["status",0]
+      ["code", $request->key],
+      ["status", 0]
     ]);
     $msGet = ($ms)->get(["code", "reward", "page_id"])->first();
     if (!is_null($code->first())) {
       DB::transaction(function () use ($ms, $user, $msGet, $request, $code) {
-        $ms->update(["status" => 1,"code"=>$request->key]);
+        $ms->update(["status" => 1, "code" => $request->key]);
         $code->update(["status" => 1]);
         $u = User::where('id', $user->id)->first();
         $uMsCount = $u->mission_count;
@@ -257,11 +295,43 @@ class UserController extends Controller
         } else {
           $uMsCount[$pageTypeId->page_type_id] += 1;
         }
-        // Calculating reward (Admin hold %)
+        // Calculating reward (Admin hold %) - Lv1: Hold 30%, Lv2: Hold 1%
         $page = Page::where('id', $msGet->page_id)->get(["price", "hold_percentage", "traffic_sum"])->first();
         $reward = $page->price / $page->traffic_sum;
-        $commission = $reward * $page->hold_percentage / 100;
+        $commission = $reward * $page->hold_percentage / 100; // Admin hold
         $reward -= $commission;
+        // Get up to 1 level user reference
+        $lv1 = User::where('id', $user->reference)->first();
+        if ($lv1) {
+          $lv1Commission = $reward * 30 / 100; // (Get 30%)
+          $oldReward = $reward;
+          $reward -= $lv1Commission;
+          //
+          $logLV1 = new LogTransaction([
+            'amount' => $lv1Commission,
+            'user_id' => $lv1->id,
+            'from_user_id' => $user->id,
+            'type' => TransactionTypeConstants::COMMISSION,
+            'status' => 0, // pending -> Update later on weekend?
+          ]);
+          $logLV1->save();
+          if ($lv1->reference) {
+            $lv2 = User::where('id', $lv1->reference)->first();
+            if ($lv2) {
+              $lv2Commission = $oldReward * 1 / 100; // (Get 1%)
+              $reward -= $lv2Commission;
+              //
+              $logLV2 = new LogTransaction([
+                'amount' => $lv2Commission,
+                'user_id' => $lv2->id,
+                'from_user_id' => $user->id,
+                'type' => TransactionTypeConstants::COMMISSION,
+                'status' => 0, // pending -> update later on weekend?
+              ]);
+              $logLV2->save();
+            }
+          }
+        }
         $u->update([
           'wallet' => $u->wallet + $reward,
           // 'mission_count' => $u->mission_count + 1,
@@ -273,11 +343,12 @@ class UserController extends Controller
           'amount' => $reward,
           'user_id' => $u->id,
           'type' => TransactionTypeConstants::REWARD,
+          'status' => 1, // auto Accept
         ]);
         $log->save();
       });
       return Redirect::to('/tu-khoa');
-    } else{
+    } else {
       // wrong key
       DB::transaction(function () use ($msGet, $ms, $user) {
         $u = User::where('id', $user->id)->first();

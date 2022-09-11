@@ -50,6 +50,7 @@
                 <input type="text" name="username" placeholder="username" class="input input-bordered w-full mb-5">
                 <input type="password" name="password" placeholder="Password" class="input input-bordered w-full mb-5">
                 <input type="password" name="re_password" placeholder="Re-Password" class="input input-bordered w-full mb-5">
+                <input type="text" name="reference" placeholder="Mã giới thiệu" class="input input-bordered w-full mb-5">
                 <button class="btn btn-block">Submit</button>
             </form>
         </div>
