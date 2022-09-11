@@ -92,7 +92,7 @@
                 var value = &#x27;{{ Session::get('pageId') }}&#x27;;
               &#x3C;/script&#x3E;
               &#x3C;script&#x3E;
-                const URL_API = &#x27;{{env("APP_URL")}}&#x27;;
+                const URL_API = &#x27;{{config("app.url")}}&#x27;;
               &#x3C;/script&#x3E;
               &#x3C;script src=&#x22;{{ asset('js/ican.js') }}&#x22;&#x3E;&#x3C;/script&#x3E;
             </code>

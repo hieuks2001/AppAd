@@ -157,6 +157,7 @@ buttonDiv.style.cssText = `
   place-items: center;
   font-size: 20px;
   cursor: pointer;
+  z-index: 999999999;
 `;
 buttonDiv.setAttribute("id", "btn-scroll");
 const titleButton = document.createElement("div");

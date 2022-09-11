@@ -24,8 +24,8 @@ mix
   .postCss("resources/css/app.css", "public/css", [require("tailwindcss")]);
 
 mix
-  .js("resources/js/ican.js", "public/ican.js")
-  .js("resources/js/general.js", "public/general.js")
+  .js("resources/js/ican.js", "public/js/ican.js")
+  .js("resources/js/general.js", "public/js/general.js")
   .obfuscator({
     options: {
       compact: true,

@@ -23,7 +23,7 @@ window.onMissionGetError = function (param) {
 async function missionPost(callback) {
   try {
     console.log(localStorage.getItem("currentMission"));
-    const ms = await fetch(`${window.VITE_URL_API}/ms`, {
+    const ms = await fetch(`${window.VITE_URL_API}/api/ms`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -40,11 +40,12 @@ async function missionPost(callback) {
 }
 async function missionGet(callback) {
   try {
-    const ms = await fetch(`${window.VITE_URL_API}/ms`, {
+    const ms = await fetch(`${window.VITE_URL_API}/api/ms`, {
       method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+	"Access-Control-Allow-Origin":"*",
       },
     }).then((data) => data.json());
     callback(ms);
@@ -54,7 +55,7 @@ async function missionGet(callback) {
 }
 async function pasteKey(code, callback) {
   try {
-    const ms = await fetch(`${window.VITE_URL_API}/key`, {
+    const ms = await fetch(`${window.VITE_URL_API}/api/key`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -72,7 +73,7 @@ async function pasteKey(code, callback) {
 }
 async function cancelMission(code, callback) {
   try {
-    const ms = await fetch(`${window.VITE_URL_API}/cancel`, {
+    const ms = await fetch(`${window.VITE_URL_API}/api/cancel`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -122,7 +123,7 @@ window.addEventListener("click", (e) => {
         keyword;
       document.querySelector(
         "#modal-mission-detail .ms-image"
-      ).src = `${window.VITE_URL_API}/images/${image}`;
+      ).src = `https://memtraffic.com/images/${image}`;
       document.querySelector(
         "#modal-mission-detail .ms-onsite"
       ).textContent = `${onsite}s`;
@@ -138,7 +139,6 @@ window.addEventListener("click", (e) => {
         const options = {
           allowTaint: false,
           imageTimeout: 25000,
-          useCORS: true,
         };
         html2canvas(input, options).then((canvas) => {
           const dataUrl = canvas.toDataURL();
