@@ -77,6 +77,14 @@ class ContentServiceProvider extends ServiceProvider
       $money["withdrawed"] = DB::table("log_traffic_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::WITHDRAW, "status" => 1])->sum("amount");
       $view->with('money', $money);
     });
+    view()->composer('box.patternBox4', function ($view) {
+      $user = Auth::user();
+      $money = [];
+      $money["balance"] = $user->wallet;
+      $money["withdrawing"] = DB::table("log_traffic_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::TOPUP, "status" => 0])->sum("amount");
+      $money["withdrawed"] = DB::table("log_traffic_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::TOPUP, "status" => 1])->sum("amount");
+      $view->with('money', $money);
+    });
     view()->composer('regispage.index', function ($view) {
       $onsite = PageType::all()->sortBy('name');
       $view->with('onsite', $onsite);
@@ -99,11 +107,24 @@ class ContentServiceProvider extends ServiceProvider
       $view->with('missions', $missions);
     });
     view()->composer('usdt.deposit', function ($view) {
-      $data = DB::table('log_traffic_transactions')->where(['user_id' => Auth::user()->id, 'status' => 1, 'type' => TransactionTypeConstants::TOPUP])->get();
+      $data = DB::table('log_traffic_transactions')
+        ->where([
+          'user_id' => Auth::user()->id, 
+          'status' => 1, 
+          'type' => TransactionTypeConstants::TOPUP
+        ])
+        ->orderBy("updated_at", "DESC")
+        ->simplePaginate(10);
       $view->with('data', $data);
     });
     view()->composer('usdt.withdraw', function ($view) {
-      $data = DB::table('log_traffic_transactions')->where(['user_id' => Auth::user()->id, 'type' => TransactionTypeConstants::WITHDRAW])->get();
+      $data = DB::table('log_traffic_transactions')
+      ->where([
+        'user_id' => Auth::user()->id, 
+        'type' => TransactionTypeConstants::WITHDRAW
+        ])
+      ->orderBy("updated_at", "DESC")
+      ->simplePaginate(10);
       $view->with('data', $data);
     });
   }

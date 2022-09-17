@@ -16,7 +16,7 @@
                 </div>
                 <div class="flex-1 px-2 mx-2">
                     <div class="twelve wide column center aligned">
-                        <a href="">Home</a>
+                        1USDT = 23,000VND
                     </div>
                 </div>
                 <div class="flex-none hidden lg:block">
@@ -60,7 +60,7 @@
             menu[0].classList.add("active")
         }
         menu.forEach(m => {
-            if (window.location.href === m.getAttribute('href')) {
+            if (window.location.pathname.includes(m.getAttribute('href').split("/")[3])) {
                 m.classList.add("active")
             }
         });

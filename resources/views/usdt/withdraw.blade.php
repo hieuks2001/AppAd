@@ -24,7 +24,6 @@
                     <th class="bg-slate-200">Ngày</th>
                     <th class="bg-slate-200">Hình thức</th>
                     <th class="bg-slate-200">Số tiền</th>
-                    <th class="bg-slate-200">Ghi chú</th>
                     <th class="bg-slate-200">Trạng thái</th>
                 </tr>
             <tbody>
@@ -34,7 +33,6 @@
                   <td class="bg-white">{{$item->created_at}}</td>
                   <td class="bg-white">momo</td>
                   <td class="bg-white">{{$item->amount}}</td>
-                  <td class="bg-white"></td>
                   <td class="bg-white">
                     @if ($item->status == 0)
                         Đang duyệt
@@ -51,5 +49,9 @@
               @endif
             </tbody>
         </table>
-    </div>
+        <div class="btn-group flex justify-center mt-5">
+          <a class="btn btn-outline btn-sm {{$data->onFirstPage() ? 'btn-disabled' : ''}}" href="{{$data->previousPageUrl()}}">Previous</a>
+          <a class="btn btn-outline btn-sm {{!$data->hasMorePages() ? 'btn-disabled' : ''}}" href="{{$data->nextPageUrl()}}">Next</a>
+        </div>
+      </div>
 @endsection

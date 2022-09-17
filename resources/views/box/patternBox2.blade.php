@@ -13,13 +13,13 @@
     </div>
     <div class="bg-red-500 p-5 rounded-xl">
         <div class="ui purple inverted">
-            <h2 class="text-3xl font-bold">{{$traffic["totalCharge"]}} USDT</h2>
-            <b>Tổng nạp</b>
+            <h2 class="text-3xl font-bold">{{number_format($traffic["totalCharge"],3)}} <span class="text-xl">USDT</span></h2>
+            <b>Tổng traffic trả</b>
         </div>
     </div>
     <div class="bg-green-400 p-5 rounded-xl">
         <div class="ui pink inverted">
-            <h2 class="text-3xl font-bold">{{$traffic["remaining"]}} USDT</h2>
+            <h2 class="text-3xl font-bold">{{number_format($traffic["remaining"],3)}} <span class="text-xl">USDT</span></h2>
             <b>Số dư</b>
         </div>
     </div>

@@ -148,7 +148,8 @@ const buttonDiv = document.createElement("div");
 buttonDiv.style.cssText = `
   position:fixed;
   bottom: 20px;
-  right: 20px;
+  tranform: translateX(-50%);
+  right: calc(50% - 64px * 3);
   width: 64px;
   height: 64px;
   background-color: #0F69E6;
@@ -166,7 +167,8 @@ titleButton.style.cssText = `
   border-radius: 10px 10px 0 10px;
   position: fixed;
   bottom: 84px;
-  right: 84px;
+  tranform: translateX(-50%);
+  right: calc(50% - 120px);
   padding: 10px;
   color: #fff;
   font-size: 18px;
@@ -175,6 +177,10 @@ titleButton.style.cssText = `
   `;
 document.body.appendChild(titleButton);
 document.body.appendChild(buttonDiv);
+
+// buttonDiv.style.display = "grid";
+// titleButton.style.display = "block";
+// titleButton.textContent = "Bấm để tiếp tục đếm ngược";
 
 let disabledFocusedSite = true;
 function run(onsite, key) {
@@ -193,23 +199,31 @@ function run(onsite, key) {
         titleButton.textContent = "Bấm để tiếp tục đếm ngược";
         buttonDiv.onclick = async (e) => {
           window.scrollTo({
-            top: isBottom ? 0 : document.body.scrollHeight,
+            top: 0,
             behavior: "smooth",
           });
           buttonDiv.innerHTML = downIcon;
-          if (!isBottom) {
-            await getCode(key, cd + 1);
-            countdown();
-            buttonDiv.style.display = "none";
-            titleButton.style.display = "none";
-            if (cd === -1) {
-              clearInterval(timer);
-              getCodeBtn.textContent =
-                "Click link bất kỳ trong trang để nhận code";
-            }
-          }
+          buttonDiv.onclick = () => {};
+          titleButton.textContent = "Sau 2 giây sẽ tự vuốt xuống";
           isBottom = !isBottom;
           disabledFocusedSite = false;
+          setTimeout(() => {
+            if (!isBottom) {
+              window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: "smooth",
+              });
+              getCode(key, cd + 1).then((x) => x);
+              countdown();
+              buttonDiv.style.display = "none";
+              titleButton.style.display = "none";
+              if (cd === -1) {
+                clearInterval(timer);
+                getCodeBtn.textContent =
+                  "Click link bất kỳ trong trang để nhận code";
+              }
+            }
+          }, 2000);
         };
       }
       if (cd > -1) {

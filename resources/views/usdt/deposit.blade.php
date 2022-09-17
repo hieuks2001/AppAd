@@ -1,6 +1,6 @@
 @extends('usdt.index')
 @section('deposit')
-    @include('box.patternBox2')
+    @include('box.patternBox4')
     <div class="mt-5 flex p-5 bg-white drop-shadow-2xl rounded-2xl mb-10">
         <form class="flex flex-1 m-0" action="/deposit" method="post" id="form-deposit">
             @csrf
@@ -8,8 +8,7 @@
                 class="input input-bordered w-full max-w-xs mr-5" />
             <button id="deposit-btn" class="btn btn-primary" type="submit">Nạp tiền</button>
         </form>
-        <input type="text" placeholder="0xB3822db2D50F93dED229711391e7801Db8858Ab2"
-            class="input input-bordered w-full max-w-xs read-only:bg-slate-200" readonly />
+        <div></div>
     </div>
     <div class="overflow-x-auto bg-white drop-shadow-2xl p-5 rounded-2xl">
         <div class="flex items-center justify-between">
@@ -24,7 +23,7 @@
                     <th class="bg-slate-200">Ngày</th>
                     <th class="bg-slate-200">Số tiền</th>
                     <th class="bg-slate-200">Từ</th>
-                    <th class="bg-slate-200">Ghi chú</th>
+                    <th class="bg-slate-200">Trạng thái</th>
                 </tr>
             <tbody>
               @if (isset($data))
@@ -33,12 +32,26 @@
                   <td class="bg-white">{{$key->updated_at}}</td>
                   <td class="bg-white">{{$key->amount}}</td>
                   <td class="bg-white">momo</td>
-                  <td class="bg-white"></td>
+                  <td class="bg-white">
+                    @if ($key->status == 0)
+                        Đang duyệt
+                    @else
+                        @if ($key->status == 1)
+                            Đã duyệt
+                        @else
+                            Đã huỷ
+                        @endif
+                    @endif
+                  </td>
               </tr>
               @endforeach
               @endif
             </tbody>
         </table>
+        <div class="btn-group flex justify-center mt-5">
+          <a class="btn btn-outline btn-sm {{$data->onFirstPage() ? 'btn-disabled' : ''}}" href="{{$data->previousPageUrl()}}">Previous</a>
+          <a class="btn btn-outline btn-sm {{!$data->hasMorePages() ? 'btn-disabled' : ''}}" href="{{$data->nextPageUrl()}}">Next</a>
+        </div>
     </div>
 @endsection
 @push('scripts')
