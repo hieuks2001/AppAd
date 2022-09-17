@@ -2,7 +2,7 @@
 @section('withdraw')
     @include('box.patternBox3')
     <div class="container md:w-2/5 mx-auto my-10">
-        <form action="/add-page" method="post" class="" enctype="multipart/form-data">
+        <form action="/withdraw" method="post" class="" enctype="multipart/form-data">
             @csrf
             <div class="shadow-2xl p-5 rounded-2xl text-center">
                 <input type="text" name="amount" placeholder="Nhập số tiền USDT muốn rút"
@@ -28,13 +28,27 @@
                     <th class="bg-slate-200">Trạng thái</th>
                 </tr>
             <tbody>
-                <tr>
-                    <td class="bg-white">a</td>
-                    <td class="bg-white">a</td>
-                    <td class="bg-white">a</td>
-                    <td class="bg-white">b</td>
-                    <td class="bg-white">c</td>
-                </tr>
+              @if (isset($data))
+              @foreach ($data as $item)
+              <tr>
+                  <td class="bg-white">{{$item->created_at}}</td>
+                  <td class="bg-white">momo</td>
+                  <td class="bg-white">{{$item->amount}}</td>
+                  <td class="bg-white"></td>
+                  <td class="bg-white">
+                    @if ($item->status == 0)
+                        Đang duyệt
+                    @else
+                        @if ($item->status == 1)
+                            Đã duyệt
+                        @else
+                            Đã huỷ
+                        @endif
+                    @endif
+                  </td>
+              </tr>
+              @endforeach
+              @endif
             </tbody>
         </table>
     </div>
