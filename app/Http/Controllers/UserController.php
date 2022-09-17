@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Constants\MissionStatusConstants;
 use App\Constants\TransactionTypeConstants;
+use App\Constants\TransactionStatusConstants;
 use App\Models\LogTransaction;
+use App\Models\LogMissionTransaction;
 use App\Models\Missions;
 use App\Models\Otp;
 use App\Models\User;
@@ -21,6 +23,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
+use Telegram\Bot\Laravel\Facades\Telegram;
 use Web3\Web3;
 use Web3\Contract;
 use Web3\Utils;
@@ -388,37 +391,61 @@ class UserController extends Controller
   }
   // ====================== END PAGES ============================
 
-  public function depositView()
-  {
-    return view("usdt.deposit");
-  }
-  public function deposit(Request $request)
-  {
-    $user = Auth::user();
-    $amount = $request->amount;
-    $wallet = User::where('id', $user->id)->first();
-    $rs = $wallet->update(['wallet' => $wallet->wallet + $amount]);
-    return Redirect::to("/deposit");
-  }
-
   public function withdrawView()
   {
-    $abi = '[{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"constant":true,"inputs":[],"name":"_decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"_name","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"_symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"burn","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"getOwner","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"mint","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"renounceOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"}]';
-    $web3 = new Web3('https://bsc-dataseed.binance.org');
-    $contract = new Contract($web3->provider, $abi);
-    $temp = $contract->at("0x55d398326f99059fF775485246999027B3197955")->call("balanceOf", "0xB3822db2D50F93dED229711391e7801Db8858Ab2", function ($err, $data) {
-      if ($err !== null) {
-        return view("usdt.withdraw")->withErrors("error");
-      }
-      error_log(print_r(Utils::toString($data[0]), true));
-      return $data;
-    });
-    error_log(print_r($temp, true));
-    return view("usdt.withdraw", ["data" => $temp]);
+    return view("usdt.withdraw");
   }
 
   public function withdraw(Request $request)
   {
-    return view("usdt.deposit");
+    $user = Auth::user();
+    $amount = $request->amount;
+    $wallet = $user->wallet;
+    if ($amount > $wallet) {
+      return view("usdt.withdraw")->withErrors("Không đủ số dư trong tài khoản!");
+    }
+
+    $old_log = LogMissionTransaction::where([
+      'user_id' => $user->id,
+      'status' => TransactionStatusConstants::PENDING,
+      'type' => TransactionTypeConstants::WITHDRAW,
+    ])->get();
+    if (count($old_log) > 0) {
+      return view("usdt.withdraw")->withErrors("Bạn đang có yêu cầu rút chưa được duyệt, vui lòng đợi và thử lại sau!");
+    }
+    // $rs = DB::transaction(function () use ($wallet, $amount, $user) {
+    // $rs = $wallet->update(['wallet' => $wallet->wallet - $amount]);
+    // Create log
+    $log = new LogMissionTransaction();
+    $log->amount = $amount;
+    $log->user_id = $user->id;
+    $log->type = TransactionTypeConstants::WITHDRAW;
+    $log->status = TransactionStatusConstants::PENDING;
+    $log->save();
+
+    $inline_keyboard = json_encode([
+      'inline_keyboard' => [
+        [
+          ['text' => 'Đồng ý', 'callback_data' => json_encode(['type' => TransactionStatusConstants::APPROVED, 'id_request' => $log->id, 'from' => 'mission'])],
+          ['text' => 'Từ chối', 'callback_data' => json_encode(['type' => TransactionStatusConstants::CANCELED, 'id_request' => $log->id, 'from' => 'mission'])],
+        ],
+      ]
+    ]);
+
+    // $log->notify(new TelegramNotification($log, $user));
+    $text = "Thông báo mới từ nhiemvu.app \n"
+      . "SDT người yêu cầu: $user->username\n"
+      . "Loại: <strong>Rút tiền</strong>\n"
+      . "Số tiền yêu cầu: <strong>$log->amount</strong> USDT \n";
+
+    Telegram::sendMessage([
+      'chat_id' => env('TELEGRAM_ADMIN'),
+      'parse_mode' => 'HTML',
+      'text' => $text,
+      'reply_markup' => $inline_keyboard,
+    ]);
+    // });
+
+    return view("usdt.withdraw");
   }
 }

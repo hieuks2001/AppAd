@@ -26,8 +26,6 @@ Route::get('/logout', 'UserController@logout');
 
 // usdt
 Route::group(['middleware' => ['checkLogin']], function () {
-  // Route::get('/deposit', 'UserController@depositView');
-  // Route::post('/deposit', 'UserController@deposit');
   Route::get('/withdraw', 'UserController@withdrawView');
   Route::post('/withdraw', 'UserController@withdraw');
 });

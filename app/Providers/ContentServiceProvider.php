@@ -69,6 +69,14 @@ class ContentServiceProvider extends ServiceProvider
       $traffic["remaining"] = $traffic["totalCharge"]  - Mission::whereIn("page_id", $boughtPage)->where("status", MissionStatusConstants::COMPLETED)->sum("reward");
       $view->with('traffic', $traffic);
     });
+    view()->composer('box.patternBox3', function ($view) {
+      $user = Auth::user();
+      $money = [];
+      $money["balance"] = $user->wallet;
+      $money["withdrawing"] = DB::table("log_mission_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::WITHDRAW, "status" => 0])->sum("amount");
+      $money["withdrawed"] = DB::table("log_mission_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::WITHDRAW, "status" => 1])->sum("amount");
+      $view->with('money', $money);
+    });
     view()->composer('regispage.index', function ($view) {
       $onsite = PageType::all();
       $view->with('onsite', $onsite);
@@ -89,6 +97,16 @@ class ContentServiceProvider extends ServiceProvider
         ->orderBy('created_at', 'desc')
         ->simplePaginate(10);
       $view->with('missions', $missions);
+    });
+    view()->composer('usdt.withdraw', function ($view) {
+      $data = DB::table('log_mission_transactions')
+      ->where([
+        'user_id' => Auth::user()->id, 
+        'type' => TransactionTypeConstants::WITHDRAW
+        ])
+      ->orderBy("updated_at", "DESC")
+      ->simplePaginate(10);
+      $view->with('data', $data);
     });
   }
 }

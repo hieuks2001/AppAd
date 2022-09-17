@@ -11,7 +11,7 @@
             <b>Hoa hồng</b>
         </div>
     </div> --}}
-    <div class="bg-red-500 p-5 rounded-xl">
+    <div class="bg-yellow-400 p-5 rounded-xl">
         <div class="ui purple inverted">
             <h2 class="text-3xl font-bold">{{$money["sum"]}} USDT</h2>
             <b>Tổng cộng</b>
