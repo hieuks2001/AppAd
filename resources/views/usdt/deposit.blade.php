@@ -1,6 +1,22 @@
 @extends('usdt.index')
 @section('deposit')
     @include('box.patternBox4')
+    @if ($errors->all())
+        <div class="alert alert-error shadow-lg my-5">
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                @foreach ($errors->all() as $error)
+                    <span>
+                        {{ $error }}
+                    </span>
+                @endforeach
+            </div>
+        </div>
+    @endif
     <div class="mt-5 flex p-5 bg-white drop-shadow-2xl rounded-2xl mb-10">
         <form class="flex flex-1 m-0" action="/deposit" method="post" id="form-deposit">
             @csrf

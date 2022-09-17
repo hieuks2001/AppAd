@@ -14,6 +14,7 @@ class VerifyCsrfToken extends Middleware
   protected $except = [
     //
     "page-init/",
-    "generate-code/"
+    "generate-code/",
+    '/<token>/webhook'
   ];
 }
