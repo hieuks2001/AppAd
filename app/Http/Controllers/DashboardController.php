@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\Page;
 use App\Models\PageType;
 use App\Models\User;
+use App\Models\UserMission;
 use App\Models\UserType;
 use Brick\Math\Exception\NumberFormatException;
 use Carbon\Carbon;
@@ -216,15 +217,24 @@ class DashboardController extends Controller
 
   public function managementUsers()
   {
-    $userTypes = DB::table('user_types')->get();
-    $users = DB::table('user_missions')->where('status', 1)->simplePaginate(10);
-    return view('admin.users', compact(['userTypes', 'users']));
+    $userTypes = UserType::get();
+    $users = UserMission::where([['status', 1],['is_admin',0]])->simplePaginate(10);
+    $usersTraffic = User::where([['status', 1],['is_admin',0]])->simplePaginate(10);
+    return view('admin.users', compact(['userTypes', 'users','usersTraffic']));
   }
-
+  
   public function searchUser(Request $request){
     $sdt = $request->data;
-    $users = DB::table('user_missions')->where('username','LIKE',"%{$sdt}%")->simplePaginate(10);
-    return view('admin.users', compact(['users']));
+    $users = UserMission::where('username','LIKE',"%{$sdt}%")->simplePaginate(10);
+    $usersTraffic = User::where([['status', 1],['is_admin',0]])->simplePaginate(10);
+    return view('admin.users', compact(['users','usersTraffic']));
+  }
+  
+  public function searchUserTraffic(Request $request){
+    $sdt = $request->data;
+    $usersTraffic = User::where('username','LIKE',"%{$sdt}%")->simplePaginate(10);
+    $users = UserMission::where([['status', 1],['is_admin',0]])->simplePaginate(10);
+    return view('admin.users', compact(['users','usersTraffic']));
   }
 
   public function postCreateUserType(Request $request)
@@ -271,7 +281,7 @@ class DashboardController extends Controller
     $userTypeID = $request['user_type_id'];
 
     // $user = User::where('id', $id)->first();
-    $user = DB::table('user_missions')->where('id', $id)->first();
+    $user = UserMission::where('id', $id)->first();
     if ($user) {
       $type = UserType::where('id', $userTypeID)
         ->get('id')
@@ -280,7 +290,7 @@ class DashboardController extends Controller
         // $user->user_type_id = $type->id;
         // $user->mission_count = $type->mission_need;
         // $user->save();
-        DB::table('user_missions')->where('id', $id)->update(['user_type_id' => $type->id]);
+        UserMission::where('id', $id)->update(['user_type_id' => $type->id]);
       }
     }
     return redirect()->to('/management/users');
@@ -336,7 +346,7 @@ class DashboardController extends Controller
       return;
     }
     DB::transaction(function () use ($transaction) {
-        $rs = DB::table('user_missions')->where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
+        $rs = UserMission::where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
         $transaction->status = TransactionStatusConstants::APPROVED;
     });
     return;
@@ -354,5 +364,44 @@ class DashboardController extends Controller
     $transaction->status = TransactionStatusConstants::CANCELED;
     $transaction->save();
     return;
+  }
+
+  public function registerManual(Request $request) //only admin
+  {
+    if (!isset($request->name)) {
+      return Redirect::to('/management/users');
+    }
+    if (!isset($request->password)) {
+      return Redirect::to('/management/users')->with('error', 'Không đầy đủ thông tin cần thiết!');
+    }
+    $checkUser = UserMission::where('username', $request->name);
+    if ($checkUser->count() != 0) {
+      return Redirect::to('/management/users')->with('error', 'Tên tài khoản đã có người sử dụng!');
+    }
+    $request->validate([
+      'name' => 'required',
+      'phone' => 'required|digits:10',
+      'password' => 'required'
+    ],[
+      'phone.digits' => 'SĐT không phù hợp'
+    ]);
+    $input = $request->all();
+    DB::transaction(function () use ($input) {
+      $type =  UserType::where('is_default', 1)->get('id')->first();
+      $user = new UserMission();
+      $user->username = $input['name'];
+      $user->phone_number = $input['phone'];
+      $user->password = bcrypt($input['password']);
+      $user->is_admin = 0;
+      $user->status = 1; // Set status to inactive / unverfied
+      $user->user_type_id = $type->id;
+      $user->wallet = 0;
+      $user->verified = 1;
+      $user->commission = 0;
+      $user->save();
+    });
+
+    // Send otp sms
+    return Redirect::to('/management/users')->with('message', 'Đăng ký thành công!');
   }
 }

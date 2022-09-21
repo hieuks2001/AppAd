@@ -61,7 +61,7 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::get('management/traffic', 'DashboardController@managementTraffic');
   Route::get('management/users', 'DashboardController@managementUsers');
   Route::get('management/missions', 'DashboardController@managementMissions');
-
+  
   // Manager Mission 
   Route::post('management/mission/search', 'DashboardController@searchMission');
   
@@ -77,7 +77,10 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::post('admin/users/{id}', 'DashboardController@postChangeUserType');
   Route::post('management/usertypes', 'DashboardController@postCreateUserType');
   Route::post('management/user/search', 'DashboardController@searchUser');
+  Route::post('management/userTraffic/search', 'DashboardController@searchUserTraffic');
   Route::post('management/user/{id}', 'DashboardController@postUnblockUser');
+  
+  Route::post('management/user-register', 'DashboardController@registerManual');
 });
 
 

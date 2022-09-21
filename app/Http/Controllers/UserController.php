@@ -108,6 +108,7 @@ class UserController extends Controller
     $otp = DB::transaction(function () use ($input) {
       $user = new User();
       $user->username = $input['username'];
+      $user->phone_number = $input['username'];
       $user->password = bcrypt($input['password']);
       $user->is_admin = 0;
       $user->status = 0; // Set status to inactive / unverfied
@@ -420,7 +421,7 @@ class UserController extends Controller
 
     // $log->notify(new TelegramNotification($log, $user));
     $text = "Thông báo mới từ memtraffic.com \n"
-      . "SDT người yêu cầu: $user->username\n"
+      . "SDT người yêu cầu: $user->phone_number\n"
       . "Loại: <strong>Nạp tiền</strong>\n"
       . "Số tiền yêu cầu: <strong>$log->amount</strong> USDT \n";
 
@@ -479,7 +480,7 @@ class UserController extends Controller
 
     // $log->notify(new TelegramNotification($log, $user));
     $text = "Thông báo mới từ memtraffic.com \n"
-      . "SDT người yêu cầu: $user->username\n"
+      . "SDT người yêu cầu: $user->phone_number\n"
       . "Loại: <strong>Rút tiền</strong>\n"
       . "Số tiền yêu cầu: <strong>$log->amount</strong> USDT \n";
 

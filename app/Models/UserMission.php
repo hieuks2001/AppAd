@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class UserMission extends Authenticatable
 {
   use Notifiable, Uuids;
 
   protected $fillable = [
-    'password', 'username', 'phone_number', 'wallet', 'is_admin', 'status',
+    'password', 'username', 'phone_number', 'wallet', 'commission', 'is_admin', 'status', 'mission_count', 'mission_attempts', 'user_type_id'
   ];
 
   /**
@@ -24,13 +24,31 @@ class User extends Authenticatable
     'password',
   ];
 
+  // Cast onsite into array
+  protected $casts = [
+    'mission_count' => 'array'
+  ];
+
+  /**
+   * The model's default values for attributes.
+   *
+   * @var array
+   */
+  protected $attributes = [
+    'mission_count' => '[]',
+  ];
 
   protected $primaryKey = 'id';
-  protected $table = 'user_traffics';
+  protected $table = 'user_missions';
 
 
   // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
   public $incrementing = false;
 
   public $timestamps = true;
+
+  public function userType()
+  {
+    return $this->belongsTo('App\Models\UserType');
+  }
 }
