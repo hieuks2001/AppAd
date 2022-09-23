@@ -9,9 +9,33 @@ use App\Models\LogTrafficTransaction;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Telegram\Bot\Laravel\Facades\Telegram;
+use Illuminate\Support\Facades\Http;
 
 class HandleUpdateTelegram extends Command
 {
+  public function momoSend($data, $callback)
+  {
+    $response = Http::asForm()->post('https://api-momo.online/share.php', [
+      'token' => '9zqwhGSdisUGouE75w3O8rd2L1dj4OPgGyfOqSieUao',
+      'id_momo' => '0906568374',
+      'phone' => $data->phone,
+      'money' => $data->money*23000,
+      'comment' => $data->comment,
+    ]);
+    if ($response["status"]) {
+      if (is_callable($callback)) {
+        call_user_func($callback, $response);
+      }
+      return $response;
+    } else {
+      //refresh token if error
+      $token = Http::asForm()->post('https://api-momo.online/share.php', [
+        'token' => 'npEXDCZaHRaN0YvbldX700vLACEnedPaayntqVbDHoI',
+        'id_momo' => '0906568374',
+      ]);
+      $this->momoSend($phone, $money, $callback);
+    }
+  }
   /**
    * The name and signature of the console command.
    *
@@ -83,9 +107,26 @@ class HandleUpdateTelegram extends Command
               echo "Người dùng không đủ USDT cho yêu cầu này! id " . $data->id_request . " từ " . $data->from;
               continue;
             }
-            $targetUser->decrement("wallet", $mRequest->amount);
-          }
-
+            // momo
+            $body = new \stdClass();
+            $body->phone = $targetUser->first()->phone_number;
+            $body->money = $mRequest->amount;
+            $from_site = $data->from == 'traffic' ? 'memtraffic.com' : 'nhiemvu.app';
+            $body->comment = "Rút tiền từ " . $from_site;
+            $rsMomo = $this->momoSend($body, function ($result) use ($targetUser, $mRequest) {
+              if(!$result["error"]){ //thanh cong
+                $targetUser->decrement("wallet", $mRequest->amount);
+                return true;
+              } else {
+                //momo error
+                echo "Lỗi chuyển tiền" . $result["message"];
+                return false;
+              }
+            });
+            if (!$rsMomo) {
+              continue;
+            };
+          };
           $mRequest->status = TransactionStatusConstants::APPROVED;
           $mRequest->save();
 
