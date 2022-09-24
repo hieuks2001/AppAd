@@ -22,7 +22,8 @@
             @csrf
             <div class="shadow-2xl p-5 rounded-2xl text-center">
                 <input type="text" name="amount" placeholder="Nhập số tiền USDT muốn rút"
-                    class="input input-bordere w-full  mb-5" required>
+                    class="input input-bordere w-full  mb-5" required id="amount">
+                    <p class="text-xl mb-5" id="convert-money">~ 0 VND</p>
                 <button class="btn btn-block">Rút tiền</button>
             </div>
         </form>

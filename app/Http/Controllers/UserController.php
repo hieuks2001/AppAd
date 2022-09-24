@@ -421,6 +421,7 @@ class UserController extends Controller
 
     // $log->notify(new TelegramNotification($log, $user));
     $text = "Thông báo mới từ memtraffic.com \n"
+      . "ID người yêu cầu: $user->id\n"
       . "SDT người yêu cầu: $user->phone_number\n"
       . "Loại: <strong>Nạp tiền</strong>\n"
       . "Số tiền yêu cầu: <strong>$log->amount</strong> USDT \n";
@@ -480,6 +481,7 @@ class UserController extends Controller
 
     // $log->notify(new TelegramNotification($log, $user));
     $text = "Thông báo mới từ memtraffic.com \n"
+      . "ID người yêu cầu: $user->id\n"
       . "SDT người yêu cầu: $user->phone_number\n"
       . "Loại: <strong>Rút tiền</strong>\n"
       . "Số tiền yêu cầu: <strong>$log->amount</strong> USDT \n";

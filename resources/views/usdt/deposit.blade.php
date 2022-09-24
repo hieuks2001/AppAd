@@ -17,14 +17,16 @@
             </div>
         </div>
     @endif
-    <div class="mt-5 flex p-5 bg-white drop-shadow-2xl rounded-2xl mb-10">
+    <div class="mt-5 flex items-center p-5 bg-white drop-shadow-2xl rounded-2xl mb-10">
         <form class="flex flex-1 m-0" action="/deposit" method="post" id="form-deposit">
             @csrf
             <input type="text" placeholder="Nhập số tiền muốn nạp" name="amount"
-                class="input input-bordered w-full max-w-xs mr-5" />
+              class="input input-bordered w-full max-w-xs mr-5" required id="amount"/>
             <button id="deposit-btn" class="btn btn-primary" type="submit">Nạp tiền</button>
-        </form>
-        <div></div>
+          </form>
+        <div>
+          <p class="text-xl" id="convert-money">~ 0 VND</p>
+        </div>
     </div>
     <div class="overflow-x-auto bg-white drop-shadow-2xl p-5 rounded-2xl">
         <div class="flex items-center justify-between">
