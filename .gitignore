@@ -1,5 +1,8 @@
 /node_modules
-/public
+/public/hot
+/public/storage
+/public/images/*
+/public/js/*
 /storage/*.key
 /vendor
 .env
@@ -12,3 +15,4 @@ yarn-error.log
 /public/css/*
 /public/ican.js
 /public/general.js
+/public/robots.txt
