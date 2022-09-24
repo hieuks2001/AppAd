@@ -174,6 +174,7 @@ titleButton.style.cssText = `
   font-size: 18px;
   font-weight: bold;
   display: none;
+  z-index: 999999999;
   `;
 document.body.appendChild(titleButton);
 document.body.appendChild(buttonDiv);

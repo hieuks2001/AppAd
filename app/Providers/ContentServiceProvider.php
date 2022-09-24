@@ -110,7 +110,6 @@ class ContentServiceProvider extends ServiceProvider
       $data = DB::table('log_traffic_transactions')
         ->where([
           'user_id' => Auth::user()->id, 
-          'status' => 1, 
           'type' => TransactionTypeConstants::TOPUP
         ])
         ->orderBy("updated_at", "DESC")
