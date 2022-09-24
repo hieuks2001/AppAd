@@ -12,7 +12,7 @@ class User extends Authenticatable
   use Notifiable, Uuids;
 
   protected $fillable = [
-    'password', 'username', 'wallet', 'commission', 'is_admin', 'status', 'mission_count', 'mission_attempts', 'user_type_id'
+    'password', 'username', 'phone_number', 'wallet', 'commission', 'is_admin', 'status', 'mission_count', 'mission_attempts', 'user_type_id'
   ];
 
   /**

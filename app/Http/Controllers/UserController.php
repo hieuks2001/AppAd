@@ -109,6 +109,7 @@ class UserController extends Controller
       $type =  UserType::where('is_default', 1)->get('id')->first();
       $user = new User();
       $user->username = $input['username'];
+      $user->phone_number = $input['username'];
       $user->password = bcrypt($input['password']);
       $user->is_admin = 0;
       $user->status = 0; // Set status to inactive / unverfied
@@ -434,7 +435,8 @@ class UserController extends Controller
 
     // $log->notify(new TelegramNotification($log, $user));
     $text = "Thông báo mới từ nhiemvu.app \n"
-      . "SDT người yêu cầu: $user->username\n"
+      . "ID người yêu cầu: $user->id\n"
+      . "SDT người yêu cầu: $user->phone_number\n"
       . "Loại: <strong>Rút tiền</strong>\n"
       . "Số tiền yêu cầu: <strong>$log->amount</strong> USDT \n";
 
