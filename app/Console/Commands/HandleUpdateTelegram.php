@@ -33,7 +33,7 @@ class HandleUpdateTelegram extends Command
         'token' => 'npEXDCZaHRaN0YvbldX700vLACEnedPaayntqVbDHoI',
         'id_momo' => '0906568374',
       ]);
-      $this->momoSend($phone, $money, $callback);
+      $this->momoSend($data, $callback);
     }
   }
   /**
