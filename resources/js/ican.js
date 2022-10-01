@@ -191,8 +191,8 @@ function run(onsite, key) {
   function countdown() {
     timer = setInterval(() => {
       if (decodeGetTimes(onsite, key).includes(cd)) {
-        let isBottom = true;
         disabledFocusedSite = true;
+        let once = 0;
         clearInterval(timer);
         buttonDiv.innerHTML = upIcon;
         buttonDiv.style.display = "grid";
@@ -205,26 +205,28 @@ function run(onsite, key) {
           });
           buttonDiv.innerHTML = downIcon;
           buttonDiv.onclick = () => {};
-          titleButton.textContent = "Sau 2 giây sẽ tự vuốt xuống";
-          isBottom = !isBottom;
+          titleButton.textContent = "Vui lòng kéo xuống để tiếp tục đếm ngược";
           disabledFocusedSite = false;
-          setTimeout(() => {
-            if (!isBottom) {
-              window.scrollTo({
-                top: document.body.scrollHeight,
-                behavior: "smooth",
-              });
-              getCode(key, cd + 1).then((x) => x);
-              countdown();
-              buttonDiv.style.display = "none";
-              titleButton.style.display = "none";
-              if (cd === -1) {
-                clearInterval(timer);
-                getCodeBtn.textContent =
-                  "Click link bất kỳ trong trang để nhận code";
+          once++;
+          window.onscroll = debounce(() => {
+            var scrollTop = Math.floor(window.pageYOffset);
+            if (window.innerHeight + scrollTop >= document.body.offsetHeight) {
+              if (once === 1) {
+                getCode(key, cd + 1).then((x) => x);
+                countdown();
+                buttonDiv.style.display = "none";
+                titleButton.style.display = "none";
+                if (cd === -1) {
+                  clearInterval(timer);
+                  getCodeBtn.textContent =
+                    "Click link bất kỳ trong trang để nhận code";
+                }
               }
+              once++;
+            } else if (scrollTop <= 0) {
+              console.log("top");
             }
-          }, 2000);
+          }, 50);
         };
       }
       if (cd > -1) {
@@ -244,4 +246,22 @@ function run(onsite, key) {
       if (timer) clearInterval(timer);
     };
   }
+}
+
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function () {
+    var context = this,
+      args = arguments;
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+      timeout = null;
+      if (!immediate) {
+        func.apply(context, args);
+      }
+    }, wait);
+
+    if (callNow) func.apply(context, args);
+  };
 }

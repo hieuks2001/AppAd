@@ -427,7 +427,7 @@ class UserController extends Controller
       . "Số tiền yêu cầu: <strong>$log->amount</strong> USDT \n";
 
     Telegram::sendMessage([
-      'chat_id' => env('TELEGRAM_ADMIN'),
+      'chat_id' => env('TELEGRAM_ADMIN_DEPOSIT'),
       'parse_mode' => 'HTML',
       'text' => $text,
       'reply_markup' => $inline_keyboard,

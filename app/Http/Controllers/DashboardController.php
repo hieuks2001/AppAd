@@ -274,6 +274,50 @@ class DashboardController extends Controller
 
     return redirect()->to('/management/users');
   }
+  public function editUserType(Request $request)
+  {
+    // dd(json_decode($request->mission_need, true));
+    // validate data
+    $validated = $request->validate([
+      'id'=>'required',
+      'name' => 'required',
+      'mission_need' => 'required',
+      'page_weight' => 'required'
+    ]);
+    $name = $validated['name'];
+    $missionNeed = json_decode($validated['mission_need'], true);
+    $pageWeight = json_decode($validated['page_weight'], true);
+
+    $userType = UserType::where('id',$validated['id']);
+    if (!$userType->get()->first()) {
+      return redirect()->to('/management/users')->with("error", "User type not correct id");
+    }
+
+    foreach ($pageWeight as $key => $value) {
+      $pageType = PageType::where('id', $key);
+      if (!$pageType->get()->first()) {
+        return redirect()->to('/management/users')->with("error", "Page type not correct id");
+      }
+    }
+    
+    foreach ($missionNeed as $key => $value) {
+      if ($value < 0) {
+        return redirect()->to('/management/users')->with("error", "Mission need must greater than zero");
+      }
+      $pageType = PageType::where('id', $key)->get();
+      if (!$pageType->first()) {
+        return redirect()->to('/management/users')->with("error", "Page type not correct id");
+      }
+    }
+
+    $userType->update([
+      'name'=>$name,
+      'mission_need'=>$missionNeed,
+      'page_weight'=>$pageWeight,
+    ]);
+
+    return redirect()->to('/management/users');
+  }
 
   public function postChangeUserType(Request $request, $id)
   {

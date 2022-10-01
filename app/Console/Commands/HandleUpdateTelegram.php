@@ -19,7 +19,7 @@ class HandleUpdateTelegram extends Command
       'token' => '9zqwhGSdisUGouE75w3O8rd2L1dj4OPgGyfOqSieUao',
       'id_momo' => '0906568374',
       'phone' => $data->phone,
-      'money' => $data->money*23000,
+      'money' => $data->money * 23000,
       'comment' => $data->comment,
     ]);
     if ($response["status"]) {
@@ -114,7 +114,7 @@ class HandleUpdateTelegram extends Command
             $from_site = $data->from == 'traffic' ? 'memtraffic.com' : 'nhiemvu.app';
             $body->comment = "Rút tiền từ " . $from_site;
             $rsMomo = $this->momoSend($body, function ($result) use ($targetUser, $mRequest) {
-              if(!$result["error"]){ //thanh cong
+              if (!$result["error"]) { //thanh cong
                 $targetUser->decrement("wallet", $mRequest->amount);
                 return true;
               } else {
@@ -137,26 +137,26 @@ class HandleUpdateTelegram extends Command
           try {
             Telegram::editMessageText([
               'parse_mode' => 'HTML',
-              'chat_id' => env('TELEGRAM_ADMIN'),
+              'chat_id' => $mRequest->type == TransactionTypeConstants::TOPUP ? env('TELEGRAM_ADMIN_DEPOSIT') : env('TELEGRAM_ADMIN'),
               'text' => $old_txt . "\n<b>Đã Duyệt</b>\n",
               'message_id' => $record->message->message_id
             ]);
             echo 'Edit message ok';
-          } catch (\Throwable $th){
+          } catch (\Throwable $th) {
             // throw $th;
           }
-        } else if ($data->type == TransactionStatusConstants::CANCELED){
+        } else if ($data->type == TransactionStatusConstants::CANCELED) {
           $mRequest->status = TransactionStatusConstants::CANCELED;
           $mRequest->save();
           try {
             Telegram::editMessageText([
               'parse_mode' => 'HTML',
-              'chat_id' => env('TELEGRAM_ADMIN'),
+              'chat_id' => $mRequest->type == TransactionTypeConstants::TOPUP ? env('TELEGRAM_ADMIN_DEPOSIT') : env('TELEGRAM_ADMIN'),
               'text' => $old_txt . "\n<b>Đã Huỷ</b>\n",
               'message_id' => $record->message->message_id
             ]);
             echo 'Edit message ok';
-          } catch (\Throwable $th){
+          } catch (\Throwable $th) {
             // throw $th;
           }
         }

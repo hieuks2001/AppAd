@@ -4,7 +4,7 @@
   <div class="flex items-center justify-between">
     <h3 class="text-2xl font-bold text-slate-800">Loại người dùng (nhiemvu.app)</h3>
     <div class="flex">
-      <label for="modal-create" class="btn modal-button btn-accent gap-2">
+      <label for="modal-create--user_type" class="btn modal-button btn-accent gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -20,13 +20,22 @@
       <tr>
         <th>ID</th>
         <th>Tên</th>
-        <!-- <th>Số traffic tối đa / ngày</th> -->
+        <th></th>
       </tr>
     <tbody>
       @foreach ($user_types as $key => $value)
       <tr>
         <td>{{ $value->id }}</td>
         <td>{{ $value->name }}</td>
+        <td>
+          <label for="modal-edit--user_type" class="btn btn-square btn-outline btn-sm" onclick="onClickUserType('{{ $value->id }}')">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </label>
+        </td>
       </tr>
       @endforeach
     </tbody>
@@ -70,7 +79,7 @@
   <div class="flex items-center justify-between">
     <h3 class="text-2xl font-bold text-slate-800">nhiemvu.app</h3>
     <div class="flex">
-      <label for="modal-create-user" class="btn modal-button btn-accent gap-2 mr-3">
+      <label for="modal-create--user_traffic" class="btn modal-button btn-accent gap-2 mr-3">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
           stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -104,7 +113,7 @@
         <td>{{ $user_types[array_search($value->user_type_id, array_column(json_decode(json_encode($user_types),TRUE),
           'id'))]->name }}</td>
         <td>
-          <label for="modal-edit" class="btn btn-square btn-outline btn-sm" onclick="onClickUser('{{ $value->id }}')">
+          <label for="modal-edit--user_mission" class="btn btn-square btn-outline btn-sm" onclick="onClickUser('{{ $value->id }}')">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -146,10 +155,11 @@
       href="{{$users->nextPageUrl()}}">Next</a>
   </div>
 </div>
-<input type="checkbox" id="modal-edit" class="modal-toggle">
+<!-- Modal edit User -->
+<input type="checkbox" id="modal-edit--user_mission" class="modal-toggle">
 <div class="modal modal-bottom sm:modal-middle">
   <div class="modal-box relative">
-    <label for="modal-edit" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <label for="modal-edit--user_mission" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
     <form id="form-edit" method="post" class="mb-0"> {{-- action in js dom --}}
       @csrf
       <p class="label-text font-bold">
@@ -175,10 +185,12 @@
     </form>
   </div>
 </div>
-<input type="checkbox" id="modal-create" class="modal-toggle">
+
+<!-- Modal create user type -->
+<input type="checkbox" id="modal-create--user_type" class="modal-toggle">
 <div class="modal modal-bottom sm:modal-middle">
   <div class="modal-box relative">
-    <label for="modal-create" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <label for="modal-create--user_type" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
     <h3 class="mb-3 text-lg font-bold">Tạo loại người dùng mới</h3>
     <form id="form-create" action="/management/usertypes" method="post" class="mb-0">
       @csrf
@@ -188,7 +200,7 @@
           <span class="label-text">Số lượng cần của mỗi loại trang</span>
         </label>
         @foreach ($page_types as $key => $item)
-        @if ($key !== count($page_types) - 2)
+        @if ($key !== count($page_types) - 1)
         <label class="input-group">
           <div class="flex items-center w-full pl-4 bg-slate-200">Số lượng cần để lên
             <span class="font-bold">
@@ -208,7 +220,7 @@
         </label>
         @foreach ($page_types as $item)
         <label class="input-group">
-          <div class="flex items-center w-full pl-4 bg-slate-200">Số lượng cần để lên
+          <div class="flex items-center w-full bg-slate-200">
             <span class="font-bold">
               loại {{$item->name}}
             </span>
@@ -224,10 +236,63 @@
     </form>
   </div>
 </div>
-<input type="checkbox" id="modal-create-user" class="modal-toggle">
+<!-- Modal edit user type -->
+<input type="checkbox" id="modal-edit--user_type" class="modal-toggle">
 <div class="modal modal-bottom sm:modal-middle">
   <div class="modal-box relative">
-    <label for="modal-create-user" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <label for="modal-edit--user_type" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <h3 class="mb-3 text-lg font-bold">Chỉnh sửa loại người dùng</h3>
+    <form id="form-edit--user_type" action="{{action('DashboardController@editUserType')}}" method="post" class="mb-0">
+      @csrf
+      <input type="text" id="ut_id" name="id" hidden>
+      <input type="text" id="ut_name" name="name" placeholder="Tên loại người dùng" class="input input-bordered w-full">
+      <div class="form-control mb-3">
+        <label class="label">
+          <span class="label-text">Số lượng cần của mỗi loại trang</span>
+        </label>
+        @foreach ($page_types as $key => $item)
+        @if ($key !== count($page_types) - 1)
+        <label class="input-group">
+          <div class="flex items-center w-full pl-4 bg-slate-200">Số lượng cần để lên
+            <span class="font-bold">
+              loại {{$item->name+1}}
+            </span>
+          </div>
+          <input type="text" placeholder="10" data-mission_need="{{$item->id}}" oninput="handleEditChange(this)"
+            class="mission_need input input-bordered w-14">
+        </label>
+        @endif
+        @endforeach
+      </div>
+      <div class="form-control mb-3">
+        <label class="label">
+          <span class="label-text">Tỉ lệ random của từng site</span>
+          <span class="label-text">%</span>
+        </label>
+        @foreach ($page_types as $item)
+        <label class="input-group">
+          <div class="flex items-center w-full bg-slate-200">
+            <span class="font-bold">
+              loại {{$item->name}}
+            </span>
+          </div>
+          <input type="text" placeholder="10" data-page_weight="{{$item->id}}" oninput="handleEditChange(this)"
+            class="page_weight input input-bordered w-14">
+        </label>
+        @endforeach
+      </div>
+      <input type="text" name="mission_need" hidden>
+      <input type="text" name="page_weight" hidden>
+      <button type="submit" class="btn btn-block">Tạo</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal create user -->
+<input type="checkbox" id="modal-create--user_traffic" class="modal-toggle">
+<div class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box relative">
+    <label for="modal-create--user_traffic" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
     <h3 class="mb-3 text-lg font-bold">Tạo người dùng mới</h3>
     <form id="" action="{{action('DashboardController@registerManual')}}" method="POST" class="mb-0">
       @csrf
@@ -252,7 +317,7 @@
   </div>
 </div>
 <script>
-  const users = {!! json_encode($users->toArray(), JSON_HEX_TAG) !!}
+    const users = {!! json_encode($users->toArray(), JSON_HEX_TAG) !!}
     const user_types = {!! json_encode($user_types->toArray(), JSON_HEX_TAG) !!}
     const formEdit = document.getElementById('form-edit');
     const items = document.querySelectorAll('#form-edit .item');
@@ -275,8 +340,10 @@
     }
     const mission_need = {};
     const page_weight = {};
-    const eleMissionNeed = document.getElementsByName("mission_need")[0];
-    const elePageWeight = document.getElementsByName("page_weight")[0];
+    const eleMissionNeed = document.querySelector("#form-create input[name='mission_need']");
+    const elePageWeight = document.querySelector("#form-create input[name='page_weight']");
+    console.log(eleMissionNeed);
+    console.log(elePageWeight);
     function handleChange(ele) {
       if ("mission_need" in ele.dataset) {
         mission_need[ele.dataset.mission_need] = ele.value;
@@ -285,6 +352,41 @@
       if ("page_weight" in ele.dataset) {
         page_weight[ele.dataset.page_weight] = ele.value;
         elePageWeight.value = JSON.stringify(page_weight);
+      }
+    }
+    const elePageTypeMissionNeedSend = document.querySelector("#form-edit--user_type input[name='mission_need']");
+    const elePageTypePageWeightSend = document.querySelector("#form-edit--user_type input[name='page_weight']");
+    let mission_need__edit = {}
+    let page_weight__edit = {}
+    function onClickUserType(id) {
+      const eleUserTypeId = document.querySelector("#form-edit--user_type #ut_id")
+      const eleUserTypeName = document.querySelector("#form-edit--user_type #ut_name")
+      const allElePageTypeMissionNeed = document.querySelectorAll("#form-edit--user_type [data-mission_need]")
+      const allElePageTypePageWeight = document.querySelectorAll("#form-edit--user_type [data-page_weight]")
+      const usertype = user_types.find(type=>type.id === id);
+      eleUserTypeId.value = usertype.id;
+      eleUserTypeName.value = usertype.name;
+      elePageTypeMissionNeedSend.value = JSON.stringify(usertype.mission_need);
+      elePageTypePageWeightSend.value = JSON.stringify(usertype.page_weight);
+      mission_need__edit = usertype.mission_need
+      page_weight__edit = usertype.page_weight
+      allElePageTypeMissionNeed.forEach(element => {
+        const key = Object.keys(element.dataset)[0]
+        element.value = usertype[key][element.dataset[key]]
+      });
+      allElePageTypePageWeight.forEach(element => {
+        const key = Object.keys(element.dataset)[0]
+        element.value = usertype[key][element.dataset[key]]
+      });
+    }
+    function handleEditChange(ele) {
+      if ("mission_need" in ele.dataset) {
+        mission_need__edit[ele.dataset.mission_need] = +ele.value;
+        elePageTypeMissionNeedSend.value = JSON.stringify(mission_need__edit);
+      }
+      if ("page_weight" in ele.dataset) {
+        page_weight__edit[ele.dataset.page_weight] = +ele.value;
+        elePageTypePageWeightSend.value = JSON.stringify(page_weight__edit);
       }
     }
 </script>

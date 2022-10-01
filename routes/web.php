@@ -61,10 +61,10 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::get('management/traffic', 'DashboardController@managementTraffic');
   Route::get('management/users', 'DashboardController@managementUsers');
   Route::get('management/missions', 'DashboardController@managementMissions');
-  
+
   // Manager Mission 
   Route::post('management/mission/search', 'DashboardController@searchMission');
-  
+
   // Manager Traffic
   Route::post('management/traffic/search/approved', 'DashboardController@searchTrafficApproved');
   Route::post('management/traffic/search/not-approved', 'DashboardController@searchTrafficNotApproved');
@@ -72,14 +72,15 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::post('management/traffic/{id}', 'DashboardController@postApproveTraffic');
   Route::post('management/traffic/{id}/edit', 'DashboardController@postEditTraffic');
   Route::post('management/traffic/{id}/del', 'DashboardController@delApproveTraffic');
-  
+
   // Manager User
   Route::post('admin/users/{id}', 'DashboardController@postChangeUserType');
   Route::post('management/usertypes', 'DashboardController@postCreateUserType');
+  Route::post('management/usertypes/edit', 'DashboardController@editUserType');
   Route::post('management/user/search', 'DashboardController@searchUser');
   Route::post('management/userTraffic/search', 'DashboardController@searchUserTraffic');
   Route::post('management/user/{id}', 'DashboardController@postUnblockUser');
-  
+
   Route::post('management/user-register', 'DashboardController@registerManual');
 });
 
