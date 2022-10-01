@@ -20,7 +20,7 @@
     <div class="bg-green-400 p-5 rounded-xl">
         <div class="ui pink inverted">
             <h2 class="text-3xl font-bold">{{$traffic["remaining"]}} USDT</h2>
-            <b>Số dư</b>
+            <b>Ví</b>
         </div>
     </div>
 </div>
