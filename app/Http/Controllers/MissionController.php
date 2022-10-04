@@ -287,7 +287,7 @@ class MissionController extends Controller
       $key = $data->key;
       $time = $data->data;
       $path = $data->path;
-      
+
       $result = Code::where([
         ["id", $key],
         ["status", 0],
@@ -303,7 +303,7 @@ class MissionController extends Controller
         $newCode = new Code();
         $newCode->id = $key;
         $newCode->keys = json_encode([
-          $page->onsite => true, //time start countdown
+          $page->onsite - 3 => true, //time start countdown
           hexdec($key[5] . $key[10]) => false,
           hexdec($key[25] . $key[28]) => false,
           0 => false,
