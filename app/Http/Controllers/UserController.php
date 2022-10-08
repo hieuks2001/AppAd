@@ -101,12 +101,18 @@ class UserController extends Controller
     $request->validate([
       'username' => 'required|digits:10',
       'password' => 'required',
-      'reference' => 'nullable|uuid',
+      'reference' => 'required|uuid',
     ], [
       'username.digits' => 'SĐT không phù hợp',
-      'reference.uuid' => 'Mã giới thiệu không phù hợp'
+      'reference.uuid' => 'Mã giới thiệu không phù hợp',
+      'reference.required' => 'Lỗi, tài khoản đăng kí không phù hợp!',
     ]);
     $input = $request->all();
+
+    $ref = User::where("id", $input['reference'])->first();
+    if (!$ref){
+      return Redirect::to('/register')->with('error', 'Lỗi!');
+    }
     $otp = DB::transaction(function () use ($input) {
       $type =  UserType::where('is_default', 1)->get('id')->first();
       $user = new User();
@@ -132,7 +138,7 @@ class UserController extends Controller
     });
 
     // Send otp sms
-    $this->sendOTP($input['username'], $otp->otp);
+    // $this->sendOTP($input['username'], $otp->otp);
     return Redirect::to('/login')->with('message', 'Đăng ký thành công! Vui lòng đăng nhập lại và xác minh mã OTP để kích hoạt tài khoản!');
   }
 

@@ -19,7 +19,7 @@ Route::get('/', 'UserController@index')->middleware('checkLogin');
 Route::get('/login', 'UserController@login')->name('login');
 Route::post('/login', 'UserController@login');
 
-Route::get('/register', 'UserController@register');
+Route::get('/register', 'UserController@register')->name('register');
 Route::post('/register', 'UserController@register');
 
 Route::get('/logout', 'UserController@logout');

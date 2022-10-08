@@ -18,11 +18,13 @@
 @endif
 <br>
 <div class="flex justify-center">
-    <form action="{{ URL::to('update-ref') }}" method="post">
+    {{-- <form action="{{ URL::to('update-ref') }}" method="post">
         @csrf
         <input type="text" name="reference" placeholder="Mã giới thiệu" class="input input-bordered w-full mb-5">
         <button type="submit" class="btn btn-success text-xl">Cập nhật</button>
-    </form>
+    </form> --}}
+
+  <input readonly class="input input-bordered w-full max-w-xs" value="{{route("register", ["ref"=>Auth::user()->id])}}"></input>
 
 </div>
 @endsection
