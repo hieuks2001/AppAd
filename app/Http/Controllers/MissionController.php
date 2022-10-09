@@ -41,7 +41,7 @@ class MissionController extends Controller
     $pageWeight = $uType->page_weight;
     $result = array();
     foreach ($types as $key => $typeId) {
-      if (array_key_exists($typeId, $uMission)) {
+      if (array_key_exists($typeId, $uMission) && array_key_exists($typeId, $condition)) {
         $result[$typeId] = $pageWeight[$typeId];
         if ($uMission[$typeId] < $condition[$typeId]) {
           return $result;
