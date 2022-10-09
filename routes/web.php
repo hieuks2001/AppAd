@@ -77,3 +77,17 @@ Route::get('/verify', 'UserController@verifyOtp');
 // User
 Route::post('/update-ref', 'UserController@updateReference');
 Route::get('/ref', 'UserController@getReference');
+
+// Testing
+Route::get('/ms/gen', 'DevController@createTestMissison');
+// Route::get('/ms/user', 'DevController@createUserTest');
+Route::get('/ms/user', 'DevController@UpdateUserType');
+Route::get('/ms/get', 'DevController@getMission');
+Route::get('/ms/done', 'DevController@completeMission');
+
+Route::get('/dev/ms', 'DevController@createLogMonth');
+Route::get('/dev/clearms', 'DevController@clearMission');
+Route::get('/dev/test', 'DevController@testMission');
+Route::get('/dev/testuser', 'DevController@createUserMonth');
+Route::get('/dev/testuser2', 'DevController@createUserWeek');
+Route::get('/dev/ms2', 'DevController@createLogWeek');
