@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
+use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -36,6 +37,15 @@ class HandleUserReferenceWeekly extends Command
     parent::__construct();
   }
 
+  public function line($string, $style = null, $verbosity = null)
+  {
+      $timestamped = date('[Y-m-d H:i:s] ') . ucfirst($style) . ': ' . $string;
+
+      $styled = $style ? "<$style>$timestamped</$style>" : $timestamped;
+
+      $this->output->writeln($styled, $this->parseVerbosity($verbosity));
+  }
+
   /**
    * Execute the console command.
    *
@@ -50,14 +60,16 @@ class HandleUserReferenceWeekly extends Command
     $now = Carbon::now();
     $start = $now->startOfWeek()->format("Y-m-d");
     $end = $now->endOfWeek(Carbon::SATURDAY)->format("Y-m-d");
+    $minimumReward = Setting::where("name", "minimum_reward")->first();
+    $delayDay = Setting::where("name", "delay_day")->first();
     echo ("From $start to $end");
-    User::chunkById(200, function ($users) use ($start, $end) {
+    User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay) {
       // Loop each user in 200 users
       foreach ($users as $user) {
         echo "\n====================================================================\n";
-        echo "Checking $user->username \n";
-        if (checkUserReference($user->id, $start, $end, 6, 20)) {
-          echo "User $user->username dat du dieu kien an tron theo tuan (week) - Tien hanh an tron\n";
+        $this->line("Checking $user->username");
+        if (checkUserReference($user->id, $start, $end, 6, (float)$minimumReward->value, (int)$delayDay->value)) {
+          $this->info("User $user->username dat du dieu kien an tron theo tuan (week) - Tien hanh an tron");
           $lv1Referrer = User::where("id", $user->reference)->first();
           if (!$lv1Referrer) {
             continue;
@@ -72,7 +84,7 @@ class HandleUserReferenceWeekly extends Command
             }
           }
         } else {
-          echo "User $user->username khong du dieu kien an tron theo tuan (week)";
+          $this->error("User $user->username khong du dieu kien an tron theo tuan (week)");
           $this->giveCommission($user->id);
         }
       }

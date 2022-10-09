@@ -2,10 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class HandleUserReferenceMonthly extends Command
 {
@@ -33,6 +35,15 @@ class HandleUserReferenceMonthly extends Command
     parent::__construct();
   }
 
+  public function line($string, $style = null, $verbosity = null)
+  {
+      $timestamped = date('[Y-m-d H:i:s] ') . ucfirst($style) . ': ' . $string;
+
+      $styled = $style ? "<$style>$timestamped</$style>" : $timestamped;
+
+      $this->output->writeln($styled, $this->parseVerbosity($verbosity));
+  }
+
   /**
    * Execute the console command.
    *
@@ -58,25 +69,27 @@ class HandleUserReferenceMonthly extends Command
 
       array_push($dates, $week);
     }
-    echo "Checking from $start to $end";
-    User::chunkById(200, function ($users) use ($dates) {
+    $minimumReward = Setting::where("name", "minimum_reward")->first();
+    $delayDay = Setting::where("name", "delay_day")->first();
+    $this->info("Checking from $start to $end");
+    User::chunkById(200, function ($users) use ($dates, $minimumReward, $delayDay) {
       // Loop each user in 200 users
       foreach ($users as $user) {
         echo "\n====================================================================\n";
-        echo "Checking $user->username \n";
+        $this->line("Checking $user->username");
         $count = 0;
         for ($i = 1; $i <= count($dates); $i++) {
           $week = $dates[$i - 1];
-          if (checkUserReference($user->id, current($week), end($week), 6 * $i, 20)) {
+          if (checkUserReference($user->id, current($week), end($week), 6 * $i, (float)$minimumReward->value, (int)$delayDay->value)) {
             $count++;
           }
         }
-        print_r("Count: " . $count);
         if ($count >= 4) {
-          echo "\nUser $user->username dat du dieu kien tach line theo thang - Tien hanh tach line.\n";
+          // echo "\nUser $user->username dat du dieu kien tach line theo thang - Tien hanh tach line.\n";
+          $this->info("User $user->username dat du dieu kien tach line theo thang - Tien hanh tach line.");
           $this->removeReference($user->id);
         } else {
-          echo "\nUser $user->username khong du dieu kien tach line theo thang.\n";
+          $this->error("User $user->username khong du dieu kien tach line theo thang.");
         }
       }
     }, $column = "id");
@@ -91,7 +104,7 @@ class HandleUserReferenceMonthly extends Command
 
     $u->reference = null;
     $u->save();
-    echo "\n$u->username da tach line xong.\n";
+    $this->info("$u->username da tach line xong.");
     return;
   }
 }

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 if (!function_exists('checkUserReference')) {
 
-  function checkUserReference($userId, $fromDate, $toDate, $userCount, $minimumReward = 20)
+  function checkUserReference($userId, $fromDate, $toDate, $userCount, $minimumReward = 20, $delayDays = 1)
   {
     if ($fromDate instanceof \Carbon\Carbon) {
       $fromDate = $fromDate->format("Y-m-d");
@@ -69,7 +69,7 @@ if (!function_exists('checkUserReference')) {
       }
       // Check if all day in week are rewarded more than 20 usdt
       // Skip 1 day
-      if ($count >= count($newDates) - 1) {
+      if ($count >= count($newDates) - $delayDays) {
         $acceptedUserCount++;
       }
 
