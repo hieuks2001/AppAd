@@ -12,6 +12,7 @@ use App\Models\LogTrafficTransaction;
 use Illuminate\Http\Request;
 use App\Models\Page;
 use App\Models\PageType;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserMission;
 use App\Models\UserType;
@@ -222,14 +223,14 @@ class DashboardController extends Controller
     $usersTraffic = User::where([['status', 1],['is_admin',0]])->simplePaginate(10);
     return view('admin.users', compact(['userTypes', 'users','usersTraffic']));
   }
-  
+
   public function searchUser(Request $request){
     $sdt = $request->data;
     $users = UserMission::where('username','LIKE',"%{$sdt}%")->simplePaginate(10);
     $usersTraffic = User::where([['status', 1],['is_admin',0]])->simplePaginate(10);
     return view('admin.users', compact(['users','usersTraffic']));
   }
-  
+
   public function searchUserTraffic(Request $request){
     $sdt = $request->data;
     $usersTraffic = User::where('username','LIKE',"%{$sdt}%")->simplePaginate(10);
@@ -299,7 +300,7 @@ class DashboardController extends Controller
         return redirect()->to('/management/users')->with("error", "Page type not correct id");
       }
     }
-    
+
     foreach ($missionNeed as $key => $value) {
       if ($value < 0) {
         return redirect()->to('/management/users')->with("error", "Mission need must greater than zero");
@@ -447,5 +448,28 @@ class DashboardController extends Controller
 
     // Send otp sms
     return Redirect::to('/management/users')->with('message', 'Đăng ký thành công!');
+  }
+
+  public function managementSettings(){
+    $minimumReward = Setting::where("name", "minimum_reward")->first();
+    $delayDay = Setting::where("name", "delay_day")->first();
+    return view('admin.setting', compact(['minimumReward', 'delayDay']));
+  }
+
+  public function changeSettingValue(Request $request){
+    $request->validate([
+      'name' => 'required',
+      'value' => 'required',
+    ]);
+    $input = $request->all();
+    $setting = Setting::where("name", $input["name"])->first();
+    // dd($setting);
+    if (!$setting){
+      return redirect()->to('/management/setting');
+    }
+    $setting->update([
+      "value"=>$input["value"]
+    ]);
+    return redirect()->to('/management/setting');
   }
 }
