@@ -210,7 +210,8 @@ function run(onsite, key) {
           disabledFocusedSite = false;
           once++;
           window.onscroll = debounce(() => {
-            if (Math.floor(window.pageYOffset) >= Math.floor(bodyHeight)) {
+            var scrollTop = Math.floor(window.pageYOffset);
+            if (scrollTop >= Math.floor(bodyHeight)) {
               if (once === 1) {
                 getCode(key, cd + 1).then((x) => x);
                 countdown();
