@@ -297,7 +297,7 @@ class MissionController extends Controller
           ["id", $pageId],
           ["status", PageStatusConstants::APPROVED],
         ])->get(["onsite"])->first();
-        if ($page->onsite !== $time) {
+        if ($page->onsite !== ($time + 3)) {
           return response()->json(["error" => "Error"]);
         }
         $newCode = new Code();
