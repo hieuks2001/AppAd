@@ -84,10 +84,6 @@
                   L&#x1EA5;y m&#xE3;
                 &#x3C;/button&#x3E;
               &#x3C;/div&#x3E;
-              &#x3C;div id=&#x22;canihelpu&#x22; style=&#x22;text-align: center&#x22;&#x3E;
-                &#x3C;span id=&#x22;countdown&#x22; style=&#x22;font-size: 2rem; font-weight: bold&#x22;&#x3E;&#x3C;/span&#x3E;
-                &#x3C;p id=&#x22;notification&#x22; style=&#x22;font-size: 1.2rem; font-weight: bold; margin: 0&#x22;&#x3E;&#x3C;/p&#x3E;
-              &#x3C;/div&#x3E;
               &#x3C;script&#x3E;
                 var value = &#x27;{{ Session::get('pageId') }}&#x27;;
               &#x3C;/script&#x3E;

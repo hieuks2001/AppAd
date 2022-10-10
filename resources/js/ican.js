@@ -64,7 +64,7 @@ async function getCode(k, d) {
     }
   } catch (error) {}
 }
-
+let bodyHeight = 0;
 const getCodeBtn = document.getElementById("getCode");
 window.addEventListener("DOMContentLoaded", async () => {
   const result = await getCode(localStorage.getItem("publicKey"), null).catch(
@@ -86,6 +86,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     if (document.referrer.includes("https://www.google.com")) {
       getCodeBtn.addEventListener("click", async (e) => {
         e.preventDefault();
+        bodyHeight = document.body.getBoundingClientRect().top * -1;
         const rs = await initPage().catch((error) => {
           getCodeBtn.textContent = "Lấy mã";
           handleError(error);
@@ -198,7 +199,7 @@ function run(onsite, key) {
         buttonDiv.style.display = "grid";
         titleButton.style.display = "block";
         titleButton.textContent = "Bấm để tiếp tục đếm ngược";
-        buttonDiv.onclick = async (e) => {
+        buttonDiv.onclick = (e) => {
           window.scrollTo({
             top: 0,
             behavior: "smooth",
@@ -210,7 +211,7 @@ function run(onsite, key) {
           once++;
           window.onscroll = debounce(() => {
             var scrollTop = Math.floor(window.pageYOffset);
-            if (window.innerHeight + scrollTop >= document.body.offsetHeight) {
+            if (scrollTop >= bodyHeight) {
               if (once === 1) {
                 getCode(key, cd + 1).then((x) => x);
                 countdown();
