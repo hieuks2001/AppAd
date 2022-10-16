@@ -283,7 +283,7 @@
       </div>
       <input type="text" name="mission_need" hidden>
       <input type="text" name="page_weight" hidden>
-      <button type="submit" class="btn btn-block">Tạo</button>
+      <button type="submit" class="btn btn-block">Xong</button>
     </form>
   </div>
 </div>

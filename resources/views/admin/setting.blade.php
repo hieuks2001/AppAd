@@ -9,18 +9,29 @@
     @csrf
     <input type="hidden" name="name" value="{{$minimumReward->name}}"
         class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" name="value" value="{{$minimumReward->value}}" class="input input-bordered w-full mb-5">
+    <input type="number" step="any" name="value" value="{{$minimumReward->value}}" class="input input-bordered w-full mb-5">
     <button class="btn btn-block">Lưu</button>
   </form>
   <div class="flex items-center justify-between">
-    <h3 class="text-2xl font-bold text-slate-800">Só lượng ngày nghỉ tối đa của 1 user</h3>
+    <h3 class="text-2xl font-bold text-slate-800">Số lượng ngày nghỉ tối đa của 1 user (Tuần)</h3>
   </div>
   <br>
   <form method="POST" action="{{ URL::to('/management/setting') }}">
     @csrf
-    <input type="hidden" name="name" value = "{{$delayDay->name}}"
+    <input type="hidden" name="name" value = "{{$delayDayWeek->name}}"
         class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" name="value" value="{{$delayDay->value}}" class="input input-bordered w-full mb-5">
+    <input type="number" name="value" value="{{$delayDayWeek->value}}" class="input input-bordered w-full mb-5">
+    <button class="btn btn-block">Lưu</button>
+  </form>
+  <div class="flex items-center justify-between">
+    <h3 class="text-2xl font-bold text-slate-800">Số lượng ngày nghỉ tối đa của 1 user (Tháng)</h3>
+  </div>
+  <br>
+  <form method="POST" action="{{ URL::to('/management/setting') }}">
+    @csrf
+    <input type="hidden" name="name" value = "{{$delayDayMonth->name}}"
+        class="appearance-none input input-bordered w-full mb-5 ">
+    <input type="number" name="value" value="{{$delayDayMonth->value}}" class="input input-bordered w-full mb-5">
     <button class="btn btn-block">Lưu</button>
   </form>
 </div>

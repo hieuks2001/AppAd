@@ -452,8 +452,9 @@ class DashboardController extends Controller
 
   public function managementSettings(){
     $minimumReward = Setting::where("name", "minimum_reward")->first();
-    $delayDay = Setting::where("name", "delay_day")->first();
-    return view('admin.setting', compact(['minimumReward', 'delayDay']));
+    $delayDayWeek = Setting::where("name", "delay_day_week")->first();
+    $delayDayMonth = Setting::where("name", "delay_day_month")->first();
+    return view('admin.setting', compact(['minimumReward', 'delayDayWeek', 'delayDayMonth']));
   }
 
   public function changeSettingValue(Request $request){
