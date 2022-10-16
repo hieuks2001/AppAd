@@ -140,7 +140,7 @@ class DevController extends Controller
       // ["ip", $uIP],
       ["status", MissionStatusConstants::DOING]
     ])->first();
-    if (!$ms){
+    if (!$ms) {
       return $user->mission_count;
     }
     $uMsCount = $user->mission_count;
@@ -391,7 +391,7 @@ class DevController extends Controller
     $user->username = $username;
     $user->password = bcrypt("12341234");
     $user->is_admin = 0;
-    $user->status = 0; // Set status to inactive / unverfied
+    $user->status = 1; // Set status to inactive / unverfied
     $user->wallet = 0;
     $user->verified = 1;
     $user->user_type_id = $type->id;
@@ -417,7 +417,7 @@ class DevController extends Controller
     $userRoot->username = "root";
     $userRoot->password = bcrypt("12341234");
     $userRoot->is_admin = 0;
-    $userRoot->status = 0; // Set status to inactive / unverfied
+    $userRoot->status = 1; // Set status to inactive / unverfied
     $userRoot->wallet = 0;
     $userRoot->verified = 1;
     $userRoot->user_type_id = $type->id;
@@ -429,7 +429,7 @@ class DevController extends Controller
     $userA->username = "User A";
     $userA->password = bcrypt("12341234");
     $userA->is_admin = 0;
-    $userA->status = 0; // Set status to inactive / unverfied
+    $userA->status = 1; // Set status to inactive / unverfied
     $userA->wallet = 0;
     $userA->verified = 1;
     $userA->user_type_id = $type->id;
@@ -460,7 +460,7 @@ class DevController extends Controller
     $userRoot->username = "root";
     $userRoot->password = bcrypt("12341234");
     $userRoot->is_admin = 0;
-    $userRoot->status = 0; // Set status to inactive / unverfied
+    $userRoot->status = 1; // Set status to inactive / unverfied
     $userRoot->wallet = 0;
     $userRoot->verified = 1;
     $userRoot->user_type_id = $type->id;
@@ -472,7 +472,7 @@ class DevController extends Controller
     $userA->username = "User A";
     $userA->password = bcrypt("12341234");
     $userA->is_admin = 0;
-    $userA->status = 0; // Set status to inactive / unverfied
+    $userA->status = 1; // Set status to inactive / unverfied
     $userA->wallet = 0;
     $userA->verified = 1;
     $userA->user_type_id = $type->id;
@@ -500,7 +500,7 @@ class DevController extends Controller
     $end = $now->endOfMonth()->format("Y-m-d");
 
     $dates = CarbonPeriod::create($start, $end)->toArray();
-    $dates = array_map(function ($date){
+    $dates = array_map(function ($date) {
       return $date->format("Y-m-d");
     }, $dates);
 
@@ -587,5 +587,97 @@ class DevController extends Controller
       }
     }
     dd($acceptedUserCount);
+  }
+
+  public function missionTodayNewUser($username)
+  {
+    $u = User::where("username", $username)->first();
+
+    $type =  UserType::where('is_default', 1)->get('id')->first();
+
+    $userA = new User();
+    $userA->username = "Ref" . $username . Carbon::now()->format("Ymds");
+    $userA->password = bcrypt("12341234");
+    $userA->is_admin = 0;
+    $userA->status = 1; // Set status to inactive / unverfied
+    $userA->wallet = 0;
+    $userA->verified = 1;
+    $userA->user_type_id = $type->id;
+    $userA->commission = 0;
+    $userA->reference = $u->id;
+    $userA->save();
+
+    return ["username"=>$userA->username, "password"=>"12341234"];
+  }
+
+  public function missionTodayOldUserDoMission($username, $miss_number = 0)
+  {
+    $u = User::where("username", $username)->first();
+
+    $refs = User::where("reference", $u->id)->inRandomOrder()->get();
+
+    $refs = $refs->slice($miss_number);
+
+    foreach ($refs as $user) {
+      // Create mission
+      $page = Page::where("status", 1)->inRandomOrder()->limit(1)->first();
+
+      $reward = ($page->price - ($page->price * $page->hold_percentage / 100)) / $page->traffic_sum;
+
+      $lv1 = User::where('id', $user->reference)->first();
+      if ($lv1) {
+        $lv1Commission = $reward * 30 / 100; // (Get 30%)
+        $oldReward = $reward;
+        $reward -= $lv1Commission;
+        // Create log lv1
+        $logLV1 = new LogTransaction([
+          'amount' => $lv1Commission,
+          'user_id' => $lv1->id,
+          'from_user_id' => $user->id,
+          'type' => TransactionTypeConstants::COMMISSION,
+          'status' => 0, // pending -> Update later on weekend?
+        ]);
+        $logLV1->save();
+        // If lv1 have reference
+
+        if ($lv1->reference) {
+          $lv2 = User::where('id', $lv1->reference)->first();
+          if ($lv2) {
+            // Create log lv2
+            $lv2Commission = $oldReward * 1 / 100; // (Get 1%)
+            $reward -= $lv2Commission;
+            $logLV2 = new LogTransaction([
+              'amount' => $lv2Commission,
+              'user_id' => $lv2->id,
+              'from_user_id' => $user->id,
+              'type' => TransactionTypeConstants::COMMISSION,
+              'status' => 0, // pending -> update later on weekend?
+            ]);
+            $logLV2->save();
+          }
+        }
+      }
+
+      $newMission = new Mission();
+      $newMission->page_id = $page->id;
+      $newMission->user_id = $user->id;
+      $newMission->reward = $reward;
+      $newMission->status = MissionStatusConstants::DOING;
+      $newMission->ip = "1.1.1.1";
+      $newMission->user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36";
+      $newMission->origin_url = "";
+      $newMission->status = 1; // DONE
+      $newMission->updated_at = Carbon::now();
+      $newMission->save();
+
+      $log = new LogTransaction([
+        'amount' => $reward,
+        'user_id' => $u->id,
+        'type' => TransactionTypeConstants::REWARD,
+        'status' => 1, // auto Accept
+      ]);
+      $log->save();
+    }
+    return "OK";
   }
 }

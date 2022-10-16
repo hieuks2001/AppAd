@@ -91,3 +91,6 @@ Route::get('/dev/test', 'DevController@testMission');
 Route::get('/dev/testuser', 'DevController@createUserMonth');
 Route::get('/dev/testuser2', 'DevController@createUserWeek');
 Route::get('/dev/ms2', 'DevController@createLogWeek');
+
+Route::get('/ms/missiontoday_newuser/{username}', 'DevController@missionTodayNewUser');
+Route::get('/ms/missiontoday_olduser_do_mission/{username}/{miss_number}', 'DevController@missionTodayOldUserDoMission');

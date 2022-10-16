@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Constants\MissionStatusConstants;
 use App\Constants\PagePriorityConstants;
 use App\Constants\PageStatusConstants;
+use App\Constants\TransactionTypeConstants;
+use App\Models\LogTransaction;
 use App\Models\Mission;
 use App\Models\Missions;
 use App\Models\Page;
@@ -260,7 +262,24 @@ class MissionController extends Controller
       $newMission->page_id = $pickedPage->id;
       $newMission->user_id = $user->id;
       // Reward = (price - 10% ) / traffic_sum
-      $newMission->reward = ($pickedPage->price - ($pickedPage->price * $pickedPage->hold_percentage / 100)) / $pickedPage->traffic_sum;
+      // $newMission->reward = ($pickedPage->price - ($pickedPage->price * $pickedPage->hold_percentage / 100)) / $pickedPage->traffic_sum;
+      //===================
+      $reward = ($pickedPage->price - ($pickedPage->price * $pickedPage->hold_percentage / 100)) / $pickedPage->traffic_sum;
+      $lv1 = User::where('id', $user->reference)->first();
+      if ($lv1) {
+        $lv1Commission = $reward * 30 / 100; // (Get 30%)
+        $oldReward = $reward;
+        $reward -= $lv1Commission;
+        if ($lv1->reference) {
+          $lv2 = User::where('id', $lv1->reference)->first();
+          if ($lv2) {
+            $lv2Commission = $oldReward * 1 / 100; // (Get 1%)
+            $reward -= $lv2Commission;
+          }
+        }
+      }
+      //
+      $newMission->reward = $reward;
       $newMission->status = MissionStatusConstants::DOING;
       $newMission->ip = $rqIp;
       $newMission->user_agent = $request->userAgent();

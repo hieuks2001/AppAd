@@ -138,7 +138,7 @@ class UserController extends Controller
     });
 
     // Send otp sms
-    // $this->sendOTP($input['username'], $otp->otp);
+    $this->sendOTP($input['username'], $otp->otp);
     return Redirect::to('/login')->with('message', 'Đăng ký thành công! Vui lòng đăng nhập lại và xác minh mã OTP để kích hoạt tài khoản!');
   }
 

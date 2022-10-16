@@ -61,7 +61,7 @@ class HandleUserReferenceWeekly extends Command
     $start = $now->startOfWeek()->format("Y-m-d");
     $end = $now->endOfWeek(Carbon::SATURDAY)->format("Y-m-d");
     $minimumReward = Setting::where("name", "minimum_reward")->first();
-    $delayDay = Setting::where("name", "delay_day")->first();
+    $delayDay = Setting::where("name", "delay_day_week")->first();
     echo ("From $start to $end");
     User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay) {
       // Loop each user in 200 users

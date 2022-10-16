@@ -20,9 +20,14 @@ class SettingSeeder extends Seeder
       );
       $minimumReward->save();
 
-      $delayDay = new Setting(
-        ["name" => "delay_day", "value" => "1"]
+      $delayDayWeek = new Setting(
+        ["name" => "delay_day_week", "value" => "1"]
       );
-      $delayDay->save();
+      $delayDayWeek->save();
+
+      $delayDayMonth = new Setting(
+        ["name" => "delay_day_month", "value" => "1"]
+      );
+      $delayDayMonth->save();
     }
 }

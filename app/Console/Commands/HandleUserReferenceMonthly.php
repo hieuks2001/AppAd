@@ -70,7 +70,7 @@ class HandleUserReferenceMonthly extends Command
       array_push($dates, $week);
     }
     $minimumReward = Setting::where("name", "minimum_reward")->first();
-    $delayDay = Setting::where("name", "delay_day")->first();
+    $delayDay = Setting::where("name", "delay_day_month")->first();
     $this->info("Checking from $start to $end");
     User::chunkById(200, function ($users) use ($dates, $minimumReward, $delayDay) {
       // Loop each user in 200 users
