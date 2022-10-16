@@ -589,9 +589,10 @@ class DevController extends Controller
     dd($acceptedUserCount);
   }
 
-  public function missionTodayNewUser($username)
+  public function missionTodayNewUser($username, $day)
   {
     $u = User::where("username", $username)->first();
+    $create_at = Carbon::createFromFormat('d', $day);
 
     $type =  UserType::where('is_default', 1)->get('id')->first();
 
@@ -605,15 +606,17 @@ class DevController extends Controller
     $userA->user_type_id = $type->id;
     $userA->commission = 0;
     $userA->reference = $u->id;
+    $userA->created_at = $create_at;
+    $userA->updated_at = $create_at;
     $userA->save();
 
     return ["username"=>$userA->username, "password"=>"12341234"];
   }
 
-  public function missionTodayOldUserDoMission($username, $miss_number = 0)
+  public function missionTodayOldUserDoMission($username, $miss_number = 0, $day)
   {
     $u = User::where("username", $username)->first();
-
+    $create_at = Carbon::createFromFormat('d', $day);
     $refs = User::where("reference", $u->id)->inRandomOrder()->get();
 
     $refs = $refs->slice($miss_number);
@@ -637,6 +640,8 @@ class DevController extends Controller
           'type' => TransactionTypeConstants::COMMISSION,
           'status' => 0, // pending -> Update later on weekend?
         ]);
+        $logLV1->created_at = $create_at;
+        $logLV1->updated_at = $create_at;
         $logLV1->save();
         // If lv1 have reference
 
@@ -653,6 +658,8 @@ class DevController extends Controller
               'type' => TransactionTypeConstants::COMMISSION,
               'status' => 0, // pending -> update later on weekend?
             ]);
+            $logLV2->created_at = $create_at;
+            $logLV2->updated_at = $create_at;
             $logLV2->save();
           }
         }
@@ -667,7 +674,8 @@ class DevController extends Controller
       $newMission->user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36";
       $newMission->origin_url = "";
       $newMission->status = 1; // DONE
-      $newMission->updated_at = Carbon::now();
+      $newMission->created_at = $create_at;
+      $newMission->updated_at = $create_at;
       $newMission->save();
 
       $log = new LogTransaction([
@@ -676,6 +684,8 @@ class DevController extends Controller
         'type' => TransactionTypeConstants::REWARD,
         'status' => 1, // auto Accept
       ]);
+      $log->created_at = $create_at;
+      $log->updated_at = $create_at;
       $log->save();
     }
     return "OK";
