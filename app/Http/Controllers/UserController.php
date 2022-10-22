@@ -85,6 +85,9 @@ class UserController extends Controller
 
   public function register(Request $request)
   {
+    if (!isset($request->ref)) {
+      return Redirect::to("/login");
+    }
     if (!isset($request->username)) {
       return view('procedure.register');
     }
