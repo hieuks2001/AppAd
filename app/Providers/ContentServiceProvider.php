@@ -9,6 +9,7 @@ use App\Constants\PageStatusConstants;
 use App\Constants\TransactionTypeConstants;
 use App\Models\Mission;
 use App\Models\Page;
+use Carbon\Carbon;
 use App\Models\PageType;
 use App\Models\UserType;
 use Illuminate\Support\Facades\Auth;
@@ -99,10 +100,37 @@ class ContentServiceProvider extends ServiceProvider
         ->simplePaginate(10);
       $view->with('missions', $missions);
     });
+    view()->composer('notification', function ($view) {
+      $now = Carbon::parse(Carbon::now()->format("Y-m-d"));
+      $notification = [];
+      $isWeekend = $now->isWeekend();
+      $isLastMonth = $now->isLastOfMonth();
+      // 4 TH
+      // TH1: X ko phải là cuối tuần -> []
+      // TH2: X là cuối tuần nhưng ko phải là cuối tháng -> ["week"=>msg]
+      // TH3: X là cuối tháng nhưng ko phải là cuối tuần -> ["month"=>msg]
+      // TH4: X là cuối tuần và cuối tháng (đặc biệt) -> ["month"=>msg,"week"=>msg]
+
+      if ($isWeekend) {
+        # code...
+        // Check đã đạt điều kiện tuần ở đây
+            // true -> ['week'=>msg]
+            // false -> [] or ko làm gì cả
+        $notification['week'] = "Message of Week";
+      }
+      if ($isLastMonth) {
+        # code...
+        // Check đã đạt điều kiện tháng ở đây
+            // true -> ['month'=>msg]
+            // false -> [] or ko làm gì cả
+        $notification['month'] = "Message of Month";
+      }
+      $view->with('notification', $notification);
+    });
     view()->composer('usdt.withdraw', function ($view) {
       $data = DB::table('log_mission_transactions')
       ->where([
-        'user_id' => Auth::user()->id, 
+        'user_id' => Auth::user()->id,
         'type' => TransactionTypeConstants::WITHDRAW
         ])
       ->orderBy("updated_at", "DESC")

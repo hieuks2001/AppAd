@@ -39,10 +39,12 @@
     </div>
     <!-- Page content here -->
     <div class="container px-5 py-5">
+      @include('notification')
       @yield('dashboard')
       @yield('mission')
       @yield('regispage')
       @yield('usdt')
+      @yield('ref')
     </div>
   </div>
   <div class="drawer-side text-white">
@@ -54,6 +56,7 @@
       {{-- <li><a class="menu-item" href="{{ URL::to('regispage') }}">Mua traffic user</a></li> --}}
       {{-- <li><a class="menu-item" href="{{ URL::to('deposit') }}">Nạp tiền</a></li> --}}
       <li><a class="menu-item" href="{{ URL::to('withdraw') }}">Rút tiền</a></li>
+      <li><a class="menu-item" href="{{ URL::to('ref') }}">Mã giới thiệu</a></li>
     </ul>
   </div>
 </div>
