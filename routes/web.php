@@ -22,6 +22,9 @@ Route::post('/login', 'UserController@login');
 Route::get('/register', 'UserController@register')->name('register');
 Route::post('/register', 'UserController@register');
 
+Route::get('/change-password', 'UserController@changePassword');
+Route::post('/change-password', 'UserController@changePassword');
+
 Route::get('/logout', 'UserController@logout');
 
 // usdt

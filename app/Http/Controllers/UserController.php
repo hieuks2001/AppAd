@@ -142,6 +142,30 @@ class UserController extends Controller
     return Redirect::to('/login')->with('message', 'Đăng ký thành công! Vui lòng đăng nhập lại và xác minh mã OTP để kích hoạt tài khoản!');
   }
 
+  public function changePassword(Request $request)
+  {
+    if (!Auth::check()) {
+      return Redirect::to('/login');
+    }
+    $user = Auth::user();
+    if (!isset($request->password_old) or !isset($request->password_new) or !isset($request->password_new_repeat)) {
+      return view("procedure.change_password");
+    }
+    if (Auth::attempt(['username' => $user->username, 'password' => $request->password_old])) {
+      //Đổi mật khẩu
+      if ($request->password_new == $request->password_new_repeat) {
+        # code...
+        User::where("username", $user->username)->update(['password' => bcrypt($request['password_new'])]);
+        return Redirect::to("/logout");
+      } else {
+        return Redirect::to("/change-password")->with('error', "Nhập lại mật khẩu đã không đúng");
+      }
+    } else {
+      return Redirect::to("/change-password")->with('error', "Sai mật khẩu cũ");
+    }
+  }
+
+
   public function verifyOtp()
   {
     if (!Auth::check()) {
