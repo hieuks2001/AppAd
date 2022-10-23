@@ -70,7 +70,7 @@ class HandleUpdateTelegram extends Command
     $activities = Telegram::getUpdates();
     // dd($activities);
     if (count($activities) <= 0) {
-      return;
+      return true;
     }
 
     foreach ($activities as $k => $v) {
@@ -162,6 +162,6 @@ class HandleUpdateTelegram extends Command
         }
       }
     }
-    return;
+    return true;
   }
 }
