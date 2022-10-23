@@ -60,6 +60,7 @@ class HandleUserReferenceWeekly extends Command
     $now = Carbon::now();
     $start = $now->startOfWeek()->format("Y-m-d");
     $end = $now->endOfWeek(Carbon::SUNDAY)->format("Y-m-d");
+    $end = $now->addWeek()->startOfWeek()->format("Y-m-d");
     $minimumReward = Setting::where("name", "minimum_reward")->first();
     $delayDay = Setting::where("name", "delay_day_week")->first();
     echo ("From $start to $end");

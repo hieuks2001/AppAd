@@ -733,6 +733,7 @@ class DevController extends Controller
     $now = Carbon::createFromFormat("d", $input["day"]);
     $start = $now->startOfWeek()->format("Y-m-d");
     $end = $now->endOfWeek(Carbon::SUNDAY)->format("Y-m-d");
+    $end = $now->addWeek()->startOfWeek()->format("Y-m-d");
     $minimumReward = Setting::where("name", "minimum_reward")->first();
     $delayDay = Setting::where("name", "delay_day_week")->first();
     $result = array();
