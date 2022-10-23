@@ -1,9 +1,9 @@
 @extends('layout')
-@section('login')
+@section('change_password')
 <div class="container px-5 md:px-0 md:w-1/3 mx-auto h-screen grid place-items-center ">
   <div class="flex flex-col items-center">
     <h2 class="text-4xl mb-10">
-      Đăng nhập tài khoản
+      Đổi mật khẩu
     </h2>
     @if (session()->has('error'))
     <div class="alert alert-error shadow-lg mb-5">
@@ -37,16 +37,14 @@
       </div>
     </div>
     @endif
-    <form class="" method="POST" action="{{ URL::to('/login') }}">
+    <form class="" method="POST" action="{{action('UserController@changePassword')}}">
       @csrf
-      <input type="text" name="username" placeholder="Số điện thoại"
-        class="appearance-none input input-bordered w-full mb-5 ">
-      <input type="password" name="password" placeholder="Mật khẩu" class="input input-bordered w-full mb-5">
-      <button class="btn btn-block">Đăng nhập</button>
+      <input type="password" name="password_old" placeholder="Mật khẩu cũ" class="input input-bordered w-full mb-5">
+      <input type="password" name="password_new" placeholder="Mật khẩu mới" class="input input-bordered w-full mb-5">
+      <input type="password" name="password_new_repeat" placeholder="Nhập lại mật khẩu mới"
+        class="input input-bordered w-full mb-5">
+      <button class="btn btn-block">Đổi</button>
     </form>
-    <div class="">
-      Bạn chưa có tài khoản? <a href="{{ URL::to('register') }}">Đăng ký</a>
-    </div>
   </div>
 </div>
 @endsection
