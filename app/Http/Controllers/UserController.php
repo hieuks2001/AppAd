@@ -85,6 +85,9 @@ class UserController extends Controller
 
   public function register(Request $request)
   {
+    if (Auth::user()){
+      return Redirect::to("/");
+    }
     if (!isset($request->ref)) {
       return Redirect::to("/login");
     }
