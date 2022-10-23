@@ -10,6 +10,7 @@ use App\Models\Mission;
 use App\Models\Missions;
 use App\Models\Page;
 use App\Models\PageType;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserType;
 use Carbon\Carbon;
@@ -589,15 +590,29 @@ class DevController extends Controller
     dd($acceptedUserCount);
   }
 
-  public function missionTodayNewUser($username, $day)
+  // New test ===============================================================================================================================
+
+  public function missionTodayNewUser(Request $request)
   {
-    $u = User::where("username", $username)->first();
-    $create_at = Carbon::createFromFormat('d', $day);
+
+    $request->validate([
+      "day" => "required|numeric|min:1|max:31",
+      "username" => "required"
+    ]);
+
+    $input = $request->all();
+    $u = User::where("username", $input["username"])->first();
+
+    if (!$u){
+      return ["error" => "User " . $input["username"] ." not found!"];
+    }
+
+    $create_at = Carbon::createFromFormat('d', $input["day"]);
 
     $type =  UserType::where('is_default', 1)->get('id')->first();
 
     $userA = new User();
-    $userA->username = "Ref" . $username . Carbon::now()->format("Ymds");
+    $userA->username = "Ref" . $input["username"] . Carbon::now()->format("Ymds");
     $userA->password = bcrypt("12341234");
     $userA->is_admin = 0;
     $userA->status = 1; // Set status to inactive / unverfied
@@ -610,16 +625,28 @@ class DevController extends Controller
     $userA->updated_at = $create_at;
     $userA->save();
 
-    return ["username"=>$userA->username, "password"=>"12341234"];
+    return ["username" => $userA->username, "password" => "12341234", "created_at" => $create_at->format("d-m-Y")];
   }
 
-  public function missionTodayOldUserDoMission($username, $miss_number = 0, $day)
+  public function missionTodayOldUserDoMission(Request $request)
   {
-    $u = User::where("username", $username)->first();
-    $create_at = Carbon::createFromFormat('d', $day);
-    $refs = User::where("reference", $u->id)->inRandomOrder()->get();
+    $request->validate([
+      "miss_number" => "required|numeric",
+      "day" => "required|numeric|min:1|max:31",
+      "username" => "required"
+    ]);
 
-    $refs = $refs->slice($miss_number);
+    $input = $request->all();
+    $u = User::where("username", $input["username"])->first();
+    if (!$u){
+      return ["error" => "User " . $input["username"] ." not found!"];
+    }
+    $create_at = Carbon::createFromFormat('d', $input["day"]);
+    $refs = User::where("reference", $u->id)->whereDate("created_at", "<=", $create_at)->inRandomOrder()->get();
+
+    $refs = $refs->slice($input["miss_number"]);
+
+    $count = 0;
 
     foreach ($refs as $user) {
       // Create mission
@@ -680,14 +707,160 @@ class DevController extends Controller
 
       $log = new LogTransaction([
         'amount' => $reward,
-        'user_id' => $u->id,
+        'user_id' => $user->id,
         'type' => TransactionTypeConstants::REWARD,
         'status' => 1, // auto Accept
       ]);
       $log->created_at = $create_at;
       $log->updated_at = $create_at;
       $log->save();
+
+      $user->update([
+        'wallet' => $user->wallet + $reward,
+      ]);
+      $count++;
     }
-    return "OK";
+    return ["Missions Created: " => $count];
+  }
+
+  public function checkUserUpdateWeek(Request $rq)
+  {
+    $rq->validate([
+      "day" => "numeric|min:1|max:31",
+    ]);
+
+    $input = $rq->all();
+    $now = Carbon::createFromFormat("d", $input["day"]);
+    $start = $now->startOfWeek()->format("Y-m-d");
+    $end = $now->endOfWeek(Carbon::SUNDAY)->format("Y-m-d");
+    $minimumReward = Setting::where("name", "minimum_reward")->first();
+    $delayDay = Setting::where("name", "delay_day_week")->first();
+    $result = array();
+
+    User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay, &$result) {
+      // Loop each user in 200 users
+      foreach ($users as $user) {
+        if (checkUserReference($user->id, $start, $end, 6, (float)$minimumReward->value, (int)$delayDay->value)) {
+          $result[$user->username] = "OK";
+          // $this->info("User $user->username dat du dieu kien an tron theo tuan (week) - Tien hanh an tron");
+          $lv1Referrer = User::where("id", $user->reference)->first();
+          if (!$lv1Referrer) {
+            continue;
+          }
+          // Return User's 30% commission
+          $this->returnCommission($user->id, $lv1Referrer->id);
+          if ($lv1Referrer->reference) {
+            $lv2Referrer = User::where("id", $lv1Referrer->reference)->first();
+            if ($lv2Referrer) {
+              $this->giveCommission($user->id);
+            }
+          }
+        } else {
+          $result[$user->username] = "Khong";
+          $this->giveCommission($user->id);
+        }
+      }
+    }, $column = "id");
+    return $result;
+  }
+
+  public function checkUserUpdateMonth($month)
+  {
+    // $now = Carbon::now()->subMonth(); // Previous month
+    $now = Carbon::createFromFormat("m", $month);
+    $dates = array();
+    for ($i = 1; $i <= 4; $i++) {
+      $start = $now->endOfMonth()->subWeeks($i)->format("Y-m-d");
+      if ($i == 4) {
+        $start = $now->startOfMonth()->format("Y-m-d");
+      }
+      $end = $now->endOfMonth()->format("Y-m-d");
+      $week = CarbonPeriod::create($start, $end)->toArray();
+      $week = array_map(function ($date) {
+        return $date->format("Y-m-d");
+      }, $week);
+
+      array_push($dates, $week);
+    }
+    $minimumReward = Setting::where("name", "minimum_reward")->first();
+    $delayDay = Setting::where("name", "delay_day_month")->first();
+
+    $result = array();
+    User::chunkById(200, function ($users) use ($dates, $minimumReward, $delayDay, &$result) {
+      // Loop each user in 200 users
+      foreach ($users as $user) {
+        $count = 0;
+        for ($i = 1; $i <= count($dates); $i++) {
+          $week = $dates[$i - 1];
+          if (checkUserReference($user->id, current($week), end($week), 6 * $i, (float)$minimumReward->value, (int)$delayDay->value)) {
+            $count++;
+          }
+        }
+        if ($count >= 4) {
+          $result[$user->username] = "OK";
+          $this->removeReference($user->id);
+        } else {
+          // $this->error("User $user->username khong du dieu kien tach line theo thang.");
+          $result[$user->username] = "Khong";
+        }
+      }
+    }, $column = "id");
+
+    return $result;
+  }
+
+  function removeReference($userId)
+  {
+    $u = User::where("id", $userId)->first();
+    if (!$u){
+      return;
+    }
+
+    $u->reference = null;
+    $u->save();
+    // $this->info("$u->username da tach line xong.");
+    return;
+  }
+
+  function returnCommission($userId, $referId)
+  {
+    // Return the user's referral commission
+    $pendingCommision = LogTransaction::where([
+      "user_id" => $referId,
+      "from_user_id" => $userId,
+      "status" => 0,
+      "type" => TransactionTypeConstants::COMMISSION,
+    ])->get(["amount", "id", "status"]);
+    // Begin transaction for money!!!
+    foreach ($pendingCommision as $value) {
+      DB::transaction(function () use ($value, $userId) {
+        DB::table("user_missions")->where("id", $userId)->increment("wallet", $value->amount);
+        $value->status = -1; // Canceled - Mean give back to user
+        $value->save();
+      });
+    }
+  }
+
+  function giveCommission($userId)
+  {
+    // Give commission to referrer
+    $pendingCommision = LogTransaction::where([
+      "from_user_id" => $userId,
+      "status" => 0,
+      "type" => TransactionTypeConstants::COMMISSION,
+    ])->get(["amount", "id", "status", "user_id"]);
+
+    if ($pendingCommision->count() == 0) {
+      return;
+    }
+    // Begin transaction for money!!!
+    foreach ($pendingCommision as $value) {
+      DB::transaction(function () use ($value) {
+        // echo ("User_id >>>> " . $value->user_id . " >>>> " . $value->amount . "\n");
+        DB::table("user_missions")->where("id", $value->user_id)->increment("wallet", $value->amount); // ->user_id mean referrer
+        $value->status = 1; // Accepted - Mean give to referrer
+        $value->save();
+      });
+    }
   }
 }

@@ -59,7 +59,7 @@ class HandleUserReferenceWeekly extends Command
     // Create dates array contain all day in week (Y-m-d)
     $now = Carbon::now();
     $start = $now->startOfWeek()->format("Y-m-d");
-    $end = $now->endOfWeek(Carbon::SATURDAY)->format("Y-m-d");
+    $end = $now->endOfWeek(Carbon::SUNDAY)->format("Y-m-d");
     $minimumReward = Setting::where("name", "minimum_reward")->first();
     $delayDay = Setting::where("name", "delay_day_week")->first();
     echo ("From $start to $end");

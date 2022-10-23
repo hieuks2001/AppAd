@@ -28,7 +28,7 @@ if (!function_exists('checkUserReference')) {
     }
 
     if (!isset($user->reference) or !$user->reference) { // Already seperate line from commision system or No referrer
-      echo "Already seperate line from commision system or No referer\n";
+      // echo "Already seperate line from commision system or No referer\n";
       return false;
     }
     // Get User list
