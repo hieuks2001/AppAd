@@ -14,6 +14,9 @@ class VerifyCsrfToken extends Middleware
   protected $except = [
     //
     "check/",
-    "generate-code/"
+    "generate-code/",
+    "mstest/missiontoday_newuser/",
+    "mstest/missiontoday_olduser_do_mission/",
+    "mstest/mission_checkweek/",
   ];
 }
