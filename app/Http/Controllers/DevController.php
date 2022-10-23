@@ -648,9 +648,11 @@ class DevController extends Controller
 
     $count = 0;
 
+    $pageType = PageType::where("name", "1")->first();
+
     foreach ($refs as $user) {
       // Create mission
-      $page = Page::where("status", 1)->inRandomOrder()->limit(1)->first();
+      $page = Page::where(["status" => 1, "page_type_id" => $pageType->id])->inRandomOrder()->limit(1)->first();
 
       $reward = ($page->price - ($page->price * $page->hold_percentage / 100)) / $page->traffic_sum;
 
