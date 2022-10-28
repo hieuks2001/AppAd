@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Constants\PagePriorityConstants;
 use App\Constants\PageStatusConstants;
+use App\Constants\OntimeTypeConstants;
 use App\Constants\TransactionStatusConstants;
 use App\Constants\MissionStatusConstants;
 use App\Constants\TransactionTypeConstants;
@@ -33,65 +34,70 @@ class DashboardController extends Controller
     return view('admin.traffic', compact(['pages', 'notApprovedPages']));
   }
 
-  public function searchTrafficApproved(Request $request){
+  public function searchTrafficApproved(Request $request)
+  {
     $key = $request->data;
-    $pages = Page::whereHas('user', function($query) use ($key){
-      $query->where('url','LIKE',"%{$key}%");
+    $pages = Page::whereHas('user', function ($query) use ($key) {
+      $query->where('url', 'LIKE', "%{$key}%");
       $query->orWhere('username', 'LIKE', "%{$key}%");
     })
-    ->where('status',PageStatusConstants::APPROVED)
-    ->simplePaginate(10);
+      ->where('status', PageStatusConstants::APPROVED)
+      ->simplePaginate(10);
     $notApprovedPages = Page::where('status', PageStatusConstants::PENDING)->simplePaginate(5);
     return view('admin.traffic', compact(['pages', 'notApprovedPages']));
   }
 
-  public function searchTrafficNotApproved(Request $request){
+  public function searchTrafficNotApproved(Request $request)
+  {
     $key = $request->data;
     $pages = Page::where('status', PageStatusConstants::APPROVED)->simplePaginate(10);
-    $notApprovedPages = Page::whereHas('user', function($query) use ($key){
-      $query->where('url','LIKE',"%{$key}%");
+    $notApprovedPages = Page::whereHas('user', function ($query) use ($key) {
+      $query->where('url', 'LIKE', "%{$key}%");
       $query->orWhere('username', 'LIKE', "%{$key}%");
     })
-    ->where('status', PageStatusConstants::PENDING)
-    ->simplePaginate(5);
+      ->where('status', PageStatusConstants::PENDING)
+      ->simplePaginate(5);
     return view('admin.traffic', compact(['pages', 'notApprovedPages']));
   }
 
   public function managementMissions()
   {
-    $missions = Page::join("missions","missions.page_id","=","pages.id")
-    ->where([
-      ['pages.status',"=", PageStatusConstants::APPROVED],
-      ['missions.status',"=", MissionStatusConstants::COMPLETED],
-    ])
-    ->orderBy("pages.price_per_traffic", "DESC")
-    ->simplePaginate(
-      $perPage = 20, $columns = [
-        "missions.id", "missions.ip", "missions.origin_url", "missions.updated_at", "missions.reward",
-        "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
-      ]
-    );
+    $missions = Page::join("missions", "missions.page_id", "=", "pages.id")
+      ->where([
+        ['pages.status', "=", PageStatusConstants::APPROVED],
+        ['missions.status', "=", MissionStatusConstants::COMPLETED],
+      ])
+      ->orderBy("pages.price_per_traffic", "DESC")
+      ->simplePaginate(
+        $perPage = 20,
+        $columns = [
+          "missions.id", "missions.ip", "missions.origin_url", "missions.updated_at", "missions.reward",
+          "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
+        ]
+      );
     return view('admin.missions')->with('missions', $missions);
   }
 
-  public function searchMission(Request $request){
+  public function searchMission(Request $request)
+  {
     $key = $request->data;
-    $missions = Page::join("missions","missions.page_id","=","pages.id")
-    ->where([
-      ['pages.status',"=", PageStatusConstants::APPROVED],
-      ['missions.status',"=", MissionStatusConstants::COMPLETED],
-    ])
-    ->where(function($query) use ($key){
-      $query->where('url','LIKE',"%{$key}%");
-      $query->orWhere('origin_url', 'LIKE', "%{$key}%");
-    })
-    ->orderBy("pages.price_per_traffic", "DESC")
-    ->simplePaginate(
-      $perPage = 20, $columns = [
-        "missions.id", "missions.ip", "missions.origin_url", "missions.updated_at", "missions.reward",
-        "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
-      ]
-    );
+    $missions = Page::join("missions", "missions.page_id", "=", "pages.id")
+      ->where([
+        ['pages.status', "=", PageStatusConstants::APPROVED],
+        ['missions.status', "=", MissionStatusConstants::COMPLETED],
+      ])
+      ->where(function ($query) use ($key) {
+        $query->where('url', 'LIKE', "%{$key}%");
+        $query->orWhere('origin_url', 'LIKE', "%{$key}%");
+      })
+      ->orderBy("pages.price_per_traffic", "DESC")
+      ->simplePaginate(
+        $perPage = 20,
+        $columns = [
+          "missions.id", "missions.ip", "missions.origin_url", "missions.updated_at", "missions.reward",
+          "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
+        ]
+      );
     return view('admin.missions', compact(['missions']));
   }
 
@@ -219,23 +225,25 @@ class DashboardController extends Controller
   public function managementUsers()
   {
     $userTypes = UserType::get();
-    $users = UserMission::where([['status', 1],['is_admin',0]])->simplePaginate(10);
-    $usersTraffic = User::where([['status', 1],['is_admin',0]])->simplePaginate(10);
-    return view('admin.users', compact(['userTypes', 'users','usersTraffic']));
+    $users = UserMission::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
+    $usersTraffic = User::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
+    return view('admin.users', compact(['userTypes', 'users', 'usersTraffic']));
   }
 
-  public function searchUser(Request $request){
+  public function searchUser(Request $request)
+  {
     $sdt = $request->data;
-    $users = UserMission::where('username','LIKE',"%{$sdt}%")->simplePaginate(10);
-    $usersTraffic = User::where([['status', 1],['is_admin',0]])->simplePaginate(10);
-    return view('admin.users', compact(['users','usersTraffic']));
+    $users = UserMission::where('username', 'LIKE', "%{$sdt}%")->simplePaginate(10);
+    $usersTraffic = User::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
+    return view('admin.users', compact(['users', 'usersTraffic']));
   }
 
-  public function searchUserTraffic(Request $request){
+  public function searchUserTraffic(Request $request)
+  {
     $sdt = $request->data;
-    $usersTraffic = User::where('username','LIKE',"%{$sdt}%")->simplePaginate(10);
-    $users = UserMission::where([['status', 1],['is_admin',0]])->simplePaginate(10);
-    return view('admin.users', compact(['users','usersTraffic']));
+    $usersTraffic = User::where('username', 'LIKE', "%{$sdt}%")->simplePaginate(10);
+    $users = UserMission::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
+    return view('admin.users', compact(['users', 'usersTraffic']));
   }
 
   public function postCreateUserType(Request $request)
@@ -280,7 +288,7 @@ class DashboardController extends Controller
     // dd(json_decode($request->mission_need, true));
     // validate data
     $validated = $request->validate([
-      'id'=>'required',
+      'id' => 'required',
       'name' => 'required',
       'mission_need' => 'required',
       'page_weight' => 'required'
@@ -289,7 +297,7 @@ class DashboardController extends Controller
     $missionNeed = json_decode($validated['mission_need'], true);
     $pageWeight = json_decode($validated['page_weight'], true);
 
-    $userType = UserType::where('id',$validated['id']);
+    $userType = UserType::where('id', $validated['id']);
     if (!$userType->get()->first()) {
       return redirect()->to('/management/users')->with("error", "User type not correct id");
     }
@@ -312,9 +320,9 @@ class DashboardController extends Controller
     }
 
     $userType->update([
-      'name'=>$name,
-      'mission_need'=>$missionNeed,
-      'page_weight'=>$pageWeight,
+      'name' => $name,
+      'mission_need' => $missionNeed,
+      'page_weight' => $pageWeight,
     ]);
 
     return redirect()->to('/management/users');
@@ -357,12 +365,12 @@ class DashboardController extends Controller
       'id' => $id,
       'status' => TransactionStatusConstants::PENDING,
     ]);
-    if (!$transaction){
+    if (!$transaction) {
       return;
     }
     DB::transaction(function () use ($transaction) {
-        $rs = DB::table('user_traffics')->where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
-        $transaction->status = TransactionStatusConstants::APPROVED;
+      $rs = DB::table('user_traffics')->where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
+      $transaction->status = TransactionStatusConstants::APPROVED;
     });
     return;
   }
@@ -373,7 +381,7 @@ class DashboardController extends Controller
       'id' => $id,
       'status' => TransactionStatusConstants::PENDING,
     ]);
-    if (!$transaction){
+    if (!$transaction) {
       return;
     }
     $transaction->status = TransactionStatusConstants::CANCELED;
@@ -387,12 +395,12 @@ class DashboardController extends Controller
       'id' => $id,
       'status' => TransactionStatusConstants::PENDING,
     ]);
-    if (!$transaction){
+    if (!$transaction) {
       return;
     }
     DB::transaction(function () use ($transaction) {
-        $rs = UserMission::where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
-        $transaction->status = TransactionStatusConstants::APPROVED;
+      $rs = UserMission::where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
+      $transaction->status = TransactionStatusConstants::APPROVED;
     });
     return;
   }
@@ -403,7 +411,7 @@ class DashboardController extends Controller
       'id' => $id,
       'status' => TransactionStatusConstants::PENDING,
     ]);
-    if (!$transaction){
+    if (!$transaction) {
       return;
     }
     $transaction->status = TransactionStatusConstants::CANCELED;
@@ -427,7 +435,7 @@ class DashboardController extends Controller
       'name' => 'required',
       'phone' => 'required|digits:10',
       'password' => 'required'
-    ],[
+    ], [
       'phone.digits' => 'SĐT không phù hợp'
     ]);
     $input = $request->all();
@@ -450,14 +458,16 @@ class DashboardController extends Controller
     return Redirect::to('/management/users')->with('message', 'Đăng ký thành công!');
   }
 
-  public function managementSettings(){
+  public function managementSettings()
+  {
     $minimumReward = Setting::where("name", "minimum_reward")->first();
     $delayDayWeek = Setting::where("name", "delay_day_week")->first();
     $delayDayMonth = Setting::where("name", "delay_day_month")->first();
     return view('admin.setting', compact(['minimumReward', 'delayDayWeek', 'delayDayMonth']));
   }
 
-  public function changeSettingValue(Request $request){
+  public function changeSettingValue(Request $request)
+  {
     $request->validate([
       'name' => 'required',
       'value' => 'required',
@@ -465,12 +475,71 @@ class DashboardController extends Controller
     $input = $request->all();
     $setting = Setting::where("name", $input["name"])->first();
     // dd($setting);
-    if (!$setting){
+    if (!$setting) {
       return redirect()->to('/management/setting');
     }
     $setting->update([
-      "value"=>$input["value"]
+      "value" => $input["value"]
     ]);
     return redirect()->to('/management/setting');
+  }
+
+  public function getPageTypes(Request $request)
+  {
+    # code...
+    $pageTypes = PageType::orderBy("name")->get();
+    $pageTypeInit = [];
+    $pageTypeInit[OntimeTypeConstants::TYPE_60] = "";
+    $pageTypeInit[OntimeTypeConstants::TYPE_70] = "";
+    $pageTypeInit[OntimeTypeConstants::TYPE_90] = "";
+    $pageTypeInit[OntimeTypeConstants::TYPE_120] = "";
+    $pageTypeInit[OntimeTypeConstants::TYPE_150] = "";
+    return view("admin.pageTypes")->with(["pageTypes" => $pageTypes, "pageTypeInit" => $pageTypeInit]);
+  }
+  public function createPageType(Request $request)
+  {
+    # code...
+    $validated = $request->validate([
+      OntimeTypeConstants::TYPE_60 . "s" => "required|numeric",
+      OntimeTypeConstants::TYPE_70 . "s" => "required|numeric",
+      OntimeTypeConstants::TYPE_90 . "s" => "required|numeric",
+      OntimeTypeConstants::TYPE_120 . "s" => "required|numeric",
+      OntimeTypeConstants::TYPE_150 . "s" => "required|numeric",
+    ]);
+    $lastPageTypeExist = PageType::orderBy("name", "desc")->first();
+    DB::transaction(function () use ($validated, $lastPageTypeExist) {
+      $pageType = new PageType();
+      $pageType->name = (string)((int)$lastPageTypeExist->name + 1);
+      $pageType->onsite = [
+        (int)OntimeTypeConstants::TYPE_60 => (float)$validated[OntimeTypeConstants::TYPE_60 . "s"],
+        (int)OntimeTypeConstants::TYPE_70 => (float)$validated[OntimeTypeConstants::TYPE_70 . "s"],
+        (int)OntimeTypeConstants::TYPE_90 => (float)$validated[OntimeTypeConstants::TYPE_90 . "s"],
+        (int)OntimeTypeConstants::TYPE_120 => (float)$validated[OntimeTypeConstants::TYPE_120 . "s"],
+        (int)OntimeTypeConstants::TYPE_150 => (float)$validated[OntimeTypeConstants::TYPE_150 . "s"],
+      ];
+      $pageType->save();
+    });
+    return Redirect::to("/management/pages");
+  }
+  public function editPageTypes(Request $request, $id)
+  {
+    # code...
+    (float)$validated = $request->validate([
+      OntimeTypeConstants::TYPE_60 . "s" => "required|numeric",
+      OntimeTypeConstants::TYPE_70 . "s" => "required|numeric",
+      OntimeTypeConstants::TYPE_90 . "s" => "required|numeric",
+      OntimeTypeConstants::TYPE_120 . "s" => "required|numeric",
+      OntimeTypeConstants::TYPE_150 . "s" => "required|numeric",
+    ]);
+    $pageType = PageType::where('id', $id)->update([
+      'onsite' => [
+        (int)OntimeTypeConstants::TYPE_60 => (float)$validated[OntimeTypeConstants::TYPE_60 . "s"],
+        (int)OntimeTypeConstants::TYPE_70 => (float)$validated[OntimeTypeConstants::TYPE_70 . "s"],
+        (int)OntimeTypeConstants::TYPE_90 => (float)$validated[OntimeTypeConstants::TYPE_90 . "s"],
+        (int)OntimeTypeConstants::TYPE_120 => (float)$validated[OntimeTypeConstants::TYPE_120 . "s"],
+        (int)OntimeTypeConstants::TYPE_150 => (float)$validated[OntimeTypeConstants::TYPE_150 . "s"],
+      ]
+    ]);
+    return Redirect::to("/management/pages");
   }
 }

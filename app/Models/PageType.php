@@ -2,23 +2,26 @@
 
 namespace App\Models;
 
+use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Model;
 
 class PageType extends Model
 {
-    // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
-    public $incrementing = false;
 
-    protected $fillable = [
-        'name', 'onsite',
-    ];
+  use Uuids;
+  // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
+  public $incrementing = false;
 
-    // Cast onsite into array
-    protected $casts = [
-        'onsite' => 'array'
-    ];
+  protected $fillable = [
+    'name', 'onsite',
+  ];
 
-    protected $primaryKey = 'id';
+  // Cast onsite into array
+  protected $casts = [
+    'onsite' => 'array'
+  ];
 
-    protected $table = 'page_types';
+  protected $primaryKey = 'id';
+
+  protected $table = 'page_types';
 }

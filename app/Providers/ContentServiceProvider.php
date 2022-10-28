@@ -109,7 +109,7 @@ class ContentServiceProvider extends ServiceProvider
     view()->composer('usdt.deposit', function ($view) {
       $data = DB::table('log_traffic_transactions')
         ->where([
-          'user_id' => Auth::user()->id, 
+          'user_id' => Auth::user()->id,
           'type' => TransactionTypeConstants::TOPUP
         ])
         ->orderBy("updated_at", "DESC")
@@ -118,12 +118,12 @@ class ContentServiceProvider extends ServiceProvider
     });
     view()->composer('usdt.withdraw', function ($view) {
       $data = DB::table('log_traffic_transactions')
-      ->where([
-        'user_id' => Auth::user()->id, 
-        'type' => TransactionTypeConstants::WITHDRAW
+        ->where([
+          'user_id' => Auth::user()->id,
+          'type' => TransactionTypeConstants::WITHDRAW
         ])
-      ->orderBy("updated_at", "DESC")
-      ->simplePaginate(10);
+        ->orderBy("updated_at", "DESC")
+        ->simplePaginate(10);
       $view->with('data', $data);
     });
   }

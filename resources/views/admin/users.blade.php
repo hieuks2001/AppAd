@@ -28,7 +28,8 @@
         <td>{{ $value->id }}</td>
         <td>{{ $value->name }}</td>
         <td>
-          <label for="modal-edit--user_type" class="btn btn-square btn-outline btn-sm" onclick="onClickUserType('{{ $value->id }}')">
+          <label for="modal-edit--user_type" class="btn btn-square btn-outline btn-sm"
+            onclick="onClickUserType('{{ $value->id }}')">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -113,7 +114,8 @@
         <td>{{ $user_types[array_search($value->user_type_id, array_column(json_decode(json_encode($user_types),TRUE),
           'id'))]->name }}</td>
         <td>
-          <label for="modal-edit--user_mission" class="btn btn-square btn-outline btn-sm" onclick="onClickUser('{{ $value->id }}')">
+          <label for="modal-edit--user_mission" class="btn btn-square btn-outline btn-sm"
+            onclick="onClickUser('{{ $value->id }}')">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -251,15 +253,15 @@
           <span class="label-text">Số lượng cần của mỗi loại trang</span>
         </label>
         @foreach ($page_types as $key => $item)
-        @if ($key !== count($page_types) - 1)
+        @if ($item->name != count($page_types))
         <label class="input-group">
           <div class="flex items-center w-full pl-4 bg-slate-200">Số lượng cần để lên
             <span class="font-bold">
-              loại {{$item->name+1}}
+              loại {{(int)$item->name+1}}
             </span>
           </div>
           <input type="text" placeholder="10" data-mission_need="{{$item->id}}" oninput="handleEditChange(this)"
-            class="mission_need input input-bordered w-14">
+            class="mission_need input input-bordered w-24">
         </label>
         @endif
         @endforeach
@@ -277,7 +279,7 @@
             </span>
           </div>
           <input type="text" placeholder="10" data-page_weight="{{$item->id}}" oninput="handleEditChange(this)"
-            class="page_weight input input-bordered w-14">
+            class="page_weight input input-bordered w-24">
         </label>
         @endforeach
       </div>
@@ -304,20 +306,20 @@
   </div>
 </div>
 @if(Session::has('error') or Session::has('message'))
-  <input type="checkbox" id="modal-notificate" class="modal-toggle" checked/>
+<input type="checkbox" id="modal-notificate" class="modal-toggle" checked />
 @endif
 <div class="modal modal-bottom sm:modal-middle">
   <div class="modal-box relative">
     <label for="modal-notificate" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
     @if (Session::has('error'))
-      <p class="my-5 text-xl">{{Session::get('error')}}</p>
+    <p class="my-5 text-xl">{{Session::get('error')}}</p>
     @else
-      <p class="my-5 text-xl">{{Session::get('message')}}</p>
+    <p class="my-5 text-xl">{{Session::get('message')}}</p>
     @endif
   </div>
 </div>
 <script>
-    const users = {!! json_encode($users->toArray(), JSON_HEX_TAG) !!}
+  const users = {!! json_encode($users->toArray(), JSON_HEX_TAG) !!}
     const user_types = {!! json_encode($user_types->toArray(), JSON_HEX_TAG) !!}
     const formEdit = document.getElementById('form-edit');
     const items = document.querySelectorAll('#form-edit .item');
