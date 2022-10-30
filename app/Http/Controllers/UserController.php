@@ -307,6 +307,9 @@ class UserController extends Controller
       ["user_agent", $request->userAgent()],
       ["status", MissionStatusConstants::DOING]
     ]);
+    if (!$ms->count()) { //not found
+      return Redirect::to('/tu-khoa')->withErrors('Lỗi');
+    }
     $code = Code::where([
       ["code", $request->key],
       ["status", 0]
