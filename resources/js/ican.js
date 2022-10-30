@@ -192,7 +192,6 @@ function run(onsite, key) {
   function countdown() {
     timer = setInterval(() => {
       if (decodeGetTimes(onsite, key).includes(cd)) {
-        disabledFocusedSite = true;
         let once = 0;
         clearInterval(timer);
         buttonDiv.innerHTML = upIcon;
@@ -207,11 +206,19 @@ function run(onsite, key) {
           buttonDiv.innerHTML = downIcon;
           buttonDiv.onclick = () => {};
           titleButton.textContent = "Vui lòng kéo xuống để tiếp tục đếm ngược";
-          disabledFocusedSite = false;
+          // disabledFocusedSite = false;
           once++;
           window.onscroll = debounce(() => {
             var scrollTop = Math.floor(window.pageYOffset);
             if (scrollTop >= Math.floor(bodyHeight)) {
+              window.onblur = () => {
+                clearInterval(timer);
+              };
+              window.onfocus = () => {
+                if (!decodeGetTimes(onsite, key).includes(cd + 1)) {
+                  countdown();
+                }
+              };
               if (once === 1) {
                 getCode(key, cd + 1).then((x) => x);
                 countdown();
@@ -237,15 +244,22 @@ function run(onsite, key) {
     }, 1000);
   }
   countdown();
+  stop(cd, timer, disabledFocusedSite, () => {
+    countdown();
+  });
+}
+
+function stop(cd, interval, status, resume) {
   if (cd) {
-    window.onfocus = function () {
-      if (!disabledFocusedSite) {
-        countdown();
+    window.addEventListener("focus", () => {
+      if (!status) {
+        resume();
       }
-    };
-    window.onblur = function () {
-      if (timer) clearInterval(timer);
-    };
+    });
+    window.addEventListener("blur", () => {
+      if (interval) clearInterval(interval);
+      disabledFocusedSite = true;
+    });
   }
 }
 
