@@ -9,7 +9,7 @@
     @csrf
     <input type="hidden" name="name" value="{{$minimumReward->name}}"
         class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" step="any" name="value" value="{{$minimumReward->value}}" class="input input-bordered w-full mb-5">
+    <input type="number" step="any" required name="value" value="{{$minimumReward->value}}" class="input input-bordered w-full mb-5">
     <button class="btn btn-block">Lưu</button>
   </form>
   <div class="flex items-center justify-between">
@@ -20,7 +20,7 @@
     @csrf
     <input type="hidden" name="name" value = "{{$delayDayWeek->name}}"
         class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" name="value" value="{{$delayDayWeek->value}}" class="input input-bordered w-full mb-5">
+    <input type="number" name="value" required value="{{$delayDayWeek->value}}" class="input input-bordered w-full mb-5">
     <button class="btn btn-block">Lưu</button>
   </form>
   <div class="flex items-center justify-between">
@@ -31,7 +31,47 @@
     @csrf
     <input type="hidden" name="name" value = "{{$delayDayMonth->name}}"
         class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" name="value" value="{{$delayDayMonth->value}}" class="input input-bordered w-full mb-5">
+    <input type="number" name="value" required value="{{$delayDayMonth->value}}" class="input input-bordered w-full mb-5">
+    <button class="btn btn-block">Lưu</button>
+  </form>
+  <div class="flex items-center justify-between">
+    <h3 class="text-2xl font-bold text-slate-800">Mức % tiền ăn từ cấp dưới (1 Level)</h3>
+  </div>
+  <form method="POST" action="{{ URL::to('/management/setting') }}">
+    @csrf
+    <input type="hidden" name="name" value = "{{$commissionRate1->name}}"
+        class="appearance-none input input-bordered w-full mb-5 ">
+    <input type="number" min = 1 max = 100 required name="value" value="{{$commissionRate1->value}}" class="input input-bordered w-full mb-5">
+    <button class="btn btn-block">Lưu</button>
+  </form>
+  <div class="flex items-center justify-between">
+    <h3 class="text-2xl font-bold text-slate-800">Mức % tiền ăn từ cấp dưới (2 Level)</h3>
+  </div>
+  <form method="POST" action="{{ URL::to('/management/setting') }}">
+    @csrf
+    <input type="hidden" name="name" value = "{{$commissionRate2->name}}"
+        class="appearance-none input input-bordered w-full mb-5 ">
+    <input type="number" name="value" value="{{$commissionRate2->value}}" class="input input-bordered w-full mb-5">
+    <button class="btn btn-block">Lưu</button>
+  </form>
+  <div class="flex items-center justify-between">
+    <h3 class="text-2xl font-bold text-slate-800">Số lượng User được mời tối đa mỗi ngày (Ăn trọn theo tuần)</h3>
+  </div>
+  <form method="POST" action="{{ URL::to('/management/setting') }}">
+    @csrf
+    <input type="hidden" name="name" value = "{{$maxRefUserPerDayWeek->name}}"
+        class="appearance-none input input-bordered w-full mb-5 ">
+    <input type="number" min = 1 max = 100 required name="value" value="{{$maxRefUserPerDayWeek->value}}" class="input input-bordered w-full mb-5">
+    <button class="btn btn-block">Lưu</button>
+  </form>
+  <div class="flex items-center justify-between">
+    <h3 class="text-2xl font-bold text-slate-800">Số lượng User được mời tối đa mỗi ngày (Tách line tháng)</h3>
+  </div>
+  <form method="POST" action="{{ URL::to('/management/setting') }}">
+    @csrf
+    <input type="hidden" name="name" value = "{{$maxRefUserPerDayMonth->name}}"
+        class="appearance-none input input-bordered w-full mb-5 ">
+    <input type="number" min = 1 max = 100 required name="value" value="{{$maxRefUserPerDayMonth->value}}" class="input input-bordered w-full mb-5">
     <button class="btn btn-block">Lưu</button>
   </form>
 </div>
