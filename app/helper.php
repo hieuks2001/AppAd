@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 if (!function_exists('checkUserReference')) {
 
-  function checkUserReference($userId, $fromDate, $toDate, $userCount, $minimumReward = 20, $delayDays = 1)
+  function checkUserReference($userId, $fromDate, $toDate, $userCount, $minimumReward = 20, $delayDays = 1, $maxUserPerDay = 2)
   {
     if ($fromDate instanceof \Carbon\Carbon) {
       $fromDate = $fromDate->format("Y-m-d");
@@ -25,6 +25,11 @@ if (!function_exists('checkUserReference')) {
     $user = User::where("id", $userId)->first();
     if (!$user) {
       return false;
+    }
+
+    $checkMaxUser = array();
+    foreach($dates as $date){
+      $checkMaxUser[$date] = 0;
     }
 
     if (!isset($user->reference) or !$user->reference) { // Already seperate line from commision system or No referrer
@@ -70,7 +75,10 @@ if (!function_exists('checkUserReference')) {
       // Check if all day in week are rewarded more than 20 usdt
       // Skip 1 day
       if ($count >= count($newDates) - $delayDays) {
-        $acceptedUserCount++;
+        if ($checkMaxUser[$refUser->created_at->format("Y-m-d")] <= $maxUserPerDay - 1) { // @dglha: Hardcode number 2 -> change later by config settings
+          $acceptedUserCount++;
+          $checkMaxUser[$refUser->created_at->format("Y-m-d")] += 1;
+        }
       }
 
       if ($acceptedUserCount >= $userCount) {

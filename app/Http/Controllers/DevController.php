@@ -648,9 +648,11 @@ class DevController extends Controller
 
     $count = 0;
 
+    $pageType = PageType::where("name", "1")->first();
+
     foreach ($refs as $user) {
       // Create mission
-      $page = Page::where("status", 1)->inRandomOrder()->limit(1)->first();
+      $page = Page::where(["status" => 1, "page_type_id" => $pageType->id])->inRandomOrder()->limit(1)->first();
 
       $reward = ($page->price - ($page->price * $page->hold_percentage / 100)) / $page->traffic_sum;
 
@@ -733,14 +735,16 @@ class DevController extends Controller
     $now = Carbon::createFromFormat("d", $input["day"]);
     $start = $now->startOfWeek()->format("Y-m-d");
     $end = $now->endOfWeek(Carbon::SUNDAY)->format("Y-m-d");
+    $end = $now->addWeek()->startOfWeek()->format("Y-m-d");
     $minimumReward = Setting::where("name", "minimum_reward")->first();
     $delayDay = Setting::where("name", "delay_day_week")->first();
+    $maxUserPerDay = Setting::where("name", "max_ref_user_per_day_week")->first();
     $result = array();
 
-    User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay, &$result) {
+    User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay, &$result, $maxUserPerDay) {
       // Loop each user in 200 users
       foreach ($users as $user) {
-        if (checkUserReference($user->id, $start, $end, 6, (float)$minimumReward->value, (int)$delayDay->value)) {
+        if (checkUserReference($user->id, $start, $end, 6, (float)$minimumReward->value, (int)$delayDay->value, (int)$maxUserPerDay->value)) {
           $result[$user->username] = "OK";
           // $this->info("User $user->username dat du dieu kien an tron theo tuan (week) - Tien hanh an tron");
           $lv1Referrer = User::where("id", $user->reference)->first();
@@ -784,15 +788,16 @@ class DevController extends Controller
     }
     $minimumReward = Setting::where("name", "minimum_reward")->first();
     $delayDay = Setting::where("name", "delay_day_month")->first();
+    $maxUserPerDay = Setting::where("name", "max_user_per_day_month")->first();
 
     $result = array();
-    User::chunkById(200, function ($users) use ($dates, $minimumReward, $delayDay, &$result) {
+    User::chunkById(200, function ($users) use ($dates, $minimumReward, $delayDay, $maxUserPerDay, &$result) {
       // Loop each user in 200 users
       foreach ($users as $user) {
         $count = 0;
         for ($i = 1; $i <= count($dates); $i++) {
           $week = $dates[$i - 1];
-          if (checkUserReference($user->id, current($week), end($week), 6 * $i, (float)$minimumReward->value, (int)$delayDay->value)) {
+          if (checkUserReference($user->id, current($week), end($week), 6 * $i, (float)$minimumReward->value, (int)$delayDay->value, (int)$maxUserPerDay->value)) {
             $count++;
           }
         }

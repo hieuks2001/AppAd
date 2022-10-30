@@ -60,15 +60,17 @@ class HandleUserReferenceWeekly extends Command
     $now = Carbon::now();
     $start = $now->startOfWeek()->format("Y-m-d");
     $end = $now->endOfWeek(Carbon::SUNDAY)->format("Y-m-d");
+    $end = $now->addWeek()->startOfWeek()->format("Y-m-d");
     $minimumReward = Setting::where("name", "minimum_reward")->first();
     $delayDay = Setting::where("name", "delay_day_week")->first();
+    $maxUserPerDay = Setting::where("name", "max_ref_user_per_day_week")->first();
     echo ("From $start to $end");
-    User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay) {
+    User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay, $maxUserPerDay) {
       // Loop each user in 200 users
       foreach ($users as $user) {
         echo "\n====================================================================\n";
         $this->line("Checking $user->username");
-        if (checkUserReference($user->id, $start, $end, 6, (float)$minimumReward->value, (int)$delayDay->value)) {
+        if (checkUserReference($user->id, $start, $end, 6, (float)$minimumReward->value, (int)$delayDay->value, (int)$maxUserPerDay->value)) {
           $this->info("User $user->username dat du dieu kien an tron theo tuan (week) - Tien hanh an tron");
           $lv1Referrer = User::where("id", $user->reference)->first();
           if (!$lv1Referrer) {
