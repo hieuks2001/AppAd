@@ -85,39 +85,33 @@ class UserController extends Controller
 
   public function register(Request $request)
   {
-    if (Auth::user()){
-      return Redirect::to("/");
-    }
-    if (!isset($request->ref)) {
-      return Redirect::to("/login");
-    }
     if (!isset($request->username)) {
       return view('procedure.register');
-    }
-    if (!isset($request->password) && !isset($request->re_password)) {
-      return Redirect::to('/register')->with('error', 'Không đầy đủ thông tin cần thiết!');
-    }
-    if ($request->password != $request->re_password) {
-      return Redirect::to('/register')->with('error', 'Mật khẩu không trùng khớp!');
-    }
-    $checkUser = User::where('username', $request->username);
-    if ($checkUser->count() != 0) {
-      return Redirect::to('/register')->with('error', 'Tên tài khoản đã có người sử dụng!');
     }
     $request->validate([
       'username' => 'required|digits:10',
       'password' => 'required',
-      'reference' => 'required|uuid',
+      're_password' => 'required',
+      'ref' => 'required',
     ], [
+      'username.required' => 'Không đầy đủ thông tin cần thiết!',
+      'password.required' => 'Không đầy đủ thông tin cần thiết!',
+      're_password.required' => 'Không đầy đủ thông tin cần thiết!',
       'username.digits' => 'SĐT không phù hợp',
-      'reference.uuid' => 'Mã giới thiệu không phù hợp',
-      'reference.required' => 'Lỗi, tài khoản đăng kí không phù hợp!',
+      'ref.required' => 'Lỗi, tài khoản đăng kí không phù hợp!',
     ]);
+    if ($request->password != $request->re_password) {
+      return Redirect::back()->with('error', 'Mật khẩu không trùng khớp!');
+    }
+    $checkUser = User::where('username', $request->username);
+    if ($checkUser->count() != 0) {
+      return Redirect::back()->with('error', 'Tên tài khoản đã có người sử dụng!');
+    }
     $input = $request->all();
 
-    $ref = User::where("id", $input['reference'])->first();
+    $ref = User::where("id", $input['ref'])->first();
     if (!$ref){
-      return Redirect::to('/register')->with('error', 'Lỗi!');
+      return Redirect::back()->with('error', 'Lỗi!');
     }
     $otp = DB::transaction(function () use ($input) {
       $type =  UserType::where('is_default', 1)->get('id')->first();
@@ -131,7 +125,7 @@ class UserController extends Controller
       $user->verified = 0;
       $user->user_type_id = $type->id;
       $user->commission = 0;
-      $user->reference = $input['reference'];
+      $user->reference = $input['ref'];
       $user->save();
 
       $otp = new Otp();

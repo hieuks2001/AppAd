@@ -43,6 +43,7 @@
       <input type="password" name="password" placeholder="Mật khẩu" class="input input-bordered w-full mb-5">
       <input type="password" name="re_password" placeholder="Nhập lại mật khẩu"
         class="input input-bordered w-full mb-5">
+      <input type="text" name="ref" hidden value="{{ request()->get('ref') }}">
       <button class="btn btn-block">Đăng ký</button>
     </form>
   </div>
