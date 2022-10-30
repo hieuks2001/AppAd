@@ -463,7 +463,11 @@ class DashboardController extends Controller
     $minimumReward = Setting::where("name", "minimum_reward")->first();
     $delayDayWeek = Setting::where("name", "delay_day_week")->first();
     $delayDayMonth = Setting::where("name", "delay_day_month")->first();
-    return view('admin.setting', compact(['minimumReward', 'delayDayWeek', 'delayDayMonth']));
+    $commissionRate1 = Setting::where("name", "commission_rate_1")->first();
+    $commissionRate2 = Setting::where("name", "commission_rate_2")->first();
+    $maxRefUserPerDayWeek = Setting::where("name", "max_ref_user_per_day_week")->first();
+    $maxRefUserPerDayMonth = Setting::where("name", "max_ref_user_per_day_month")->first();
+    return view('admin.setting', compact(['minimumReward', 'delayDayWeek', 'delayDayMonth', 'commissionRate1', 'commissionRate2', 'maxRefUserPerDayWeek', 'maxRefUserPerDayMonth']));
   }
 
   public function changeSettingValue(Request $request)
