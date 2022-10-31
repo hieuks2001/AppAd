@@ -78,8 +78,11 @@ Route::get('/verify', 'UserController@verifyOtp');
 
 
 // User
-Route::post('/update-ref', 'UserController@updateReference');
-Route::get('/ref', 'UserController@getReference');
+Route::group(['middleware' => ['checkLogin']], function () {
+  Route::post('/update-ref', 'UserController@updateReference');
+  Route::get('/ref', 'UserController@getReference');
+  Route::get('/user-ref', 'UserController@getUserReferences');
+});
 
 // Testing
 Route::get('/ms/gen', 'DevController@createTestMissison');

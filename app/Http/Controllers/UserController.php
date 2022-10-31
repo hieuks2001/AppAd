@@ -304,6 +304,12 @@ class UserController extends Controller
     return view('procedure.reference');
   }
 
+  public function getUserReferences(){
+    $u = Auth::user();
+    $users = User::where('reference', $u->id)->simplePaginate(10);
+    return view('procedure.userReferences', compact(['users']));
+  }
+
   // ================== MISSIONS ==========================
   public function pastekey(Request $request)
   {
