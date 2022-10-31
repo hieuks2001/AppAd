@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
 use ReflectionClass;
+use stdClass;
 
 class DashboardController extends Controller
 {
@@ -460,31 +461,30 @@ class DashboardController extends Controller
 
   public function managementSettings()
   {
-    $minimumReward = Setting::where("name", "minimum_reward")->first();
-    $delayDayWeek = Setting::where("name", "delay_day_week")->first();
-    $delayDayMonth = Setting::where("name", "delay_day_month")->first();
-    $commissionRate1 = Setting::where("name", "commission_rate_1")->first();
-    $commissionRate2 = Setting::where("name", "commission_rate_2")->first();
-    $maxRefUserPerDayWeek = Setting::where("name", "max_ref_user_per_day_week")->first();
-    $maxRefUserPerDayMonth = Setting::where("name", "max_ref_user_per_day_month")->first();
-    return view('admin.setting', compact(['minimumReward', 'delayDayWeek', 'delayDayMonth', 'commissionRate1', 'commissionRate2', 'maxRefUserPerDayWeek', 'maxRefUserPerDayMonth']));
+    $settings = Setting::all();
+    return view('admin.setting', compact(['settings']));
   }
 
   public function changeSettingValue(Request $request)
   {
-    $request->validate([
-      'name' => 'required',
-      'value' => 'required',
+    $validated = $request->validate([
+      "minimum_reward" => "required|numeric",
+      "delay_day_week" => "required|numeric",
+      "delay_day_month" => "required|numeric",
+      "commission_rate_1" => "required|numeric",
+      "commission_rate_2" => "required|numeric",
+      "max_ref_user_per_day_week" => "required|numeric",
+      "max_ref_user_per_day_month" => "required|numeric",
     ]);
-    $input = $request->all();
-    $setting = Setting::where("name", $input["name"])->first();
-    // dd($setting);
-    if (!$setting) {
-      return redirect()->to('/management/setting');
+    foreach ($validated as $key => $value) {
+      $setting = Setting::where("name", $key)->first();
+      if (!$setting) {
+        continue;
+      }
+      $setting->update([
+        "value" => $value
+      ]);
     }
-    $setting->update([
-      "value" => $input["value"]
-    ]);
     return redirect()->to('/management/setting');
   }
 

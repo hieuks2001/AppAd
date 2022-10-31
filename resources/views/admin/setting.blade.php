@@ -1,91 +1,43 @@
 @extends('admin')
 @section('management-users')
-<div class="mb-10 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
-  <div class="flex items-center justify-between">
-    <h3 class="text-2xl font-bold text-slate-800">Mức thu nhập tối thiểu hằng ngày</h3>
+@php
+$labels = [];
+$labels["minimum_reward"] = "Mức thu nhập tối thiểu hằng ngày";
+$labels["delay_day_week"] = "Số lượng ngày nghỉ tối đa của 1 user (Tuần)";
+$labels["delay_day_month"] = "Số lượng ngày nghỉ tối đa của 1 user (Tháng)";
+$labels["commission_rate_1"] = "Mức % tiền ăn từ cấp dưới (1 Level)";
+$labels["commission_rate_2"] = "Mức % tiền ăn từ cấp dưới (2 Level)";
+$labels["max_ref_user_per_day_week"] = "Số lượng User được mời tối đa mỗi ngày (Ăn trọn theo tuần)";
+$labels["max_ref_user_per_day_month"] = "Số lượng User được mời tối đa mỗi ngày (Tách line tháng)";
+@endphp
+<div class="flex justify-center">
+  <div class="ms:w-4/5 md:w-3/5 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
+    <form id="form-edit" method="POST" class="mb-0" action="{{ URL::to('/management/setting') }}">
+      @csrf
+      @foreach ($settings as $setting)
+      <div class="items-end mb-5">
+        <div class="">
+          <p class="text-md sm:text-lg md:text-xl font-bold text-slate-800 mb-2">{{$labels[$setting->name]}}</p>
+          <input type="number" step="any" required name="{{$setting->name}}" value="{{$setting->value}}"
+            class="input input-bordered input-sm w-full">
+        </div>
+      </div>
+      @endforeach
+      <button type="submit" class="btn btn-block">Lưu</button>
+    </form>
   </div>
-  <br>
-  <form method="POST" action="{{ URL::to('/management/setting') }}">
-    @csrf
-    <input type="hidden" name="name" value="{{$minimumReward->name}}"
-        class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" step="any" required name="value" value="{{$minimumReward->value}}" class="input input-bordered w-full mb-5">
-    <button class="btn btn-block">Lưu</button>
-  </form>
-  <div class="flex items-center justify-between">
-    <h3 class="text-2xl font-bold text-slate-800">Số lượng ngày nghỉ tối đa của 1 user (Tuần)</h3>
-  </div>
-  <br>
-  <form method="POST" action="{{ URL::to('/management/setting') }}">
-    @csrf
-    <input type="hidden" name="name" value = "{{$delayDayWeek->name}}"
-        class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" name="value" required value="{{$delayDayWeek->value}}" class="input input-bordered w-full mb-5">
-    <button class="btn btn-block">Lưu</button>
-  </form>
-  <div class="flex items-center justify-between">
-    <h3 class="text-2xl font-bold text-slate-800">Số lượng ngày nghỉ tối đa của 1 user (Tháng)</h3>
-  </div>
-  <br>
-  <form method="POST" action="{{ URL::to('/management/setting') }}">
-    @csrf
-    <input type="hidden" name="name" value = "{{$delayDayMonth->name}}"
-        class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" name="value" required value="{{$delayDayMonth->value}}" class="input input-bordered w-full mb-5">
-    <button class="btn btn-block">Lưu</button>
-  </form>
-  <div class="flex items-center justify-between">
-    <h3 class="text-2xl font-bold text-slate-800">Mức % tiền ăn từ cấp dưới (1 Level)</h3>
-  </div>
-  <form method="POST" action="{{ URL::to('/management/setting') }}">
-    @csrf
-    <input type="hidden" name="name" value = "{{$commissionRate1->name}}"
-        class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" min = 1 max = 100 required name="value" value="{{$commissionRate1->value}}" class="input input-bordered w-full mb-5">
-    <button class="btn btn-block">Lưu</button>
-  </form>
-  <div class="flex items-center justify-between">
-    <h3 class="text-2xl font-bold text-slate-800">Mức % tiền ăn từ cấp dưới (2 Level)</h3>
-  </div>
-  <form method="POST" action="{{ URL::to('/management/setting') }}">
-    @csrf
-    <input type="hidden" name="name" value = "{{$commissionRate2->name}}"
-        class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" name="value" value="{{$commissionRate2->value}}" class="input input-bordered w-full mb-5">
-    <button class="btn btn-block">Lưu</button>
-  </form>
-  <div class="flex items-center justify-between">
-    <h3 class="text-2xl font-bold text-slate-800">Số lượng User được mời tối đa mỗi ngày (Ăn trọn theo tuần)</h3>
-  </div>
-  <form method="POST" action="{{ URL::to('/management/setting') }}">
-    @csrf
-    <input type="hidden" name="name" value = "{{$maxRefUserPerDayWeek->name}}"
-        class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" min = 1 max = 100 required name="value" value="{{$maxRefUserPerDayWeek->value}}" class="input input-bordered w-full mb-5">
-    <button class="btn btn-block">Lưu</button>
-  </form>
-  <div class="flex items-center justify-between">
-    <h3 class="text-2xl font-bold text-slate-800">Số lượng User được mời tối đa mỗi ngày (Tách line tháng)</h3>
-  </div>
-  <form method="POST" action="{{ URL::to('/management/setting') }}">
-    @csrf
-    <input type="hidden" name="name" value = "{{$maxRefUserPerDayMonth->name}}"
-        class="appearance-none input input-bordered w-full mb-5 ">
-    <input type="number" min = 1 max = 100 required name="value" value="{{$maxRefUserPerDayMonth->value}}" class="input input-bordered w-full mb-5">
-    <button class="btn btn-block">Lưu</button>
-  </form>
 </div>
 
 @if(Session::has('error') or Session::has('message'))
-  <input type="checkbox" id="modal-notificate" class="modal-toggle" checked/>
+<input type="checkbox" id="modal-notificate" class="modal-toggle" checked />
 @endif
 <div class="modal modal-bottom sm:modal-middle">
   <div class="modal-box relative">
     <label for="modal-notificate" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
     @if (Session::has('error'))
-      <p class="my-5 text-xl">{{Session::get('error')}}</p>
+    <p class="my-5 text-xl">{{Session::get('error')}}</p>
     @else
-      <p class="my-5 text-xl">{{Session::get('message')}}</p>
+    <p class="my-5 text-xl">{{Session::get('message')}}</p>
     @endif
   </div>
 </div>
