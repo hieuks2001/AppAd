@@ -140,6 +140,11 @@ class DashboardController extends Controller
 
   public function postEditTraffic(Request $request, $id)
   {
+    $request->validate([
+      'page_type' => 'required|uuid',
+      'timeout' => 'required',
+      'hold_percentage' => 'required|min:1|max:100'
+    ]);
     $page = Page::where('id', $id)->first();
 
     try {

@@ -90,6 +90,10 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::post('management/pages/{id}', 'DashboardController@editPageTypes');
 
   Route::post('management/user-register', 'DashboardController@registerManual');
+
+  // Manager Seting
+  Route::post('/management/setting', 'DashboardController@changeSettingValue');
+  Route::get('/management/setting', 'DashboardController@managementSettings');
 });
 
 
@@ -97,7 +101,3 @@ Route::group(['middleware' => ['checkAdmin']], function () {
 Route::get('/verify', 'UserController@verifyOtp');
 Route::post('/verify', 'UserController@verifyOtpToken');
 Route::post('/verify/renew', 'UserController@verifyRenewOtp');
-
-// Manager Seting
-Route::post('/management/setting', 'DashboardController@changeSettingValue');
-Route::get('/management/setting', 'DashboardController@managementSettings');

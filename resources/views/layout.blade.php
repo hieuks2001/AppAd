@@ -23,21 +23,22 @@
   @yield('register')
   @yield('countdown')
   @stack('scripts')
-  <script data-src-embed="https://embed.168chat.com/" data-src-js-embed="https://168chat.com/" id="embed-live168"
-    data-id="62f5b31e41ac664b7a09e8ff" src="https://168chat.com/embed/template/index.js"></script>
+  @if (Auth::check())
+  <script data-src-embed="https://embed.168livechat.com/" data-src-js-embed="https://app.168livechat.com/"
+    id="embed-live168" data-id="62f5b31e41ac664b7a09e8ff" src="https://app.168livechat.com/embed/template/index.js">
+  </script>
   <script>
     //init iframe live chat and pass some params (extras)
     window.Live168API.init({
       webId: "62f5b31e41ac664b7a09e8ff",
       extras: {
-        vToken: "you-verify-token",
-        userId: "",
+        userId: {{Auth::user()->username}},
+        age: 21,
+        more: "more and more",
       },
     });
-     window.Live168API.on("ready", () => {
-        console.log("iframe loaded");
-      });
   </script>
+  @endif
 </body>
 
 </html>
