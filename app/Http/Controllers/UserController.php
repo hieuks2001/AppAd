@@ -65,15 +65,20 @@ class UserController extends Controller
     if (Auth::check()) {
       return Redirect::to('/');
     }
-    if (isset($request->username) && isset($request->password)) {
-      if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
-        //Check is Admin -> Redirect to admin site
-        return Redirect::to('/')->with("isAdmin", Auth::user()->isAdmin);
-      } else {
-        return Redirect::to('/login')->with('error', 'Sai tên đăng nhập hoặc mật khẩu!');
-      }
+    if (empty($request->all())) return view('procedure.login');
+    $request->validate([
+      'username' => 'required|alpha_num',
+      'password' => 'required',
+    ], [
+      'username.required' => 'Vui lòng nhập số điện thoại',
+      'username.alpha_num' => 'Vui lòng không nhập các ký tự đặc biệt',
+      'password.required' => 'Vui lòng nhập mật khẩu',
+    ]);
+    if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+      //Check is Admin -> Redirect to admin site
+      return Redirect::to('/')->with("isAdmin", Auth::user()->isAdmin);
     } else {
-      return view('procedure.login');
+      return Redirect::to('/login')->with('error', 'Sai tên đăng nhập hoặc mật khẩu!');
     }
   }
 
@@ -91,18 +96,15 @@ class UserController extends Controller
     $request->validate([
       'username' => 'required|digits:10',
       'password' => 'required',
-      're_password' => 'required',
+      're_password' => 'required_with:password|same:password',
       'ref' => 'required',
     ], [
       'username.required' => 'Không đầy đủ thông tin cần thiết!',
       'password.required' => 'Không đầy đủ thông tin cần thiết!',
-      're_password.required' => 'Không đầy đủ thông tin cần thiết!',
-      'username.digits' => 'SĐT không phù hợp',
+      're_password.same' => 'Mật khẩu không trùng',
+      're_password.required_with' => 'Vui lòng nhập lại mật khẩu',      'username.digits' => 'SĐT không phù hợp',
       'ref.required' => 'Lỗi, tài khoản đăng kí không phù hợp!',
     ]);
-    if ($request->password != $request->re_password) {
-      return Redirect::back()->with('error', 'Mật khẩu không trùng khớp!');
-    }
     $checkUser = User::where('username', $request->username);
     if ($checkUser->count() != 0) {
       return Redirect::back()->with('error', 'Tên tài khoản đã có người sử dụng!');
@@ -147,21 +149,25 @@ class UserController extends Controller
     if (!Auth::check()) {
       return Redirect::to('/login');
     }
+    if (empty($request->all()))  return view("procedure.change_password");
+    $request->validate([
+      'password_old' => 'required',
+      'password_new' => 'required',
+      'password_new_repeat' => 'required_with:password_new|same:password_new'
+    ], [
+      'password_old.required' => 'Vui lòng nhập mật khẩu',
+      'password_new.required' => 'Vui lòng nhập mật khẩu',
+      'password_new_repeat.same' => 'Mật khẩu không trùng',
+      'password_new_repeat.required_with' => 'Vui lòng nhập lại mật khẩu',
+    ]);
     $user = Auth::user();
-    if (!isset($request->password_old) or !isset($request->password_new) or !isset($request->password_new_repeat)) {
-      return view("procedure.change_password");
-    }
     if (Auth::attempt(['username' => $user->username, 'password' => $request->password_old])) {
       //Đổi mật khẩu
-      if ($request->password_new == $request->password_new_repeat) {
-        # code...
-        User::where("username", $user->username)->update(['password' => bcrypt($request['password_new'])]);
-        return Redirect::to("/logout");
-      } else {
-        return Redirect::to("/change-password")->with('error', "Nhập lại mật khẩu đã không đúng");
-      }
+      # code...
+      User::where("username", $user->username)->update(['password' => bcrypt($request['password_new'])]);
+      return Redirect::to("/logout");
     } else {
-      return Redirect::to("/change-password")->with('error', "Sai mật khẩu cũ");
+      return Redirect::to("/change-password")->withErrors("Sai mật khẩu cũ");
     }
   }
 
@@ -187,6 +193,15 @@ class UserController extends Controller
     if ($user->verified) {
       return Redirect::to('/');
     }
+    $request->validate(
+      [
+        'otp' => 'required|alpha_num'
+      ],
+      [
+        'otp.required' => "Vui lòng nhập mã OTP",
+        'otp.alpha_num' => "Mã OTP chỉ gồm chữ và số"
+      ]
+    );
     $otp = OTP::where([
       'user_id' => $user->id,
       'otp' => $request->otp,
@@ -296,6 +311,12 @@ class UserController extends Controller
   public function pastekey(Request $request)
   {
     $user = Auth::user();
+    $request->validate([
+      'key' => 'required|uuid',
+    ],[
+      "key.required" => "Vui lòng nhập mã",
+      "key.uuid" => "Sai mã",
+    ]);
     $uIP = $this->getUserIpAddr();
     if ($user->status == 0) {
       // check if user is blocked
@@ -504,6 +525,12 @@ class UserController extends Controller
   public function withdraw(Request $request)
   {
     $user = Auth::user();
+    $request->validate([
+      'amount' => 'required|numeric',
+    ], [
+      'amount.required' => "Vui lòng nhập số tiền",
+      'amount.numeric' => "Số tiền chỉ bao gồm các số",
+    ]);
     $amount = $request->amount;
     $wallet = $user->wallet;
     if ($amount > $wallet) {
