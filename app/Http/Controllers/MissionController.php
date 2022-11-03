@@ -11,6 +11,7 @@ use App\Models\Mission;
 use App\Models\Missions;
 use App\Models\Page;
 use App\Models\PageType;
+use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -168,6 +169,7 @@ class MissionController extends Controller
     $pageType = $this->UpdateUserType();
     $excludePriority = [];
     $user = Auth::user();
+
     if ($this->IsBlockedUser($user)) {
       return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
     }
@@ -257,6 +259,8 @@ class MissionController extends Controller
     DB::transaction(function () use ($pickedPage, $user, $request, $rqIp, $originUrl) {
       // Refresh data
       $pickedPage = $pickedPage->refresh();
+      $commisonRateV1 = Setting::where("name", "commission_rate_1")->first();
+      $commisonRateV2 = Setting::where("name", "commission_rate_2")->first();
 
       $newMission = new Mission();
       $newMission->page_id = $pickedPage->id;
@@ -267,13 +271,13 @@ class MissionController extends Controller
       $reward = ($pickedPage->price - ($pickedPage->price * $pickedPage->hold_percentage / 100)) / $pickedPage->traffic_sum;
       $lv1 = User::where('id', $user->reference)->first();
       if ($lv1) {
-        $lv1Commission = $reward * 30 / 100; // (Get 30%)
+        $lv1Commission = $reward * (int)$commisonRateV1->value / 100; // (Get 30%)
         $oldReward = $reward;
         $reward -= $lv1Commission;
         if ($lv1->reference) {
           $lv2 = User::where('id', $lv1->reference)->first();
           if ($lv2) {
-            $lv2Commission = $oldReward * 1 / 100; // (Get 1%)
+            $lv2Commission = $oldReward * (int)$commisonRateV2->value / 100; // (Get 1%)
             $reward -= $lv2Commission;
           }
         }

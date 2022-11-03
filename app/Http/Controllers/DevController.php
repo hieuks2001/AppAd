@@ -649,6 +649,8 @@ class DevController extends Controller
     $count = 0;
 
     $pageType = PageType::where("name", "1")->first();
+    $commisonRateV1 = Setting::where("name", "commission_rate_1")->first();
+    $commisonRateV2 = Setting::where("name", "commission_rate_2")->first();
 
     foreach ($refs as $user) {
       // Create mission
@@ -658,7 +660,7 @@ class DevController extends Controller
 
       $lv1 = User::where('id', $user->reference)->first();
       if ($lv1) {
-        $lv1Commission = $reward * 30 / 100; // (Get 30%)
+        $lv1Commission = $reward * (int)$commisonRateV1->value / 100; // (Get 30%)
         $oldReward = $reward;
         $reward -= $lv1Commission;
         // Create log lv1
@@ -678,7 +680,7 @@ class DevController extends Controller
           $lv2 = User::where('id', $lv1->reference)->first();
           if ($lv2) {
             // Create log lv2
-            $lv2Commission = $oldReward * 1 / 100; // (Get 1%)
+            $lv2Commission = $oldReward * (int)$commisonRateV2->value / 100; // (Get 1%)
             $reward -= $lv2Commission;
             $logLV2 = new LogTransaction([
               'amount' => $lv2Commission,
@@ -732,7 +734,7 @@ class DevController extends Controller
     ]);
 
     $input = $rq->all();
-    $now = Carbon::createFromFormat("d", $input["day"]);
+    $now = Carbon::createFromFormat("d", $input["day"]);  
     $start = $now->startOfWeek()->format("Y-m-d");
     $end = $now->endOfWeek(Carbon::SUNDAY)->format("Y-m-d");
     $end = $now->addWeek()->startOfWeek()->format("Y-m-d");
