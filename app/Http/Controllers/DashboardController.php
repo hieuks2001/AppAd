@@ -480,6 +480,8 @@ class DashboardController extends Controller
       "commission_rate_2" => "required|numeric",
       "max_ref_user_per_day_week" => "required|numeric",
       "max_ref_user_per_day_month" => "required|numeric",
+      "ref_user_required_week" => "required|numeric",
+      "ref_user_required_month" => "required|numeric",
     ]);
     foreach ($validated as $key => $value) {
       $setting = Setting::where("name", $key)->first();

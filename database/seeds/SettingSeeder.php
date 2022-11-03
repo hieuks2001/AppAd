@@ -49,5 +49,15 @@ class SettingSeeder extends Seeder
         ["name" => "max_ref_user_per_day_month", "value" => "2"]
       );
       $maxRefUserPerDayMonth->save();
+
+      $refUserRequiredWeek = new Setting(
+        ["name" => "ref_user_required_week", "value" => "6"]
+      );
+      $refUserRequiredWeek->save();
+
+      $refUserRequiredMonth = new Setting(
+        ["name" => "ref_user_required_month", "value" => "24"]
+      );
+      $refUserRequiredMonth->save();
     }
 }

@@ -9,6 +9,9 @@ $labels["commission_rate_1"] = "Mức % tiền ăn từ cấp dưới (1 Level)"
 $labels["commission_rate_2"] = "Mức % tiền ăn từ cấp dưới (2 Level)";
 $labels["max_ref_user_per_day_week"] = "Số lượng User được mời tối đa mỗi ngày (Ăn trọn theo tuần)";
 $labels["max_ref_user_per_day_month"] = "Số lượng User được mời tối đa mỗi ngày (Tách line tháng)";
+$labels["ref_user_required_week"] = "Số lượng người dùng yêu cầu (Ăn trọn theo tuần)";
+$labels["ref_user_required_month"] = "Số lượng người dùng yêu cầu (Tách line tháng)";
+
 @endphp
 <div class="flex justify-center">
   <div class="ms:w-4/5 md:w-3/5 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
