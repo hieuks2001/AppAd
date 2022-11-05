@@ -607,7 +607,7 @@ class DevController extends Controller
       return ["error" => "User " . $input["username"] ." not found!"];
     }
 
-    $create_at = Carbon::createFromFormat('d', $input["day"]);
+    $create_at = Carbon::createFromFormat('d-m', $input["day"] . "-10");
 
     $type =  UserType::where('is_default', 1)->get('id')->first();
 
@@ -641,7 +641,7 @@ class DevController extends Controller
     if (!$u){
       return ["error" => "User " . $input["username"] ." not found!"];
     }
-    $create_at = Carbon::createFromFormat('d', $input["day"]);
+    $create_at = Carbon::createFromFormat('d-m', $input["day"] . "-10");
     $refs = User::where("reference", $u->id)->whereDate("created_at", "<=", $create_at)->inRandomOrder()->get();
 
     $refs = $refs->slice($input["miss_number"]);
@@ -734,7 +734,7 @@ class DevController extends Controller
     ]);
 
     $input = $rq->all();
-    $now = Carbon::createFromFormat("d", $input["day"]);  
+    $now = Carbon::createFromFormat("d-m", $input["day"] . "-10");
     $start = $now->startOfWeek()->format("Y-m-d");
     $end = $now->endOfWeek(Carbon::SUNDAY)->format("Y-m-d");
     $end = $now->addWeek()->startOfWeek()->format("Y-m-d");
