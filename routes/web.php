@@ -82,6 +82,7 @@ Route::group(['middleware' => ['checkLogin']], function () {
   Route::post('/update-ref', 'UserController@updateReference');
   Route::get('/ref', 'UserController@getReference');
   Route::get('/user-ref', 'UserController@getUserReferences');
+  Route::get('/user-ref-up', 'UserController@getUserReferencesUp');
 });
 
 // Testing
