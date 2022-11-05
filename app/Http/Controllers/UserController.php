@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Models\Page;
 use App\Models\Code;
 use App\Models\PageType;
+use App\Models\Setting;
 use App\Models\UserType;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -338,9 +339,12 @@ class UserController extends Controller
       ["code", $request->key],
       ["status", 0]
     ]);
+
+    $commisonRateV1 = Setting::where("name", "commission_rate_1")->first();
+    $commisonRateV2 = Setting::where("name", "commission_rate_2")->first();
     $msGet = ($ms)->get(["code", "reward", "page_id"])->first();
     if (!is_null($code->first())) {
-      DB::transaction(function () use ($ms, $user, $msGet, $request, $code) {
+      DB::transaction(function () use ($ms, $user, $msGet, $request, $code, $commisonRateV1, $commisonRateV2) {
         $ms->update(["status" => 1, "code" => $request->key]);
         $code->update(["status" => 1]);
         $u = User::where('id', $user->id)->first();
@@ -360,7 +364,7 @@ class UserController extends Controller
         // Get up to 1 level user reference
         $lv1 = User::where('id', $user->reference)->first();
         if ($lv1) {
-          $lv1Commission = $reward * 30 / 100; // (Get 30%)
+          $lv1Commission = $reward * (int)$commisonRateV1->value / 100; // (Get 30%)
           $oldReward = $reward;
           $reward -= $lv1Commission;
           //
@@ -375,7 +379,7 @@ class UserController extends Controller
           if ($lv1->reference) {
             $lv2 = User::where('id', $lv1->reference)->first();
             if ($lv2) {
-              $lv2Commission = $oldReward * 1 / 100; // (Get 1%)
+              $lv2Commission = $oldReward * (int)$commisonRateV2->value / 100; // (Get 1%)
               $reward -= $lv2Commission;
               //
               $logLV2 = new LogTransaction([
