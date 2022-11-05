@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
+use App\Models\Notification;
 use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
@@ -64,13 +65,14 @@ class HandleUserReferenceWeekly extends Command
     $minimumReward = Setting::where("name", "minimum_reward")->first();
     $delayDay = Setting::where("name", "delay_day_week")->first();
     $maxUserPerDay = Setting::where("name", "max_ref_user_per_day_week")->first();
+    $requiredRefUser = Setting::where("name", "ref_user_required_week")->first();
     echo ("From $start to $end");
-    User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay, $maxUserPerDay) {
+    User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay, $maxUserPerDay, $requiredRefUser) {
       // Loop each user in 200 users
       foreach ($users as $user) {
         echo "\n====================================================================\n";
         $this->line("Checking $user->username");
-        if (checkUserReference($user->id, $start, $end, 6, (float)$minimumReward->value, (int)$delayDay->value, (int)$maxUserPerDay->value)) {
+        if (checkUserReference($user->id, $start, $end, (int)$requiredRefUser->value, (float)$minimumReward->value, (int)$delayDay->value, (int)$maxUserPerDay->value)) {
           $this->info("User $user->username dat du dieu kien an tron theo tuan (week) - Tien hanh an tron");
           $lv1Referrer = User::where("id", $user->reference)->first();
           if (!$lv1Referrer) {
@@ -85,6 +87,11 @@ class HandleUserReferenceWeekly extends Command
               $this->giveCommission($user->id);
             }
           }
+          // Create notification
+          $noti = new Notification();
+          $noti->user_id = $user->id;
+          $noti->content = "Bạn đạt đủ điều kiện ăn trọn tiền hoa hồng của cấp dưới từ $start đến $end";
+          $noti->save();
         } else {
           $this->error("User $user->username khong du dieu kien an tron theo tuan (week)");
           $this->giveCommission($user->id);

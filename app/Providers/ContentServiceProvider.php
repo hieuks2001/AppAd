@@ -8,6 +8,7 @@ use App\Constants\PagePriorityConstants;
 use App\Constants\PageStatusConstants;
 use App\Constants\TransactionTypeConstants;
 use App\Models\Mission;
+use App\Models\Notification;
 use App\Models\Page;
 use Carbon\Carbon;
 use App\Models\PageType;
@@ -101,7 +102,8 @@ class ContentServiceProvider extends ServiceProvider
       $view->with('missions', $missions);
     });
     view()->composer('notification', function ($view) {
-      $now = Carbon::parse(Carbon::now()->format("Y-m-d"));
+      // $now = Carbon::parse(Carbon::now()->format("Y-m-d"));
+      $now = Carbon::now();
       $notification = [];
       $isWeekend = $now->isWeekend();
       $isLastMonth = $now->isLastOfMonth();
@@ -110,20 +112,27 @@ class ContentServiceProvider extends ServiceProvider
       // TH2: X là cuối tuần nhưng ko phải là cuối tháng -> ["week"=>msg]
       // TH3: X là cuối tháng nhưng ko phải là cuối tuần -> ["month"=>msg]
       // TH4: X là cuối tuần và cuối tháng (đặc biệt) -> ["month"=>msg,"week"=>msg]
-
       if ($isWeekend) {
         # code...
         // Check đã đạt điều kiện tuần ở đây
-            // true -> ['week'=>msg]
-            // false -> [] or ko làm gì cả
-        $notification['week'] = "Message of Week";
+        $weekNoti = Notification::where(["user_id" => Auth::user()->id])->whereDate("created_at", $now->endOfWeek())->first();
+        // true -> ['week'=>msg]
+        // false -> [] or ko làm gì cả
+        if ($weekNoti){
+          $notification['week'] = $weekNoti->content;
+        }
       }
       if ($isLastMonth) {
         # code...
         // Check đã đạt điều kiện tháng ở đây
             // true -> ['month'=>msg]
             // false -> [] or ko làm gì cả
-        $notification['month'] = "Message of Month";
+        $monthNoti = Notification::where(["user_id" => Auth::user()->id])->whereDate("created_at", $now->endOfWeek())->orderBy("created_at", "desc")->first();
+        // true -> ['week'=>msg]
+        // false -> [] or ko làm gì cả
+        if ($monthNoti){
+          $notification['month'] = $monthNoti->content;
+        }
       }
       $view->with('notification', $notification);
     });

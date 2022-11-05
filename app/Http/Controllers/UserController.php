@@ -301,10 +301,13 @@ class UserController extends Controller
 
   public function getReference()
   {
-    if (Auth::user()->reference) {
-      return view('procedure.reference')->withErrors('Bạn đã nhập mã giới thiệu rồi');
-    }
     return view('procedure.reference');
+  }
+
+  public function getUserReferences(){
+    $u = Auth::user();
+    $users = User::where('reference', $u->id)->simplePaginate(10);
+    return view('procedure.userReferences', compact(['users']));
   }
 
   // ================== MISSIONS ==========================
