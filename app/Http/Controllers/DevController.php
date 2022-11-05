@@ -8,6 +8,7 @@ use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
 use App\Models\Mission;
 use App\Models\Missions;
+use App\Models\Notification;
 use App\Models\Page;
 use App\Models\PageType;
 use App\Models\Setting;
@@ -743,7 +744,7 @@ class DevController extends Controller
     $maxUserPerDay = Setting::where("name", "max_ref_user_per_day_week")->first();
     $result = array();
 
-    User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay, &$result, $maxUserPerDay) {
+    User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay, &$result, $maxUserPerDay, $now) {
       // Loop each user in 200 users
       foreach ($users as $user) {
         if (checkUserReference($user->id, $start, $end, 6, (float)$minimumReward->value, (int)$delayDay->value, (int)$maxUserPerDay->value)) {
@@ -761,6 +762,11 @@ class DevController extends Controller
               $this->giveCommission($user->id);
             }
           }
+          $noti = new Notification();
+          $noti->user_id = $user->id;
+          $noti->content = "Bạn đạt đủ điều kiện ăn trọn tiền hoa hồng của cấp dưới từ $start đến $end";
+          $noti->created_at = $now;
+          $noti->save();
         } else {
           $result[$user->username] = "Khong";
           $this->giveCommission($user->id);

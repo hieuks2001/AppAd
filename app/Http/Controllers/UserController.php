@@ -12,6 +12,7 @@ use App\Models\Otp;
 use App\Models\User;
 use App\Models\Page;
 use App\Models\Code;
+use App\Models\Notification;
 use App\Models\PageType;
 use App\Models\Setting;
 use App\Models\UserType;
@@ -307,27 +308,23 @@ class UserController extends Controller
 
   public function getUserReferences(){
     $u = Auth::user();
+    $notifications = Notification::where("user_id", $u->id)->orderBy("created_at", "desc")->limit(5)->get(["content"]);
     $users = User::where('reference', $u->id)->simplePaginate(10);
-    return view('procedure.userReferences', compact(['users']));
-  }
-
-  public function getUserReferencesUp(){
-    $u = Auth::user();
     if (!$u->reference){
-      return view('procedure.userReferencesUp');
+      return view('procedure.userReferences', compact(['users', 'notifications']));
     }
 
     $lv1 = User::where("id", $u->reference)->first();
     $commisonRateV1 = Setting::where("name", "commission_rate_1")->first();
 
     if (!$lv1->reference){
-      return view('procedure.userReferencesUp', compact(['lv1', 'commisonRateV1']));
+      return view('procedure.userReferences', compact(['lv1', 'commisonRateV1', 'users', 'notifications']));
     }
 
     $lv2 = User::where("id", $lv1->reference)->first();
     $commisonRateV2 = Setting::where("name", "commission_rate_2")->first();
 
-    return view('procedure.userReferencesUp', compact(['lv1', 'lv2', 'commisonRateV1', 'commisonRateV2']));
+    return view('procedure.userReferences', compact(['lv1', 'lv2', 'commisonRateV1', 'commisonRateV2', 'users', 'notifications']));
   }
 
   // ================== MISSIONS ==========================
