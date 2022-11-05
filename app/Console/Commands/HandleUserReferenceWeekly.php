@@ -103,6 +103,7 @@ class HandleUserReferenceWeekly extends Command
 
   function returnCommission($userId, $referId)
   {
+    // TODO: Optimize
     // Return the user's referral commission
     $pendingCommision = LogTransaction::where([
       "user_id" => $referId,
