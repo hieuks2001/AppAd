@@ -16,8 +16,8 @@ class HandleUpdateTelegram extends Command
   public function momoSend($data, $callback)
   {
     $response = Http::asForm()->post('https://api-momo.online/share.php', [
-      'token' => '9zqwhGSdisUGouE75w3O8rd2L1dj4OPgGyfOqSieUao',
-      'id_momo' => '0906568374',
+      'token' => env('MOMO_TOKEN'),
+      'id_momo' => env('MOMO_ID'),
       'phone' => $data->phone,
       'money' => $data->money * 23000,
       'comment' => $data->comment,
@@ -30,8 +30,8 @@ class HandleUpdateTelegram extends Command
     } else {
       //refresh token if error
       $token = Http::asForm()->post('https://api-momo.online/share.php', [
-        'token' => 'npEXDCZaHRaN0YvbldX700vLACEnedPaayntqVbDHoI',
-        'id_momo' => '0906568374',
+        'token' => env('MOMO_TOKEN_REFRESH'),
+        'id_momo' => env('MOMO_ID'),
       ]);
       $this->momoSend($data, $callback);
     }
