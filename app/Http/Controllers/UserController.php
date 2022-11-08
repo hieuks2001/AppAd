@@ -552,10 +552,11 @@ class UserController extends Controller
   {
     $user = Auth::user();
     $request->validate([
-      'amount' => 'required|numeric',
+      'amount' => 'required|numeric|min:1',
     ], [
       'amount.required' => "Vui lòng nhập số tiền",
       'amount.numeric' => "Số tiền chỉ bao gồm các số",
+      'amount.min' => "Số tiền rút tối thiểu là 1 USDT",
     ]);
     $amount = $request->amount;
     $wallet = $user->wallet;
