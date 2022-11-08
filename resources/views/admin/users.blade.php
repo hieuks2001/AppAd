@@ -58,6 +58,7 @@
       <tr>
         <th>ID</th>
         <th>SĐT</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -65,6 +66,16 @@
       <tr>
         <td>{{ $value->id }}</td>
         <td>{{ $value->username }}</td>
+        <td>
+          <label for="modal-change--password" class="btn btn-square btn-outline btn-sm"
+            onclick="onUserChangePassword('{{$value->id}}','traffic')">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+            </svg>
+          </label>
+        </td>
       </tr>
       @endforeach
     </tbody>
@@ -102,6 +113,7 @@
         <th>ID</th>
         <th>SĐT</th>
         <th>Loại</th>
+        <th></th>
         <th></th>
         <th></th>
       </tr>
@@ -146,6 +158,16 @@
           </form>
           @endif
         </td>
+        <td>
+          <label for="modal-change--password" class="btn btn-square btn-outline btn-sm"
+            onclick="onUserChangePassword('{{$value->id}}','mission')">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+            </svg>
+          </label>
+        </td>
       </tr>
       @endforeach
     </tbody>
@@ -155,6 +177,25 @@
       href="{{$users->previousPageUrl()}}">Previous</a>
     <a class="btn btn-outline btn-sm {{!$users->hasMorePages() ? 'btn-disabled' : ''}}"
       href="{{$users->nextPageUrl()}}">Next</a>
+  </div>
+</div>
+<!-- Modal change password -->
+<input type="checkbox" id="modal-change--password" class="modal-toggle">
+<div class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box relative">
+    <label for="modal-change--password" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <form id="form-change--pwd" method="post" class="mb-0"> {{-- action in js dom --}}
+      @csrf
+      <div class="form-control max-w-full">
+        <label class="label">
+          <span class="label-text font-bold text-2xl">Đặt lại mật khẩu: <span class="font-normal"></span></span>
+        </label>
+        <div class="flex">
+          <input type="text" name="pwd" class="input input-bordered mb-3 w-full" />
+        </div>
+      </div>
+      <button type="submit" class="btn btn-block">Đặt lại</button>
+    </form>
   </div>
 </div>
 <!-- Modal edit User -->
@@ -305,14 +346,14 @@
     </form>
   </div>
 </div>
-@if(Session::has('error') or Session::has('message'))
+@if(Session::has('error') or Session::has('message') or $errors->has('pwd'))
 <input type="checkbox" id="modal-notificate" class="modal-toggle" checked />
 @endif
 <div class="modal modal-bottom sm:modal-middle">
   <div class="modal-box relative">
     <label for="modal-notificate" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
-    @if (Session::has('error'))
-    <p class="my-5 text-xl">{{Session::get('error')}}</p>
+    @if (Session::has('error') or $errors->has('pwd'))
+    <p class="my-5 text-xl">{{Session::get('error') ?? $errors->first('pwd')}}</p>
     @else
     <p class="my-5 text-xl">{{Session::get('message')}}</p>
     @endif
@@ -320,6 +361,7 @@
 </div>
 <script>
   const users = {!! json_encode($users->toArray(), JSON_HEX_TAG) !!}
+  const usersTraffic = {!! json_encode($usersTraffic->toArray(), JSON_HEX_TAG) !!}
     const user_types = {!! json_encode($user_types->toArray(), JSON_HEX_TAG) !!}
     const formEdit = document.getElementById('form-edit');
     const items = document.querySelectorAll('#form-edit .item');
@@ -380,6 +422,16 @@
         const key = Object.keys(element.dataset)[0]
         element.value = usertype[key][element.dataset[key]]
       });
+    }
+    const formChangePwd = document.getElementById("form-change--pwd");
+    const labelFormChangePwd = document.querySelector("#form-change--pwd label span span");
+    console.log(labelFormChangePwd);
+    function onUserChangePassword(uid,type) {
+      const data = type === 'traffic' ? usersTraffic.data : users.data
+      const user = data.find(ele=>ele.id===uid)
+      labelFormChangePwd.textContent = user.username
+      console.log(`management/user/${user.id}/change_password`);
+      formChangePwd.action = `/management/user/${user.id}/change_password?type=${type}`
     }
     function handleEditChange(ele) {
       if ("mission_need" in ele.dataset) {

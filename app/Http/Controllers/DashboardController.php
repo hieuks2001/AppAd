@@ -553,4 +553,19 @@ class DashboardController extends Controller
     ]);
     return Redirect::to("/management/pages");
   }
+  public function changePassword(Request $request, $id)
+  {
+    $request->validate([
+      'pwd' => 'required',
+    ], [
+      'pwd.required' => "Vui lòng nhập mật khẩu"
+    ]);
+    $table = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+    $user  = DB::table($table)->where("id", $id);
+    if (!empty($user->get())) {
+      $user->update(['password' => bcrypt($request['pwd'])]);
+      # code...
+      return Redirect::back()->with(['message' => 'Đặt lại mật khẩu của người dùng thành công']);
+    }
+  }
 }

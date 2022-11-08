@@ -79,42 +79,44 @@ class PageController extends Controller
   }
   public function regispageTab3()
   {
-    $missions = Page::join("missions","missions.page_id","=","pages.id")
-    ->where([
-      ['pages.user_id',"=", Auth::user()->id],
-      ['pages.status',"=", PageStatusConstants::APPROVED],
-      ['missions.status',"=", MissionStatusConstants::COMPLETED],
-    ])
-    ->orderBy("pages.price_per_traffic", "DESC")
-    ->simplePaginate(
-      $perPage = 10, $columns = [
-        "missions.id", "missions.ip", "missions.updated_at",
-        "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
-      ]
+    $missions = Page::join("missions", "missions.page_id", "=", "pages.id")
+      ->where([
+        ['pages.user_id', "=", Auth::user()->id],
+        ['pages.status', "=", PageStatusConstants::APPROVED],
+        ['missions.status', "=", MissionStatusConstants::COMPLETED],
+      ])
+      ->orderBy("pages.price_per_traffic", "DESC")
+      ->simplePaginate(
+        $perPage = 10,
+        $columns = [
+          "missions.id", "missions.ip", "missions.updated_at",
+          "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
+        ]
       );
     return view('regispage.tab3')->with('missions', $missions);
   }
   public function regispageTab3Search(Request $request)
   {
     $key = $request->data;
-    $missions = Page::join("missions","missions.page_id","=","pages.id")
-    ->where([
-      ['pages.user_id',"=", Auth::user()->id],
-      ['pages.status',"=", PageStatusConstants::APPROVED],
-      ['missions.status',"=", MissionStatusConstants::COMPLETED],
-    ])
-    ->where(function($query) use ($key){
-      $query->where('url','LIKE',"%{$key}%");
-      $query->orWhere('origin_url', 'LIKE', "%{$key}%");
-    })
-    ->orderBy("pages.price_per_traffic", "DESC")
-    ->simplePaginate(
-      $perPage = 10, $columns = [
-        "missions.id", "missions.ip", "missions.updated_at",
-        "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
-      ]
+    $missions = Page::join("missions", "missions.page_id", "=", "pages.id")
+      ->where([
+        ['pages.user_id', "=", Auth::user()->id],
+        ['pages.status', "=", PageStatusConstants::APPROVED],
+        ['missions.status', "=", MissionStatusConstants::COMPLETED],
+      ])
+      ->where(function ($query) use ($key) {
+        $query->where('url', 'LIKE', "%{$key}%");
+        $query->orWhere('origin_url', 'LIKE', "%{$key}%");
+      })
+      ->orderBy("pages.price_per_traffic", "DESC")
+      ->simplePaginate(
+        $perPage = 10,
+        $columns = [
+          "missions.id", "missions.ip", "missions.updated_at",
+          "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
+        ]
       );
-    return view('regispage.tab3',compact(['missions']));
+    return view('regispage.tab3', compact(['missions']));
   }
   public function regispageTab4()
   {

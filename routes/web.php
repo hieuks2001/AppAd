@@ -83,6 +83,7 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::post('management/user/search', 'DashboardController@searchUser');
   Route::post('management/userTraffic/search', 'DashboardController@searchUserTraffic');
   Route::post('management/user/{id}', 'DashboardController@postUnblockUser');
+  Route::post('management/user/{id}/change_password', 'DashboardController@changePassword');
 
   // Manager Page
   Route::get('management/pages', 'DashboardController@getPageTypes');
