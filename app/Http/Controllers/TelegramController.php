@@ -125,14 +125,17 @@ class TelegramController extends Controller
   {
     $updates = Telegram::getWebhookUpdates();
     if (count($updates) <= 0) {
-	Log::info('Failed');
-       return 'ok';
+      Log::info('Failed');
+      return 'ok';
     }
 
     foreach ($updates as $k => $v) {
-    	if (isset($v['callback_query'])) {
+      Log::info("callback_query");
+      Log::info(isset($v['callback_query']));
+      Log::info($k);
+      if (isset($v['callback_query'])) {
         $record = json_decode($v->callback_query);
-         // dd($record);
+        // dd($record);
         $data = json_decode($record->data);
         $old_txt = $record->message->text;
 
@@ -197,7 +200,7 @@ class TelegramController extends Controller
               'text' => $old_txt . "\n<b>Đã Duyệt</b>\n",
               'message_id' => $record->message->message_id
             ]);
-	    Log::info('Edit message ok');
+            Log::info('Edit message ok');
           } catch (\Throwable $th) {
             // throw $th;
           }
@@ -211,7 +214,7 @@ class TelegramController extends Controller
               'text' => $old_txt . "\n<b>Đã Huỷ</b>\n",
               'message_id' => $record->message->message_id
             ]);
-	    Log::info('Edit message ok');
+            Log::info('Edit message ok');
           } catch (\Throwable $th) {
             // throw $th;
           }
