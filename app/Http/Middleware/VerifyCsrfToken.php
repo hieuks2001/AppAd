@@ -13,14 +13,19 @@ class VerifyCsrfToken extends Middleware
    *
    * @var array
    */
-  protected $except = [
-    //
-    "page-init/",
-    "generate-code/",
-  ];
+  #protected $except = [
+  #  //
+  #  "page-init/",
+  #  "generate-code/",
+  #];
+  protected $except;
   public function __construct(Application $app, Encrypter $encrypter)
   {
     parent::__construct($app, $encrypter);
-    $this->except = array_push($this->except, env("TELEGRAM_BOT_TOKEN") . '/webhook');
+    $this->except = [
+	env("TELEGRAM_BOT_TOKEN") . '/webhook',
+	"page-init/",
+	"generate-code/"
+    ];
   }
 }

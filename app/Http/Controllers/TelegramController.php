@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class TelegramController extends Controller
 {
@@ -123,100 +124,100 @@ class TelegramController extends Controller
   public function getUpdate(Request $request)
   {
     $updates = Telegram::getWebhookUpdates();
-    var_dump($updates);
-    // if (count($updates) <= 0) {
-    //   return true;
-    // }
+    if (count($updates) <= 0) {
+	Log::info('Failed');
+       return 'ok';
+    }
 
-    // foreach ($updates as $k => $v) {
-    //   if (isset($v['callback_query'])) {
-    //     $record = json_decode($v->callback_query);
-    //     // dd($record);
-    //     $data = json_decode($record->data);
-    //     $old_txt = $record->message->text;
+    foreach ($updates as $k => $v) {
+    	if (isset($v['callback_query'])) {
+        $record = json_decode($v->callback_query);
+         // dd($record);
+        $data = json_decode($record->data);
+        $old_txt = $record->message->text;
 
-    //     if ($data->from == 'traffic') {
-    //       $mRequest = LogTrafficTransaction::find($data->id_request);
-    //     } else {
-    //       $mRequest = LogMissionTransaction::find($data->id_request);
-    //     }
+        if ($data->from == 'traffic') {
+          $mRequest = LogTrafficTransaction::find($data->id_request);
+        } else {
+          $mRequest = LogMissionTransaction::find($data->id_request);
+        }
 
-    //     if (!$mRequest) {
-    //       echo "Không tìm thấy yêu cầu ! id " . $data->id_request . " từ " . $data->from;
-    //       continue;
-    //     }
+        if (!$mRequest) {
+          echo "Không tìm thấy yêu cầu ! id " . $data->id_request . " từ " . $data->from;
+          continue;
+        }
 
-    //     if ($mRequest->status == TransactionStatusConstants::APPROVED || $mRequest->status == TransactionStatusConstants::CANCELED) {
-    //       echo "Yêu cầu đã được duyệt rồi! id " . $data->id_request . " từ " . $data->from;
-    //       continue;
-    //     }
+        if ($mRequest->status == TransactionStatusConstants::APPROVED || $mRequest->status == TransactionStatusConstants::CANCELED) {
+          echo "Yêu cầu đã được duyệt rồi! id " . $data->id_request . " từ " . $data->from;
+          continue;
+        }
 
-    //     $user_table = $data->from == 'traffic' ? "user_traffics" : "user_missions";
-    //     $targetUser = DB::table($user_table)->where("id", $mRequest->user_id);
+        $user_table = $data->from == 'traffic' ? "user_traffics" : "user_missions";
+        $targetUser = DB::table($user_table)->where("id", $mRequest->user_id);
 
-    //     if ($data->type == TransactionStatusConstants::APPROVED) {
-    //       if ($mRequest->type == TransactionTypeConstants::TOPUP) {
-    //         $targetUser->increment("wallet", $mRequest->amount);
-    //       } else if ($mRequest->type == TransactionTypeConstants::WITHDRAW) {
-    //         if (($targetUser)->first()->wallet < $mRequest->amount) {
-    //           echo "Người dùng không đủ USDT cho yêu cầu này! id " . $data->id_request . " từ " . $data->from;
-    //           continue;
-    //         }
-    //         // momo
-    //         $body = new \stdClass();
-    //         $body->phone = $targetUser->first()->phone_number;
-    //         $body->money = $mRequest->amount;
-    //         $from_site = $data->from == 'traffic' ? 'memtraffic.com' : 'nhiemvu.app';
-    //         $body->comment = "Rút tiền từ " . $from_site;
-    //         $rsMomo = $this->momoSend($body, function ($result) use ($targetUser, $mRequest) {
-    //           if (!$result["error"]) { //thanh cong
-    //             $targetUser->decrement("wallet", $mRequest->amount);
-    //             return true;
-    //           } else {
-    //             //momo error
-    //             echo "Lỗi chuyển tiền" . $result["message"];
-    //             return false;
-    //           }
-    //         });
-    //         if (!$rsMomo) {
-    //           continue;
-    //         };
-    //       };
-    //       $mRequest->status = TransactionStatusConstants::APPROVED;
-    //       $mRequest->save();
+        if ($data->type == TransactionStatusConstants::APPROVED) {
+          if ($mRequest->type == TransactionTypeConstants::TOPUP) {
+            $targetUser->increment("wallet", $mRequest->amount);
+          } else if ($mRequest->type == TransactionTypeConstants::WITHDRAW) {
+            if (($targetUser)->first()->wallet < $mRequest->amount) {
+              echo "Người dùng không đủ USDT cho yêu cầu này! id " . $data->id_request . " từ " . $data->from;
+              continue;
+            }
+            // momo
+            $body = new \stdClass();
+            $body->phone = $targetUser->first()->phone_number;
+            $body->money = $mRequest->amount;
+            $from_site = $data->from == 'traffic' ? 'memtraffic.com' : 'nhiemvu.app';
+            $body->comment = "Rút tiền từ " . $from_site;
+            $rsMomo = $this->momoSend($body, function ($result) use ($targetUser, $mRequest) {
+              if (!$result["error"]) { //thanh cong
+                $targetUser->decrement("wallet", $mRequest->amount);
+                return true;
+              } else {
+                //momo error
+                echo "Lỗi chuyển tiền" . $result["message"];
+                return false;
+              }
+            });
+            if (!$rsMomo) {
+              continue;
+            };
+          };
+          $mRequest->status = TransactionStatusConstants::APPROVED;
+          $mRequest->save();
 
-    //       $mappingTxt = $mRequest->type == TransactionTypeConstants::TOPUP
-    //         ? ["txt" => "Nạp tiền thành công", "amount" => $mRequest->amount]
-    //         : ["txt" => "Rút tiền thành công", "amount" => $mRequest->amount];
+          $mappingTxt = $mRequest->type == TransactionTypeConstants::TOPUP
+            ? ["txt" => "Nạp tiền thành công", "amount" => $mRequest->amount]
+            : ["txt" => "Rút tiền thành công", "amount" => $mRequest->amount];
 
-    //       try {
-    //         Telegram::editMessageText([
-    //           'parse_mode' => 'HTML',
-    //           'chat_id' => $mRequest->type == TransactionTypeConstants::TOPUP ? env('TELEGRAM_ADMIN_DEPOSIT') : env('TELEGRAM_ADMIN'),
-    //           'text' => $old_txt . "\n<b>Đã Duyệt</b>\n",
-    //           'message_id' => $record->message->message_id
-    //         ]);
-    //         echo 'Edit message ok';
-    //       } catch (\Throwable $th) {
-    //         // throw $th;
-    //       }
-    //     } else if ($data->type == TransactionStatusConstants::CANCELED) {
-    //       $mRequest->status = TransactionStatusConstants::CANCELED;
-    //       $mRequest->save();
-    //       try {
-    //         Telegram::editMessageText([
-    //           'parse_mode' => 'HTML',
-    //           'chat_id' => $mRequest->type == TransactionTypeConstants::TOPUP ? env('TELEGRAM_ADMIN_DEPOSIT') : env('TELEGRAM_ADMIN'),
-    //           'text' => $old_txt . "\n<b>Đã Huỷ</b>\n",
-    //           'message_id' => $record->message->message_id
-    //         ]);
-    //         echo 'Edit message ok';
-    //       } catch (\Throwable $th) {
-    //         // throw $th;
-    //       }
-    //     }
-    //   }
-    // }
+          try {
+            Telegram::editMessageText([
+              'parse_mode' => 'HTML',
+              'chat_id' => $mRequest->type == TransactionTypeConstants::TOPUP ? env('TELEGRAM_ADMIN_DEPOSIT') : env('TELEGRAM_ADMIN'),
+              'text' => $old_txt . "\n<b>Đã Duyệt</b>\n",
+              'message_id' => $record->message->message_id
+            ]);
+	    Log::info('Edit message ok');
+          } catch (\Throwable $th) {
+            // throw $th;
+          }
+        } else if ($data->type == TransactionStatusConstants::CANCELED) {
+          $mRequest->status = TransactionStatusConstants::CANCELED;
+          $mRequest->save();
+          try {
+            Telegram::editMessageText([
+              'parse_mode' => 'HTML',
+              'chat_id' => $mRequest->type == TransactionTypeConstants::TOPUP ? env('TELEGRAM_ADMIN_DEPOSIT') : env('TELEGRAM_ADMIN'),
+              'text' => $old_txt . "\n<b>Đã Huỷ</b>\n",
+              'message_id' => $record->message->message_id
+            ]);
+	    Log::info('Edit message ok');
+          } catch (\Throwable $th) {
+            // throw $th;
+          }
+        }
+      }
+    }
     return 'ok';
   }
 }
