@@ -17,7 +17,7 @@ class TelegramController extends Controller
 {
   public function momoSend($data, $callback)
   {
-    $response = Http::asForm()->post('https://api-momo.online/share.php', [
+    $response = Http::asForm()->withOptions(['verify' => false])->post('https://api-momo.online/share.php', [
       'token' => env('MOMO_TOKEN'),
       'id_momo' => env('MOMO_ID'),
       'phone' => $data->phone,
