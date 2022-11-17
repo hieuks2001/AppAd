@@ -21,7 +21,7 @@
   let value_prog = 0;
   let inter = setInterval(() => {
     value_prog += 0.1;
-    toastProgEle.value = value_prog;
+    toastProgEle?.value = value_prog;
   }, 10);
   setTimeout(() => {
     toastEle.style.display = "none"
