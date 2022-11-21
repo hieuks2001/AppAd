@@ -568,4 +568,55 @@ class DashboardController extends Controller
       return Redirect::back()->with(['message' => 'Đặt lại mật khẩu của người dùng thành công']);
     }
   }
+
+  public function addMoneyForUser(Request $request, $id){
+    $request->validate([
+      'amount' => 'required|numeric|not_in:0',
+    ], [
+      'amount.required' => "Vui lòng nhập số tiền",
+      'amount.numeric' => "Vui lòng nhập đúng định dạng"
+    ]);
+    $table = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+    $user = DB::table($table)->where('id', $id);
+    $logData = array();
+    $logData['type'] = $request["amount"] < 0 ? TransactionTypeConstants::ADMIN_MINUS : TransactionTypeConstants::ADMIN_ADD;
+    $logData['amount'] = $request["amount"] < 0 ? ($request["amount"] * -1) : $request["amount"];
+
+    if (!empty($user->get())) {
+      $userData = $user->first();
+      $logData['before'] = $userData->wallet;
+      $logData['user_id'] = $userData->id;
+      $user->increment('wallet', $request['amount']);
+      $userData = $user->first();
+      $logData['after'] = $userData->wallet;
+      $logData['status'] = TransactionStatusConstants::APPROVED;
+      // Add log
+      if ($request->query('type') === 'traffic'){
+        $log = new LogTrafficTransaction($logData);
+        $log->save();
+      } else {
+        $log = new LogMissionTransaction($logData);
+        $log->save();
+      }
+      return Redirect::back()->with(['message' => 'Thành công']);
+    }
+    return Redirect::back()->with(['message' => 'Lỗi']);
+  }
+
+  public function showUserTransactions(Request $request, $id){
+    $logTable = $request->query('type') === 'traffic' ? 'log_traffic_transactions' : 'log_mission_transactions';
+    $userTable = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+
+    $user = DB::table($userTable)->where('id', $id)->first();
+    if (!$user){
+      return view('admin.userTransactions')->withErrors("User không tồn tại");
+    }
+
+    $transactions = DB::table($logTable)->where(['user_id' => $id, $logTable.'.status' => TransactionStatusConstants::APPROVED])
+      ->join($userTable, $userTable.'.id' , '=', $logTable.'.user_id')
+      ->select($logTable.'.amount', $logTable.'.before', $logTable.'.after', $logTable.'.created_at', $logTable.'.type', $logTable.'.status', $userTable.'.username')
+      ->simplePaginate(15);
+
+    return view('admin.userTransactions', compact(['transactions', 'user']));
+  }
 }

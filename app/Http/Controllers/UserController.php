@@ -444,8 +444,9 @@ class UserController extends Controller
     $old_log = LogTrafficTransaction::where([
       'user_id' => $user->id,
       'status' => TransactionStatusConstants::PENDING,
-      'type' => TransactionTypeConstants::TOPUP
-    ])->get();
+    ])
+    ->whereIn('type', [TransactionTypeConstants::TOPUP, TransactionTypeConstants::WITHDRAW])
+    ->get();
     if (count($old_log) > 0) {
       return view("usdt.deposit")->withErrors("Bạn đang có yêu cầu nạp chưa được duyệt, vui lòng đợi và thử lại sau!");
     }
@@ -454,6 +455,8 @@ class UserController extends Controller
     $log->user_id = $wallet->id;
     $log->type = TransactionTypeConstants::TOPUP;
     $log->status = TransactionStatusConstants::PENDING;
+    $log->before = $wallet->wallet;
+    $log->after = $wallet->wallet + $amount;
     $log->save();
 
     $inline_keyboard = json_encode([
@@ -508,8 +511,9 @@ class UserController extends Controller
     $old_log = LogTrafficTransaction::where([
       'user_id' => $user->id,
       'status' => TransactionStatusConstants::PENDING,
-      'type' => TransactionTypeConstants::WITHDRAW,
-    ])->get();
+    ])
+    ->whereIn('type', [TransactionTypeConstants::TOPUP, TransactionTypeConstants::WITHDRAW])
+    ->get();
     if (count($old_log) > 0) {
       return view("usdt.withdraw")->withErrors("Bạn đang có yêu cầu rút chưa được duyệt, vui lòng đợi và thử lại sau!");
     }
@@ -521,6 +525,8 @@ class UserController extends Controller
     $log->user_id = $user->id;
     $log->type = TransactionTypeConstants::WITHDRAW;
     $log->status = TransactionStatusConstants::PENDING;
+    $log->before = $user->wallet;
+    $log->after = $user->wallet - $amount;
     $log->save();
 
     $inline_keyboard = json_encode([

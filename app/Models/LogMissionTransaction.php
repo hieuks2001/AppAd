@@ -8,6 +8,6 @@ class LogMissionTransaction extends Model
 {
     protected $table = 'log_mission_transactions';
 
-    protected $fillable = ['amount', 'user_id', 'type', ];
+    protected $fillable = ['amount', 'user_id', 'type', 'before', 'after', 'status'];
 
 }
