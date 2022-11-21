@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\CleanLogData;
 use App\Console\Commands\UsersResetMissionCount;
 use App\Console\Commands\ClearCodes;
 use Illuminate\Console\Scheduling\Schedule;
@@ -17,6 +18,7 @@ class Kernel extends ConsoleKernel
   protected $commands = [
     UsersResetMissionCount::class,
     ClearCodes::class,
+    CleanLogData::class,
   ];
 
   /**
@@ -29,6 +31,7 @@ class Kernel extends ConsoleKernel
   {
     // $schedule->command('inspire')->hourly();
     $schedule->command('code:clear')->daily()->timezone("Asia/Ho_Chi_Minh")->at('00:00');
+    $schedule->command('log:clear')->daily()->timezone("Asia/Ho_Chi_Minh")->at('00:00');
   }
 
   /**
