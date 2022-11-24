@@ -3,8 +3,8 @@
 @php
 $labels = [];
 $labels["reward"] = "Thưởng nhiệm vụ";
-$labels["admin_add"] = "ADMIN cộng";
-$labels["admin_minus"] = "ADMIN trừ";
+$labels["admin_add"] = "ADMIN thao tác";
+$labels["admin_minus"] = "ADMIN thao tác";
 $labels["topup"] = "Nạp";
 $labels["pay"] = "Trả tiền dịch vụ";
 $labels["refund"] = "Hoàn tiền";
@@ -39,7 +39,25 @@ $labels["commission"] = "Nhận hoa hồng";
         @foreach ($transactions as $key => $value)
           <tr>
             <td>{{ $labels[$value->type] }}</td>
-            <td>{{ $value->amount }}</td>
+            <td>
+              @switch($value->type)
+                @case("admin_minus")
+                  -{{$value->amount}}
+                  @break
+
+                @case("withdraw")
+                  -{{$value->amount}}
+                  @break
+
+                @case("pay")
+                  -{{$value->amount}}
+                  @break
+
+                @default
+                  {{$value->amount}}
+
+              @endswitch
+            </td>
             <td>{{ $value->before }}</td>
             <td>{{ $value->after }}</td>
             <td>{{ $value->created_at}}</td>

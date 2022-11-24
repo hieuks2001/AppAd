@@ -86,6 +86,7 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::post('management/user/{id}/change_password', 'DashboardController@changePassword');
   Route::post('management/user/{id}/change_wallet', 'DashboardController@addMoneyForUser');
   Route::get('management/user/{id}/transaction', 'DashboardController@showUserTransactions');
+  Route::get('management/user/transactions', 'DashboardController@showUsersTransactions');
 
   // Manager Page
   Route::get('management/pages', 'DashboardController@getPageTypes');

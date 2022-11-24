@@ -123,7 +123,7 @@ class DashboardController extends Controller
 
         $log = new LogTrafficTransaction();
         $log->user_id = $page->user_id;
-        $log->amount  = $page->price * -1;
+        $log->amount  = $page->price;
         $log->type = TransactionTypeConstants::PAY;
         $log->status = TransactionStatusConstants::APPROVED;
 
@@ -618,5 +618,54 @@ class DashboardController extends Controller
       ->simplePaginate(15);
 
     return view('admin.userTransactions', compact(['transactions', 'user']));
+  }
+
+  public function showUsersTransactions(Request $request){
+    $type = $request->query('type') === 'traffic' ? 'traffic' : 'mission';
+    $logTable = $request->query('type') === 'traffic' ? 'log_traffic_transactions' : 'log_mission_transactions';
+    $userTable = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+
+    $username = $request->has('username') ? $request->query('username') : "";
+    $fromDay = $request->has('from') ? $request->query('from') : "";
+    $toDay = $request->has('to') ? $request->query('to') : "";
+    $sort = $request->has('sort') ? "asc" : "desc";
+
+    $data = DB::table($logTable) //->where([$logTable.'.status' => TransactionStatusConstants::APPROVED])
+    ->join($userTable, $userTable.'.id' , '=', $logTable.'.user_id')
+    ->select(
+      $userTable.'.username',
+      DB::raw(
+        'SUM(
+          CASE WHEN type = "'.TransactionTypeConstants::ADMIN_ADD.'" or type = "'.TransactionTypeConstants::REWARD.'" or type = "'.TransactionTypeConstants::TOPUP.'" or type = "'.TransactionTypeConstants::COMMISSION.'"
+          THEN amount
+          ELSE 0 END
+        ) as total_income'
+      ),
+      DB::raw(
+        'SUM(
+          CASE WHEN type = "'.TransactionTypeConstants::ADMIN_MINUS.'" or type = "'.TransactionTypeConstants::PAY.'" or type = "'.TransactionTypeConstants::WITHDRAW.'"
+          THEN amount
+          ELSE 0 END
+        ) as total_outcome'
+      ),
+      DB::raw(
+        'date_format('.$logTable.'.created_at, "%d-%m-%Y") as created_at'
+      )
+    )
+    ->where([$logTable.'.status' => TransactionStatusConstants::APPROVED]);
+
+    if (!empty($username)){
+      $data = $data->where('username', 'like', "{$username}");
+    }
+    if (!empty($fromDay) and !empty($toDay)){
+      $fromDay = Carbon::createFromFormat("Y-m-d", $fromDay);
+      $toDay = Carbon::createFromFormat("Y-m-d", $toDay)->addDay();
+      $data = $data->whereBetween($logTable.".created_at", [$fromDay, $toDay]);
+    }
+    $data = $data->groupBy([DB::raw('DAY('.$logTable.'.created_at)'), 'username'])
+      ->orderBy('created_at', $sort)
+      ->simplePaginate(20);
+
+    return view('admin.userHistories', compact(['data', 'username', 'fromDay', 'toDay', 'type', 'sort']));
   }
 }
