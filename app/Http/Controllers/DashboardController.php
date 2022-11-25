@@ -569,7 +569,8 @@ class DashboardController extends Controller
     }
   }
 
-  public function addMoneyForUser(Request $request, $id){
+  public function addMoneyForUser(Request $request, $id)
+  {
     $request->validate([
       'amount' => 'required|numeric|not_in:0',
     ], [
@@ -591,7 +592,7 @@ class DashboardController extends Controller
       $logData['after'] = $userData->wallet;
       $logData['status'] = TransactionStatusConstants::APPROVED;
       // Add log
-      if ($request->query('type') === 'traffic'){
+      if ($request->query('type') === 'traffic') {
         $log = new LogTrafficTransaction($logData);
         $log->save();
       } else {
@@ -603,24 +604,26 @@ class DashboardController extends Controller
     return Redirect::back()->with(['message' => 'Lỗi']);
   }
 
-  public function showUserTransactions(Request $request, $id){
+  public function showUserTransactions(Request $request, $id)
+  {
     $logTable = $request->query('type') === 'traffic' ? 'log_traffic_transactions' : 'log_mission_transactions';
     $userTable = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
 
     $user = DB::table($userTable)->where('id', $id)->first();
-    if (!$user){
+    if (!$user) {
       return view('admin.userTransactions')->withErrors("User không tồn tại");
     }
 
-    $transactions = DB::table($logTable)->where(['user_id' => $id, $logTable.'.status' => TransactionStatusConstants::APPROVED])
-      ->join($userTable, $userTable.'.id' , '=', $logTable.'.user_id')
-      ->select($logTable.'.amount', $logTable.'.before', $logTable.'.after', $logTable.'.created_at', $logTable.'.type', $logTable.'.status', $userTable.'.username')
+    $transactions = DB::table($logTable)->where(['user_id' => $id, $logTable . '.status' => TransactionStatusConstants::APPROVED])
+      ->join($userTable, $userTable . '.id', '=', $logTable . '.user_id')
+      ->select($logTable . '.amount', $logTable . '.before', $logTable . '.after', $logTable . '.created_at', $logTable . '.type', $logTable . '.status', $userTable . '.username')
       ->simplePaginate(15);
 
     return view('admin.userTransactions', compact(['transactions', 'user']));
   }
 
-  public function showUsersTransactions(Request $request){
+  public function showUsersTransactions(Request $request)
+  {
     $type = $request->query('type') === 'traffic' ? 'traffic' : 'mission';
     $logTable = $request->query('type') === 'traffic' ? 'log_traffic_transactions' : 'log_mission_transactions';
     $userTable = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
@@ -628,42 +631,45 @@ class DashboardController extends Controller
     $username = $request->has('username') ? $request->query('username') : "";
     $fromDay = $request->has('from') ? $request->query('from') : "";
     $toDay = $request->has('to') ? $request->query('to') : "";
-    $sort = $request->has('sort') ? "asc" : "desc";
+    $sort = $request->query('sortIn') ?: $request->query('sortOut') ?: 'desc';
+    $typeSort = 'created_at';
+    if ($request->query('sortIn')) $typeSort = 'total_income';
+    else if ($request->query('sortOut')) $typeSort = 'total_outcome';
 
     $data = DB::table($logTable) //->where([$logTable.'.status' => TransactionStatusConstants::APPROVED])
-    ->join($userTable, $userTable.'.id' , '=', $logTable.'.user_id')
-    ->select(
-      $userTable.'.username',
-      DB::raw(
-        'SUM(
-          CASE WHEN type = "'.TransactionTypeConstants::ADMIN_ADD.'" or type = "'.TransactionTypeConstants::REWARD.'" or type = "'.TransactionTypeConstants::TOPUP.'" or type = "'.TransactionTypeConstants::COMMISSION.'"
+      ->join($userTable, $userTable . '.id', '=', $logTable . '.user_id')
+      ->select(
+        $userTable . '.username',
+        DB::raw(
+          'SUM(
+          CASE WHEN type = "' . TransactionTypeConstants::ADMIN_ADD . '" or type = "' . TransactionTypeConstants::REWARD . '" or type = "' . TransactionTypeConstants::TOPUP . '" or type = "' . TransactionTypeConstants::COMMISSION . '"
           THEN amount
           ELSE 0 END
         ) as total_income'
-      ),
-      DB::raw(
-        'SUM(
-          CASE WHEN type = "'.TransactionTypeConstants::ADMIN_MINUS.'" or type = "'.TransactionTypeConstants::PAY.'" or type = "'.TransactionTypeConstants::WITHDRAW.'"
+        ),
+        DB::raw(
+          'SUM(
+          CASE WHEN type = "' . TransactionTypeConstants::ADMIN_MINUS . '" or type = "' . TransactionTypeConstants::PAY . '" or type = "' . TransactionTypeConstants::WITHDRAW . '"
           THEN amount
           ELSE 0 END
         ) as total_outcome'
-      ),
-      DB::raw(
-        'date_format('.$logTable.'.created_at, "%d-%m-%Y") as created_at'
+        ),
+        DB::raw(
+          'date_format(' . $logTable . '.created_at, "%d-%m-%Y") as created_at'
+        )
       )
-    )
-    ->where([$logTable.'.status' => TransactionStatusConstants::APPROVED]);
+      ->where([$logTable . '.status' => TransactionStatusConstants::APPROVED]);
 
-    if (!empty($username)){
+    if (!empty($username)) {
       $data = $data->where('username', 'like', "{$username}");
     }
-    if (!empty($fromDay) and !empty($toDay)){
+    if (!empty($fromDay) and !empty($toDay)) {
       $fromDay = Carbon::createFromFormat("Y-m-d", $fromDay);
       $toDay = Carbon::createFromFormat("Y-m-d", $toDay)->addDay();
-      $data = $data->whereBetween($logTable.".created_at", [$fromDay, $toDay]);
+      $data = $data->whereBetween($logTable . ".created_at", [$fromDay, $toDay]);
     }
-    $data = $data->groupBy([DB::raw('DAY('.$logTable.'.created_at)'), 'username'])
-      ->orderBy('created_at', $sort)
+    $data = $data->groupBy([DB::raw('DAY(' . $logTable . '.created_at)'), 'username'])
+      ->orderBy($typeSort, $sort)
       ->simplePaginate(20);
 
     return view('admin.userHistories', compact(['data', 'username', 'fromDay', 'toDay', 'type', 'sort']));
