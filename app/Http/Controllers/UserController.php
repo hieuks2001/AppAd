@@ -412,12 +412,6 @@ class UserController extends Controller
             }
           }
         }
-        $u->update([
-          'wallet' => $u->wallet + $reward,
-          // 'mission_count' => $u->mission_count + 1,
-          'mission_count' => $uMsCount,
-          'mission_attempts' => 0
-        ]);
         // Create log
         $log = new LogTransaction([
           'amount' => $reward,
@@ -425,7 +419,16 @@ class UserController extends Controller
           'type' => TransactionTypeConstants::REWARD,
           'status' => 1, // auto Accept
         ]);
+        $log->before = $u->wallet;
+        $log->after = $u->wallet + $reward;
         $log->save();
+
+        $u->update([
+          'wallet' => $u->wallet + $reward,
+          // 'mission_count' => $u->mission_count + 1,
+          'mission_count' => $uMsCount,
+          'mission_attempts' => 0
+        ]);
       });
       return Redirect::to('/tu-khoa');
     } else {

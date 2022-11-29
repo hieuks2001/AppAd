@@ -169,6 +169,10 @@ class MissionController extends Controller
     $pageType = $this->UpdateUserType();
     $excludePriority = [];
     $user = Auth::user();
+    $uType = $user->userType;
+    $uMissionNeed = $uType->mission_need;
+    $originalPageWeight = $uType->page_weight;
+    $types = PageType::orderBy('name', 'asc')->pluck('id')->toArray();
 
     if ($this->IsBlockedUser($user)) {
       return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
@@ -213,6 +217,20 @@ class MissionController extends Controller
       }
       if ($pages->isEmpty()) { // If there is no pages available
         // return view('mission.mission', [])->withErrors('Không còn nhiệm vụ, vui lòng quay lại sau!');
+        $pageWithTypeCount = Page::where(
+          [
+            'page_type_id' => $pageTypeId,
+            'status' => PageStatusConstants::APPROVED,
+          ]
+        )->where('traffic_remain', '>', 0)->count(); // Count pages available with current pageTypeId
+        if ($pageWithTypeCount < $uMissionNeed[$pageTypeId]){
+          unset($pageType[$pageTypeId]); // remove this page type id
+          // If page count <= mission need for this page type id => move to next page type
+          next($types); // Page loai 1 pick by default (orderBy name asc) => Move to next page type
+          $pageType[current($types)] = $originalPageWeight[current($types)];
+          $excludePriority = array();
+          continue;
+        }
         unset($pageType[$pageTypeId]); // remove this page type id
         continue;
       }

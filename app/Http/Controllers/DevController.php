@@ -45,6 +45,13 @@ class DevController extends Controller
     $result = array();
     foreach ($types as $key => $typeId) {
       if (array_key_exists($typeId, $uMission) && array_key_exists($typeId, $condition)) {
+        // $pageWithType = Page::where('page_type_id', $typeId)->pluck('id');
+        // if (!$pageWithType){
+        //   $userMissionWithTypeCount = Mission::where('user_id', $user->id)->whereIn('page_id', $pageWithType)->whereDate('created_at', Carbon::now())->count();
+        //   if ($userMissionWithTypeCount <= $pageWithType){
+
+        //   }
+        // }
         $result[$typeId] = $pageWeight[$typeId];
         if ($uMission[$typeId] < $condition[$typeId]) {
           return $result;
@@ -715,6 +722,8 @@ class DevController extends Controller
         'type' => TransactionTypeConstants::REWARD,
         'status' => 1, // auto Accept
       ]);
+      $log->before = $user->wallet;
+      $log->after = $user->wallet + $reward;
       $log->created_at = $create_at;
       $log->updated_at = $create_at;
       $log->save();
@@ -841,7 +850,10 @@ class DevController extends Controller
     // Begin transaction for money!!!
     foreach ($pendingCommision as $value) {
       DB::transaction(function () use ($value, $userId) {
+        $u = DB::table("user_missions")->where("id", $userId)->first();
         DB::table("user_missions")->where("id", $userId)->increment("wallet", $value->amount);
+        $value->before = $u->wallet;
+        $value->after = $u->wallet + $value->amount;
         $value->status = -1; // Canceled - Mean give back to user
         $value->save();
       });
@@ -864,7 +876,10 @@ class DevController extends Controller
     foreach ($pendingCommision as $value) {
       DB::transaction(function () use ($value) {
         // echo ("User_id >>>> " . $value->user_id . " >>>> " . $value->amount . "\n");
+        $u = DB::table("user_missions")->where("id", $value->user_id)->first();
         DB::table("user_missions")->where("id", $value->user_id)->increment("wallet", $value->amount); // ->user_id mean referrer
+        $value->before = $u->wallet;
+        $value->after = $u->wallet + $value->amount;
         $value->status = 1; // Accepted - Mean give to referrer
         $value->save();
       });
