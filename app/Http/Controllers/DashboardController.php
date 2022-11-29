@@ -617,6 +617,7 @@ class DashboardController extends Controller
     $transactions = DB::table($logTable)->where(['user_id' => $id, $logTable . '.status' => TransactionStatusConstants::APPROVED])
       ->join($userTable, $userTable . '.id', '=', $logTable . '.user_id')
       ->select($logTable . '.amount', $logTable . '.before', $logTable . '.after', $logTable . '.created_at', $logTable . '.type', $logTable . '.status', $userTable . '.username')
+      ->orderBy('created_at', 'desc')
       ->simplePaginate(15);
 
     return view('admin.userTransactions', compact(['transactions', 'user']));
@@ -637,6 +638,7 @@ class DashboardController extends Controller
     else if ($request->query('sortOut')) $typeSort = 'total_outcome';
 
     $data = DB::table($logTable) //->where([$logTable.'.status' => TransactionStatusConstants::APPROVED])
+      ->where($logTable.'.status', TransactionStatusConstants::APPROVED)
       ->join($userTable, $userTable . '.id', '=', $logTable . '.user_id')
       ->select(
         $userTable . '.username',
@@ -664,8 +666,8 @@ class DashboardController extends Controller
       $data = $data->where('username', 'like', "{$username}");
     }
     if (!empty($fromDay) and !empty($toDay)) {
-      $fromDay = Carbon::createFromFormat("Y-m-d", $fromDay);
-      $toDay = Carbon::createFromFormat("Y-m-d", $toDay)->addDay();
+      $fromDay = Carbon::createFromFormat("Y-m-d", $fromDay)->startOfDay();
+      $toDay = Carbon::createFromFormat("Y-m-d", $toDay)->addDay()->startOfDay();
       $data = $data->whereBetween($logTable . ".created_at", [$fromDay, $toDay]);
     }
     $data = $data->groupBy([DB::raw('DAY(' . $logTable . '.created_at)'), 'username'])
