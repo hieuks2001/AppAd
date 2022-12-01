@@ -223,6 +223,16 @@ class MissionController extends Controller
             'status' => PageStatusConstants::APPROVED,
           ]
         )->where('traffic_remain', '>', 0)->count(); // Count pages available with current pageTypeId
+        if (!array_key_exists($pageTypeId, $uMissionNeed) && array_key_exists($pageTypeId, $pageType)){
+          // Travelled from all page types => only have 1 page type as last.
+          if ($pageWithTypeCount <= 0){
+            unset($pageType[$pageTypeId]); // remove this page type id
+            continue;
+          }
+          $pageType = array();
+          $pageType[$pageTypeId] = $originalPageWeight[$pageTypeId];
+          continue;
+        }
         if ($pageWithTypeCount < $uMissionNeed[$pageTypeId]){
           unset($pageType[$pageTypeId]); // remove this page type id
           // If page count <= mission need for this page type id => move to next page type
