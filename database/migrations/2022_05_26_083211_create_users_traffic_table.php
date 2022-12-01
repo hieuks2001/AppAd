@@ -18,7 +18,7 @@ class CreateUsersTrafficTable extends Migration
       $table->string('username');
       $table->string('password');
       $table->string('phone_number')->nullable();
-      $table->decimal('wallet', 20, 5)->nullable();
+      $table->integer('wallet')->nullable();
       // $table->bigInteger('commission')->nullable();
       $table->tinyInteger('status')->default(1);
       // $table->integer('mission_count')->default(0);

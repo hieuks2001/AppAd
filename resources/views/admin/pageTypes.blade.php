@@ -43,7 +43,7 @@
         <td>
           <ul>
             @foreach ($value->onsite as $onsite_key => $onsite_value)
-            <li>{{$onsite_key. "s - " . $onsite_value . "$/traffic"}}</li>
+            <li>{{$onsite_key. "s - " . $onsite_value . "đ/traffic"}}</li>
             @endforeach
           </ul>
         </td>

@@ -632,13 +632,14 @@ class DashboardController extends Controller
     $username = $request->has('username') ? $request->query('username') : "";
     $fromDay = $request->has('from') ? $request->query('from') : "";
     $toDay = $request->has('to') ? $request->query('to') : "";
-    $sort = $request->query('sortIn') ?: $request->query('sortOut') ?: 'desc';
+    // $sort = $request->query('sortIn') ?: $request->query('sortOut') ?: 'desc';
+    $sort = $request->query('sort') ?: 'desc';
     $typeSort = 'created_at';
-    if ($request->query('sortIn')) $typeSort = 'total_income';
-    else if ($request->query('sortOut')) $typeSort = 'total_outcome';
+    // if ($request->query('sortIn')) $typeSort = 'total_income';
+    // else if ($request->query('sortOut')) $typeSort = 'total_outcome';
 
     $data = DB::table($logTable) //->where([$logTable.'.status' => TransactionStatusConstants::APPROVED])
-      ->where($logTable.'.status', TransactionStatusConstants::APPROVED)
+      ->where($logTable . '.status', TransactionStatusConstants::APPROVED)
       ->join($userTable, $userTable . '.id', '=', $logTable . '.user_id')
       ->select(
         $userTable . '.username',

@@ -445,8 +445,8 @@ class UserController extends Controller
       'user_id' => $user->id,
       'status' => TransactionStatusConstants::PENDING,
     ])
-    ->whereIn('type', [TransactionTypeConstants::TOPUP, TransactionTypeConstants::WITHDRAW])
-    ->get();
+      ->whereIn('type', [TransactionTypeConstants::TOPUP, TransactionTypeConstants::WITHDRAW])
+      ->get();
     if (count($old_log) > 0) {
       return view("usdt.deposit")->withErrors("Bạn đang có yêu cầu nạp chưa được duyệt, vui lòng đợi và thử lại sau!");
     }
@@ -473,7 +473,7 @@ class UserController extends Controller
       . "ID người yêu cầu: $user->id\n"
       . "SDT người yêu cầu: $user->phone_number\n"
       . "Loại: <strong>Nạp tiền</strong>\n"
-      . "Số tiền yêu cầu: <strong>$log->amount</strong> USDT \n";
+      . "Số tiền yêu cầu: <strong>$log->amount</strong> VND \n";
 
     Telegram::sendMessage([
       'chat_id' => env('TELEGRAM_ADMIN_DEPOSIT'),
@@ -495,11 +495,11 @@ class UserController extends Controller
   {
     $user = Auth::user();
     $request->validate([
-      'amount' => 'required|numeric|min:1',
+      'amount' => 'required|numeric|min:23000',
     ], [
       'amount.required' => "Vui lòng nhập số tiền",
       'amount.numeric' => "Số tiền chỉ bao gồm các số",
-      'amount.min' => "Số tiền rút phải lớn hơn 1 USDT",
+      'amount.min' => "Số tiền rút phải lớn hơn 23000 VND",
     ]);
     $amount = $request->amount;
     $wallet = $user->wallet;
@@ -512,8 +512,8 @@ class UserController extends Controller
       'user_id' => $user->id,
       'status' => TransactionStatusConstants::PENDING,
     ])
-    ->whereIn('type', [TransactionTypeConstants::TOPUP, TransactionTypeConstants::WITHDRAW])
-    ->get();
+      ->whereIn('type', [TransactionTypeConstants::TOPUP, TransactionTypeConstants::WITHDRAW])
+      ->get();
     if (count($old_log) > 0) {
       return view("usdt.withdraw")->withErrors("Bạn đang có yêu cầu rút chưa được duyệt, vui lòng đợi và thử lại sau!");
     }
@@ -543,7 +543,7 @@ class UserController extends Controller
       . "ID người yêu cầu: $user->id\n"
       . "SDT người yêu cầu: $user->phone_number\n"
       . "Loại: <strong>Rút tiền</strong>\n"
-      . "Số tiền yêu cầu: <strong>$log->amount</strong> USDT \n";
+      . "Số tiền yêu cầu: <strong>$log->amount</strong> VND \n";
 
     Telegram::sendMessage([
       'chat_id' => env('TELEGRAM_ADMIN'),

@@ -19,7 +19,7 @@ class HandleUpdateTelegram extends Command
       'token' => env('MOMO_TOKEN'),
       'id_momo' => env('MOMO_ID'),
       'phone' => $data->phone,
-      'money' => $data->money * 23000,
+      'money' => $data->money,
       'comment' => $data->comment,
     ]);
     if ($response["status"]) {
@@ -104,7 +104,7 @@ class HandleUpdateTelegram extends Command
             $targetUser->increment("wallet", $mRequest->amount);
           } else if ($mRequest->type == TransactionTypeConstants::WITHDRAW) {
             if (($targetUser)->first()->wallet < $mRequest->amount) {
-              echo "Người dùng không đủ USDT cho yêu cầu này! id " . $data->id_request . " từ " . $data->from;
+              echo "Người dùng không đủ VND cho yêu cầu này! id " . $data->id_request . " từ " . $data->from;
               continue;
             }
             // momo

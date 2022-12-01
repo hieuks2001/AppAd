@@ -7,12 +7,8 @@ function customQueryStringForSort(String $sortType,$sortNew)
 if (isset($_SERVER['QUERY_STRING'])) {
 $temp = [];
 parse_str($_SERVER['QUERY_STRING'],$temp);
-if ($sortType == 'sortIn') {
-$temp['sortIn'] = $sortNew;
-unset($temp['sortOut']);
-}else{
-unset($temp['sortIn']);
-$temp['sortOut'] = $sortNew;
+if ($sortType == 'sort') {
+$temp['sort'] = $sortNew;
 }
 return http_build_query($temp);
 } else {
@@ -64,16 +60,24 @@ return "$sortType=$sortNew";
       <tr>
         <th>Username</th>
         <th>
+          <span>Mức chi</span>
+        </th>
+        <th>
+          <span>Mức thu</span>
+        </th>
+        <th>
           <div class="flex items-center">
-            <span>Mức chi</span>
+            <span>
+              Ngày thực hiện
+            </span>
             <span class="ml-2 flex-col inline-flex">
-              <a href="{{url('management/user/transactions')}}?{{customQueryStringForSort('sortOut','desc')}}"><svg
+              <a href="{{url('management/user/transactions')}}?{{customQueryStringForSort('sort','desc')}}"><svg
                   xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" class="w-6 h-6">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
                 </svg>
               </a>
-              <a href="{{url('management/user/transactions')}}?{{customQueryStringForSort('sortOut','asc')}}"><svg
+              <a href="{{url('management/user/transactions')}}?{{customQueryStringForSort('sort','asc')}}"><svg
                   xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                   stroke="currentColor" class="w-6 h-6">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -82,29 +86,6 @@ return "$sortType=$sortNew";
             </span>
           </div>
         </th>
-        <th>
-          <div class="flex items-center">
-            <span>Mức thu</span>
-            <span>
-              <div class="ml-2 flex-col inline-flex">
-                <a href="{{url('management/user/transactions')}}?{{customQueryStringForSort('sortIn','desc')}}"><svg
-                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-                  </svg>
-                </a>
-                <a href="{{url('management/user/transactions')}}?{{customQueryStringForSort('sortIn','asc')}}"><svg
-                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                  </svg>
-                </a>
-
-              </div>
-            </span>
-          </div>
-        </th>
-        <th>Ngày thực hiện</th>
       </tr>
     <tbody>
       @foreach ($data as $key => $value)

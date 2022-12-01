@@ -35,7 +35,7 @@ mix
       deadCodeInjectionThreshold: 0.7,
       debugProtection: false,
       debugProtectionInterval: 0,
-      disableConsoleOutput: true,
+      disableConsoleOutput: false,
       domainLock: [],
       domainLockRedirectUrl: "about:blank",
       forceTransformStrings: [],

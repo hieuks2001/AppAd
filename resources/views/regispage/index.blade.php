@@ -1,71 +1,47 @@
 @extends('main')
 @section('regispage')
-  @include('box.patternBox2')
-  <br />
-  <div
-    class="container mx-auto md:w-2/5"
-    style="margin-top:5%"
-  >
+@include('box.patternBox2')
+<br />
+<div class="container mx-auto md:w-2/5" style="margin-top:5%">
 
-    @if ($errors->all())
-      @foreach ($errors->all() as $err)
-        <div class="alert alert-error mb-5 shadow-lg">
-          <div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 flex-shrink-0 stroke-current"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>
-              {{ $err }}
-            </span>
-          </div>
-        </div>
-      @endforeach
-    @endif
-    @if (session()->has('message'))
-      <div class="alert alert-success mb-5 shadow-lg">
-        <div>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6 flex-shrink-0 stroke-current"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>
-            @php
-              echo Session::get('message');
-            @endphp
-          </span>
-        </div>
-      </div>
-    @endif
-    @if (session()->has('pageId'))
-      <input
-        type="checkbox"
-        id="my-modal"
-        class="modal-toggle"
-        checked
-      />
-      <div class="modal">
-        <div class="modal-box">
-          <div class="rounded-md bg-slate-200 p-3">
-            <code>
+  @if ($errors->all())
+  @foreach ($errors->all() as $err)
+  <div class="alert alert-error mb-5 shadow-lg">
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0 stroke-current" fill="none"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>
+        {{ $err }}
+      </span>
+    </div>
+  </div>
+  @endforeach
+  @endif
+  @if (session()->has('message'))
+  <div class="alert alert-success mb-5 shadow-lg">
+    <div>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0 stroke-current" fill="none"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>
+        @php
+        echo Session::get('message');
+        @endphp
+      </span>
+    </div>
+  </div>
+  @endif
+  @if (session()->has('pageId'))
+  <input type="checkbox" id="my-modal" class="modal-toggle" checked />
+  <div class="modal">
+    <div class="modal-box">
+      <div class="rounded-md bg-slate-200 p-3">
+        <code>
               &#x3C;div style=&#x22;width: 100%; display: flex; justify-content: center&#x22;&#x3E;
                 &#x3C;button
                   id=&#x22;getCode&#x22;
@@ -92,172 +68,111 @@
               &#x3C;/script&#x3E;
               &#x3C;script src=&#x22;{{ asset('js/ican.js') }}&#x22;&#x3E;&#x3C;/script&#x3E;
             </code>
-          </div>
-          <p>
-            + Copy toàn bộ code này và gắn vào Footer của website
-          </p>
-          <p>
-            + Cần tắt các plugin cache để tối ưu với thời gian thực
-          </p>
-          <p class="text-primary mt-3 text-xl font-bold">Những lưu ý khi dùng
-            traffic user:</p>
-          <small>
-            + Nên đẩy traffic user khi từ khoá đã vào được ít nhất từ trang 1-5 để
-            thành viên có thể tìm thấy và click vào web.
-            <br>
-            + Nên đẩy traffic user ít nhất từ 20-30 ngày để có hiệu quả tốt nhất.
-            <br>
-            + Khi đẩy key chính nên đẩy kèm với key brand để tăng tính tự nhiên
-            cho
-            website (Đẩy key brand tốt cho key chính).
-            <br>
-            + Traffic user là chất xúc tác giúp từ khóa lên TOP nhanh hơn, tuy
-            nhiên
-            website cần phải tối ưu onpage và backlink thật tốt trước khi đẩy
-            traffic.
-            <br>
-            + Quý khách nên chủ động theo dõi dữ liệu từ Google analytics và
-            Google
-            search console để đối chiếu với dữ liệu thống kê của chúng tôi.
-            <br>
-            + Chúng tôi cam kết 100% traffic user người dùng là thật, không tool,
-            không fake IP, quý khách có thể tự mình làm nhiệm vụ để kiểm chứng.
-          </small>
-          <div class="modal-action">
-            <label
-              for="my-modal"
-              class="btn btn-block"
-              id="btn-copy-script"
-            >Sao chép và Hoàn thành</label>
-          </div>
-        </div>
       </div>
-      <script>
-      document.getElementById("btn-copy-script").addEventListener("click",()=>{
-        navigator.clipboard.writeText(document.getElementsByTagName("code")[0].textContent)
-      })
-      </script>
-    @endif
-    <form
-      action="/add-page"
-      method="post"
-      enctype="multipart/form-data"
-    >
-      @csrf
-      <div class="rounded-2xl p-5 text-center shadow-2xl">
-        <input
-          type="text"
-          name="url"
-          placeholder="Nhập url đích muốn chạy traffic"
-          class="input input-bordered mb-5 w-full"
-          required
-        >
-        <input
-          type="text"
-          name="keyword"
-          placeholder="Nhập từ khóa"
-          class="input input-bordered mb-5 w-full"
-          required
-        >
-        <input
-          type="text"
-          name="traffic_per_day"
-          placeholder="Nhập lượng Traffic mỗi ngày"
-          class="input input-bordered mb-5 w-full"
-          required
-        >
-        <input
-          type="text"
-          name="traffic_sum"
-          id="traffic_sum"
-          placeholder="Nhập tổng Traffic"
-          class="input input-bordered mb-5 w-full"
-          required
-        >
-        <select
-          name="page_type"
-          id="site_types"
-          class="select select-bordered mb-5 w-full"
-        >
-          <option
-            selected
-            disabled
-          > Vui lòng chọn loại site </option>
-          @foreach ($onsite as $key => $value)
-            <option value="{{ $value->id }}">{{ $value->name }}</option>
-          @endforeach
-        </select>
-        <select
-          name="onsite"
-          id="site_type__onsite"
-          class="select select-bordered mb-5 w-full"
-        >
-          <option
-            value=""
-            selected
-            disabled
-          > Vui lòng chọn gói Onsite </option>
-          {{-- @foreach ($onsite as $key1 => $value1)
-                  @foreach ($value1->onsite as $key => $value)
-                      <option value="{{ $key }}">{{ $value1->name }} Time onsite > {{ $key }}
-                      </option>
-                  @endforeach
-              @endforeach --}}
-        </select>
-        <p
-          id="price"
-          class="input input-bordered text-start w-full p-2 read-only:bg-slate-200"
-        >Tổng USDT phải
-          trả</p>
-        </label>
-        <div class="avatar mb-5">
-          <div class="max-w-xs rounded">
-            <img
-              id="output"
-              class="object-contain"
-            />
-          </div>
-        </div>
-        <button class="btn btn-block">Submit</button>
+      <p>
+        + Copy toàn bộ code này và gắn vào Footer của website
+      </p>
+      <p>
+        + Cần tắt các plugin cache để tối ưu với thời gian thực
+      </p>
+      <p class="text-primary mt-3 text-xl font-bold">Những lưu ý khi dùng
+        traffic user:</p>
+      <small>
+        + Nên đẩy traffic user khi từ khoá đã vào được ít nhất từ trang 1-5 để
+        thành viên có thể tìm thấy và click vào web.
+        <br>
+        + Nên đẩy traffic user ít nhất từ 20-30 ngày để có hiệu quả tốt nhất.
+        <br>
+        + Khi đẩy key chính nên đẩy kèm với key brand để tăng tính tự nhiên
+        cho
+        website (Đẩy key brand tốt cho key chính).
+        <br>
+        + Traffic user là chất xúc tác giúp từ khóa lên TOP nhanh hơn, tuy
+        nhiên
+        website cần phải tối ưu onpage và backlink thật tốt trước khi đẩy
+        traffic.
+        <br>
+        + Quý khách nên chủ động theo dõi dữ liệu từ Google analytics và
+        Google
+        search console để đối chiếu với dữ liệu thống kê của chúng tôi.
+        <br>
+        + Chúng tôi cam kết 100% traffic user người dùng là thật, không tool,
+        không fake IP, quý khách có thể tự mình làm nhiệm vụ để kiểm chứng.
+      </small>
+      <div class="modal-action">
+        <label for="my-modal" class="btn btn-block" id="btn-copy-script">Sao chép và Hoàn thành</label>
       </div>
-    </form>
-  </div>
-  <div class="mt-10 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
-    <div class="flex items-center justify-between">
-      <h3 class="text-2xl font-bold text-slate-800">Lịch sử traffic</h3>
-      <form action="{{action('PageController@regispageTab3Search')}}" method="post">
-        @csrf
-        <input
-          id="search" 
-          hidden
-          type="text"
-          name="data"
-          placeholder="Tìm kiếm url, sđt"
-          class="input w-full max-w-xs"
-        />
-        <input type="submit" hidden>
-      </form>
     </div>
-    @php
-      $tabs = ['Đang chờ', 'Đang chạy', "Người làm nhiệm vụ", 'Hoàn thành', 'Lỗi'];
-    @endphp
-    <div class="tabs tabs-boxed my-3 bg-transparent">
-      @foreach ($tabs as $index => $tab)
-        <a
-          class="tab text-lg"
-          href="/regispage/tab-{{ (int) $index + 1 }}"
-        >{{ $tab }}</a>
-      @endforeach
-    </div>
-    <br />
-    @yield('tab1-blade')
-    @yield('tab2-blade')
-    @yield('tab3-blade')
-    @yield('tab4-blade')
-    @yield('tab5-blade')
   </div>
   <script>
-    const siteTypes = Object.entries({!! json_encode($onsite->toArray(), JSON_HEX_TAG) !!}).map(([key, value]) =>value)
+    document.getElementById("btn-copy-script").addEventListener("click",()=>{
+        navigator.clipboard.writeText(document.getElementsByTagName("code")[0].textContent)
+      })
+  </script>
+  @endif
+  <form action="/add-page" method="post" enctype="multipart/form-data">
+    @csrf
+    <div class="rounded-2xl p-5 text-center shadow-2xl">
+      <input type="text" name="url" placeholder="Nhập url đích muốn chạy traffic"
+        class="input input-bordered mb-5 w-full" required>
+      <input type="text" name="keyword" placeholder="Nhập từ khóa" class="input input-bordered mb-5 w-full" required>
+      <input type="text" name="traffic_per_day" placeholder="Nhập lượng Traffic mỗi ngày"
+        class="input input-bordered mb-5 w-full" required>
+      <input type="text" name="traffic_sum" id="traffic_sum" placeholder="Nhập tổng Traffic"
+        class="input input-bordered mb-5 w-full" required>
+      <select name="page_type" id="site_types" class="select select-bordered mb-5 w-full">
+        <option selected disabled> Vui lòng chọn loại site </option>
+        @foreach ($onsite as $key => $value)
+        <option value="{{ $value->id }}">{{ $value->name }}</option>
+        @endforeach
+      </select>
+      <select name="onsite" id="site_type__onsite" class="select select-bordered mb-5 w-full">
+        <option value="" selected disabled> Vui lòng chọn gói Onsite </option>
+        {{-- @foreach ($onsite as $key1 => $value1)
+        @foreach ($value1->onsite as $key => $value)
+        <option value="{{ $key }}">{{ $value1->name }} Time onsite > {{ $key }}
+        </option>
+        @endforeach
+        @endforeach --}}
+      </select>
+      <p id="price" class="input input-bordered text-start w-full p-2 read-only:bg-slate-200">Tổng VND phải
+        trả</p>
+      </label>
+      <div class="avatar mb-5">
+        <div class="max-w-xs rounded">
+          <img id="output" class="object-contain" />
+        </div>
+      </div>
+      <button class="btn btn-block">Submit</button>
+    </div>
+  </form>
+</div>
+<div class="mt-10 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
+  <div class="flex items-center justify-between">
+    <h3 class="text-2xl font-bold text-slate-800">Lịch sử traffic</h3>
+    <form action="{{action('PageController@regispageTab3Search')}}" method="post">
+      @csrf
+      <input id="search" hidden type="text" name="data" placeholder="Tìm kiếm url, sđt" class="input w-full max-w-xs" />
+      <input type="submit" hidden>
+    </form>
+  </div>
+  @php
+  $tabs = ['Đang chờ', 'Đang chạy', "Người làm nhiệm vụ", 'Hoàn thành', 'Lỗi'];
+  @endphp
+  <div class="tabs tabs-boxed my-3 bg-transparent">
+    @foreach ($tabs as $index => $tab)
+    <a class="tab text-lg" href="/regispage/tab-{{ (int) $index + 1 }}">{{ $tab }}</a>
+    @endforeach
+  </div>
+  <br />
+  @yield('tab1-blade')
+  @yield('tab2-blade')
+  @yield('tab3-blade')
+  @yield('tab4-blade')
+  @yield('tab5-blade')
+</div>
+<script>
+  const siteTypes = Object.entries({!! json_encode($onsite->toArray(), JSON_HEX_TAG) !!}).map(([key, value]) =>value)
     var output = document.getElementById('output');
     var fileUpload = document.getElementById('fileUpload');
     fileUpload?.addEventListener('change', (event) => {
@@ -297,7 +212,7 @@
           .lastChild);
       }
       selectSiteTypeOnsiteEle.value = ""
-      priceEle.textContent = "0.00 USDT"
+      priceEle.textContent = "0.00 VND"
       console.log(siteTypes);
       const siteType = siteTypes.find(siteType => siteType.id == e.target.value);
       for (const k in siteType.onsite) {
@@ -320,8 +235,8 @@
       const trafficSum = trafficSumValue;
       const timeOnsite = siteTypes.find(site => site.id == siteType).onsite[
         timeOnsiteValue];
-      priceEle.textContent = `${(timeOnsite * trafficSum).toFixed(2)} USDT`;
+      priceEle.textContent = `${Intl.NumberFormat("vi").format(timeOnsite * trafficSum)} VND`;
     }
     window.scrollTo(0, document.body.scrollHeight);
-  </script>
+</script>
 @endsection
