@@ -15,7 +15,7 @@
       </div>
       <div class="flex-1 px-2 mx-2">
         <div class="twelve wide column center aligned">
-          1USDT = 23,000VND
+          {{-- 1VND = 23,000VND --}}
         </div>
       </div>
       <div class="flex">
@@ -39,7 +39,7 @@
     </div>
     <!-- Page content here -->
     <div class="container px-5 py-5">
-      @include('notification')
+      {{-- @include('notification') --}}
       @yield('dashboard')
       @yield('mission')
       @yield('regispage')

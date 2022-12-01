@@ -54,7 +54,7 @@ class ContentServiceProvider extends ServiceProvider
     view()->composer('box.patternBox1', function ($view) {
       $user = Auth::user();
       $money = [];
-      $money["income"] = DB::table("log_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::REWARD])->sum("amount");
+      $money["income"] = DB::table("log_mission_transactions")->where(["user_id" => $user->id, "type" => TransactionTypeConstants::REWARD])->sum("amount");
       $money["balance"] = $user->wallet;
       $money["commission"] = 0;
       // $money["sum"] = $user->wallet + $money["balance"] + $money["commission"];
