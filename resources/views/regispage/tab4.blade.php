@@ -21,7 +21,7 @@
                 <td class="bg-white">{{$value->onsite}}</td>
                 <td class="bg-white">{{$value->traffic_per_day}}</td>
                 <td class="bg-white">{{$value->traffic_sum}}</td>
-                <td class="bg-white">{{$value->price}}</td>
+                <td class="bg-white">{{number_format($value->price,0)}}</td>
                 @if (!empty($value->note))
                     <td class="bg-white">{{$value->note}}</td>
                 @else

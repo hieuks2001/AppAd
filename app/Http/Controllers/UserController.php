@@ -559,7 +559,7 @@ class UserController extends Controller
     ], [
       'amount.required' => "Vui lòng nhập số tiền",
       'amount.numeric' => "Số tiền chỉ bao gồm các số",
-      'amount.min' => "Số tiền rút tối thiểu là 1 USDT",
+      'amount.min' => "Số tiền rút tối thiểu là 23000 VND",
     ]);
     $amount = $request->amount;
     $wallet = $user->wallet;
@@ -599,7 +599,7 @@ class UserController extends Controller
       . "ID người yêu cầu: $user->id\n"
       . "SDT người yêu cầu: $user->phone_number\n"
       . "Loại: <strong>Rút tiền</strong>\n"
-      . "Số tiền yêu cầu: <strong>$log->amount</strong> USDT \n";
+      . "Số tiền yêu cầu: <strong>$log->amount</strong> VND \n";
 
     Telegram::sendMessage([
       'chat_id' => env('TELEGRAM_ADMIN'),
