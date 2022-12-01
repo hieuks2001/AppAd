@@ -16,7 +16,7 @@ class CreateLogTrafficTransactionsTable extends Migration
         Schema::create('log_traffic_transactions', function (Blueprint $table) {
             $table->id();
             $table->uuid('user_id');
-            $table->float('amount', 9, 5);
+            $table->integer('amount');
             $table->string('type');
             $table->tinyInteger('status')->default(0);
             $table->timestamps();

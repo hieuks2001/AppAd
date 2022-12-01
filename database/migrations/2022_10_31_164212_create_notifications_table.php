@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLogMissionTransactionsTable extends Migration
+class CreateNotificationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateLogMissionTransactionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('log_mission_transactions', function (Blueprint $table) {
+        Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->uuid('user_id');
-            // $table->float('amount', 9, 5);
-            $table->integer('amount');
-            $table->string('type');
-            $table->tinyInteger('status')->default(0);
+            $table->uuid("user_id");
+            $table->string("content");
+            $table->tinyInteger("is_read")->default(0);
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ class CreateLogMissionTransactionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('log_mission_transactions');
+        Schema::dropIfExists('notifications');
     }
 }

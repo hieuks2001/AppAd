@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddBeforeAfterColumnstToLogMissionTransactionsTable extends Migration
+class AddColumnFromUserIdToLogMissionTransactionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,10 +14,7 @@ class AddBeforeAfterColumnstToLogMissionTransactionsTable extends Migration
     public function up()
     {
         Schema::table('log_mission_transactions', function (Blueprint $table) {
-          // $table->float('before', 9, 5)->after('amount')->nullable();
-          // $table->float('after', 9, 5)->after('before')->nullable();
-          $table->integer('before')->after('amount')->nullable();
-          $table->integer('after')->after('before')->nullable();
+            $table->uuid("from_user_id")->after("user_id")->nullable(true);
         });
     }
 
@@ -29,7 +26,7 @@ class AddBeforeAfterColumnstToLogMissionTransactionsTable extends Migration
     public function down()
     {
         Schema::table('log_mission_transactions', function (Blueprint $table) {
-          $table->dropColumn(['before', 'after']);
+            $table->dropColumn(["from_user_id"]);
         });
     }
 }
