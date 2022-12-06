@@ -46,7 +46,7 @@
       </p>
       <p><b>Bước 6:</b> Copy mã và nhập vào ô ở phía dưới và bấm
         vào nút "<b>Hoàn thành nhiệm
-          vụ</b>" và nhận <b>{{ number_format($mission->reward,0) }}</b> VND</p>
+          vụ</b>" và nhận <b>{{ number_format($mission->reward,5) }}</b> VND</p>
     </div>
   </div>
   <div id="o">
@@ -129,7 +129,7 @@
         @else
         <td></td>
         @endif
-        <td>{{ number_format($mission->reward,0) }}</td>
+        <td>{{ number_format($mission->reward,5) }}</td>
         @switch($mission->status)
         @case (0)
         <td class="bg-white">Đang chờ</td>
