@@ -14,10 +14,10 @@ class AddBeforeAfterColumnstToLogMissionTransactionsTable extends Migration
     public function up()
     {
         Schema::table('log_mission_transactions', function (Blueprint $table) {
-          // $table->float('before', 9, 5)->after('amount')->nullable();
-          // $table->float('after', 9, 5)->after('before')->nullable();
-          $table->integer('before')->after('amount')->nullable();
-          $table->integer('after')->after('before')->nullable();
+          $table->decimal('before', 14, 5)->after('amount')->nullable();
+          $table->decimal('after', 14, 5)->after('before')->nullable();
+          // $table->integer('before')->after('amount')->nullable();
+          // $table->integer('after')->after('before')->nullable();
         });
     }
 

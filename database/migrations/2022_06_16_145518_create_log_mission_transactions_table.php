@@ -17,7 +17,7 @@ class CreateLogMissionTransactionsTable extends Migration
             $table->id();
             $table->uuid('user_id');
             // $table->float('amount', 9, 5);
-            $table->integer('amount');
+            $table->decimal('amount', 14, 5);
             $table->string('type');
             $table->tinyInteger('status')->default(0);
             $table->timestamps();

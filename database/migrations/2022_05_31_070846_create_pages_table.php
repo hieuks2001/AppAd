@@ -23,8 +23,8 @@ class CreatePagesTable extends Migration
             $table->integer('traffic_sum');
             $table->integer('traffic_remain');
             $table->integer('onsite');
-            $table->integer('price_per_traffic');
-            $table->integer('price');
+            $table->decimal('price_per_traffic', 14, 5);
+            $table->decimal('price', 14, 5);
             $table->decimal('hold_percentage')->default(10);
             $table->tinyInteger('status')->default(0);
             $table->tinyInteger('priority')->default(0);
