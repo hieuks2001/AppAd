@@ -6,7 +6,7 @@
             <tr>
                 <th class="bg-slate-200">Trang traffic</th>
                 <th class="bg-slate-200">IP người làm</th>
-                <th class="bg-slate-200">Thưởng</th>
+                <th class="bg-slate-200">Phí</th>
                 <th class="bg-slate-200">Ngày hoàn thành</th>
             </tr>
         </thead>
@@ -15,7 +15,7 @@
             <tr>
                 <td class="bg-white">{{$value->url}}</td>
                 <td class="bg-white">{{$value->ip}}</td>
-                <td class="bg-white">{{number_format(((float)$value->price_per_traffic) * (100 - (float)$value->hold_percentage) / 100, 3)}}</td>
+                <td class="bg-white">{{number_format(((float)$value->price_per_traffic), 3)}}</td>
                 <td class="bg-white">{{$value->updated_at}}</td>
             </tr>
           @endforeach
@@ -26,3 +26,4 @@
       <a class="btn btn-outline btn-sm {{!$missions->hasMorePages() ? 'btn-disabled' : ''}}" href="{{$missions->nextPageUrl()}}">Next</a>
     </div>
 @endsection
+
