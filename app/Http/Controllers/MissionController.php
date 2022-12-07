@@ -287,7 +287,6 @@ class MissionController extends Controller
       $key = $data->key;
       $time = $data->data;
       $path = $data->path;
-
       $result = Code::where([
         ["id", $key],
         ["status", 0],
@@ -297,7 +296,7 @@ class MissionController extends Controller
           ["id", $pageId],
           ["status", PageStatusConstants::APPROVED],
         ])->get(["onsite"])->first();
-        if ($page->onsite !== ($time + 3)) {
+        if ($page->onsite != ($time + 3)) {
           return response()->json(["error" => "Error"]);
         }
         $newCode = new Code();
@@ -315,10 +314,9 @@ class MissionController extends Controller
       if ($result->first()->code) {
         return response()->json(["code" => $result->first()->code]);
       }
-
       if (!in_array(false, (array) json_decode($result->get('keys')->first()->keys))) {
         //already return code
-        if ($path !== "/") { //completed countdown and return code
+        if ($path != "/") { //completed countdown and return code
           $code = Uuid::uuid5(Uuid::uuid6(), $key[5] . $key[10] . $key[25] . $key[28])->toString();
           $result->update(["code" => $code]);
           return response()->json(["code" => $code]);

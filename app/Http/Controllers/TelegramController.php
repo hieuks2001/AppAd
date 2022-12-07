@@ -126,7 +126,6 @@ class TelegramController extends Controller
     $updates = Telegram::getWebhookUpdates();
     if (isset($updates['callback_query'])) {
       $record = json_decode($updates->callback_query);
-      // dd($record);
       $data = json_decode($record->data);
       $old_txt = $record->message->text;
 
