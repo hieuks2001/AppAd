@@ -27,18 +27,18 @@ class UserSeeder extends Seeder
         // 'user_type_id' => $type->id,
         // 'mission_count' => json_encode(array()),
       ],
-      [
-        'id' => Str::uuid(),
-        // 'email' => 'admin@gmail.com',
-        'password' => bcrypt('12341234'),
-        'username' => 'dlha',
-        'status' => 1,
-        'is_admin' => 0,
-        'wallet' => 99999999,
-        'verified' => 1,
-        // 'user_type_id' => $type->id,
-        // 'mission_count' => json_encode(array()),
-      ]
+      // [
+      //   'id' => Str::uuid(),
+      //   // 'email' => 'admin@gmail.com',
+      //   'password' => bcrypt('12341234'),
+      //   'username' => 'dlha',
+      //   'status' => 1,
+      //   'is_admin' => 0,
+      //   'wallet' => 99999999,
+      //   'verified' => 1,
+      //   // 'user_type_id' => $type->id,
+      //   // 'mission_count' => json_encode(array()),
+      // ]
     ];
 
     DB::table('user_traffics')->insert($data);
