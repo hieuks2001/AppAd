@@ -203,8 +203,8 @@ class DashboardController extends Controller
   {
     $page = Page::where('id', $id)->first();
     $user = Auth::user();
-    
-    if ($page->status == PageStatusConstants::PENDING){
+
+    if ($page->status == PageStatusConstants::PENDING) {
       $page->status = PageStatusConstants::CANCEL;
       $page->save();
 
@@ -227,7 +227,6 @@ class DashboardController extends Controller
       if (!empty($page->image)) {
         File::delete(public_path('images') . DIRECTORY_SEPARATOR . $page->image);
       }
-
 
       DB::table('user_traffics')->where('id', $page->user_id)->increment('wallet', $page->price);
 
