@@ -124,6 +124,8 @@ class DashboardController extends Controller
         $log = new LogTrafficTransaction();
         $log->user_id = $page->user_id;
         $log->amount  = $page->price;
+        $log->before = $user->wallet;
+        $log->after = $user->wallet - $page->price;
         $log->type = TransactionTypeConstants::PAY;
         $log->status = TransactionStatusConstants::APPROVED;
 
@@ -201,6 +203,14 @@ class DashboardController extends Controller
   {
     $page = Page::where('id', $id)->first();
     $user = Auth::user();
+    
+    if ($page->status == PageStatusConstants::PENDING){
+      $page->status = PageStatusConstants::CANCEL;
+      $page->save();
+
+      return redirect()->to('/management/traffic');
+    }
+
 
     DB::transaction(function () use ($page, $user) {
       $page->status = PageStatusConstants::CANCEL;
@@ -208,6 +218,8 @@ class DashboardController extends Controller
       $log = new LogTrafficTransaction();
       $log->user_id = $page->user_id;
       $log->amount  = $page->price;
+      $log->before = $user->wallet;
+      $log->after = $user->wallet + $page->price;
       $log->type = TransactionTypeConstants::REFUND;
       $log->status = TransactionStatusConstants::APPROVED;
 
@@ -217,7 +229,7 @@ class DashboardController extends Controller
       }
 
 
-      DB::table('users')->where('id', $page->user_id)->increment('wallet', $page->price);
+      DB::table('user_traffics')->where('id', $page->user_id)->increment('wallet', $page->price);
 
       $page->save();
       $log->save();
