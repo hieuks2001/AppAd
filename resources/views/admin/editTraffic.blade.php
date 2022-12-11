@@ -1,6 +1,7 @@
 <form id="form" enctype="multipart/form-data" method="POST" class="mb-0">
   @csrf
   <p class="font-bold mb-3">URL: <span class="item font-normal url"></span></p>
+  <p class="font-bold mb-3">Từ khoá: <span class="item font-normal keyword"></span></p>
   <p class="font-bold mb-3">Username: <span class="item font-normal user"></span>
   </p>
   <p class="font-bold mb-3">Tổng số lượng traffic: <span id="traffic_sum" class="item font-normal traffic_sum"></span>
