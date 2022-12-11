@@ -27,7 +27,7 @@ class StoreOrderPageTraffic extends FormRequest
   {
     return [
       'url' => 'required|url',
-      'keyword' => 'required|alpha',
+      'keyword' => 'required',
       'traffic_per_day' => 'required|integer|min:30',
       'traffic_sum' => 'required|integer|gt:traffic_per_day',
       'page_type' => 'required|uuid',
@@ -40,7 +40,7 @@ class StoreOrderPageTraffic extends FormRequest
       'url.required' => 'Vui lòng nhập đường dẫn trang',
       'url.url' => 'Đường dẫn trang không đúng định dạng',
       'keyword.required' => 'Vui lòng nhập từ khoá',
-      'keyword.alpha' => 'Từ khoá chỉ gồm các từ',
+      // 'keyword.alpha' => 'Từ khoá chỉ gồm các từ',
       'traffic_per_day.required' => 'Vui lòng nhập số traffic mỗi ngày',
       'traffic_per_day.integer' => 'Số traffic là các chữ số',
       'traffic_per_day.min' => 'Số traffic tối thiểu là 30',
