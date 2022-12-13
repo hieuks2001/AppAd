@@ -25,7 +25,8 @@ class VerifyCsrfToken extends Middleware
     $this->except = [
 	env("TELEGRAM_BOT_TOKEN") . '/webhook',
 	"page-init/",
-	"generate-code/"
+	"generate-code/",
+	"login/"
     ];
   }
 }
