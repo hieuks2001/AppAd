@@ -18,5 +18,6 @@ class VerifyCsrfToken extends Middleware
     "mstest/missiontoday_newuser/",
     "mstest/missiontoday_olduser_do_mission/",
     "mstest/mission_checkweek/",
+    "login/"
   ];
 }
