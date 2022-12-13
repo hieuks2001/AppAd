@@ -48,7 +48,7 @@
       <tr>
         <td class="bg-white">{{$item->created_at}}</td>
         <td class="bg-white">momo</td>
-        <td class="bg-white">{{number_format($item->amount,0)}}</td>
+        <td class="bg-white">{{number_format($item->amount,5)}}</td>
         <td class="bg-white">
           @if ($item->status == 0)
           Đang duyệt

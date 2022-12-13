@@ -20,7 +20,7 @@
       <tr>
         <td class="bg-white">{{$value->date}}</td>
         {{-- <td class="bg-white">{{$value->mission_reward}}</td> --}}
-        <td class="bg-white">{{number_format($value->mission_reward,0)}}</td>
+        <td class="bg-white">{{number_format($value->mission_reward,5)}}</td>
       </tr>
       @endforeach
     </tbody>

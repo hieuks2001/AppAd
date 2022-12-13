@@ -31,7 +31,7 @@ $page;
         <td>{{ $value->traffic_per_day }}</td>
         <td>{{ $value->onsite }}</td>
         <td>{{ $value->pageType->name }}</td>
-        <td>{{ number_format($value->price,0) }}</td>
+        <td>{{ number_format($value->price,5) }}</td>
         <td>{{ $value->traffic_remain }}</td>
       </tr>
       @endforeach
@@ -63,12 +63,12 @@ $page;
       <tr data-row="{{ $value->id }}">
         <td>{{ $value->url }}</td>
         <td>{{ $value->user->username }}</td>
-        <td>{{ number_format($value->user->wallet,0) }}</td>
+        <td>{{ number_format($value->user->wallet,5) }}</td>
         <td>{{ $value->traffic_sum }}</td>
         <td>{{ $value->traffic_per_day }}</td>
         <td>{{ $value->onsite }}</td>
         <td>{{ $value->pageType->name }}</td>
-        <td>{{ number_format($value->price,0) }}</td>
+        <td>{{ number_format($value->price,5) }}</td>
         <td>
           <label for="modal-approve--traffic" class="btn btn-info btn-block btn-sm"
             onclick="onClick({{ $value }})">Sửa</label>

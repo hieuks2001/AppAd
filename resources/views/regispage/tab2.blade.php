@@ -20,7 +20,7 @@
                 <td class="bg-white">{{$value->onsite}}</td>
                 <td class="bg-white">{{$value->traffic_per_day}}</td>
                 <td class="bg-white">{{$value->traffic_sum}}</td>
-                <td class="bg-white">{{number_format($value->price,0)}}</td>
+                <td class="bg-white">{{number_format($value->price,5)}}</td>
                 @switch($value->status)
                     @case (0)
                         <td class="bg-white">Đang chờ</td>
