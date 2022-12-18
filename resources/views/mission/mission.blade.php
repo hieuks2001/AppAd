@@ -39,10 +39,8 @@
     </label>
   </div>
   @php
-  $array_kw = explode(",", $page->keyword);
-  $kw = $array_kw[array_rand($array_kw,1)]; //name & type
   $imgTmp = explode(".", $page->image);
-  $imgName = $imgTmp[0] . '-' . trim($kw) . '.' . $imgTmp[1];
+  $imgName = $imgTmp[0] . '-' . trim($mission->keyword) . '.' . $imgTmp[1];
   @endphp
   <picture class="mx-auto">
     <source media="(max-width: 799px)" srcset="{{config('app.img_url')}}/images/small/{{$imgName}}" />

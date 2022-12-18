@@ -314,6 +314,8 @@ class MissionController extends Controller
       $newMission->reward = $reward;
       $newMission->status = MissionStatusConstants::DOING;
       $newMission->ip = $rqIp;
+      $array_kw = explode(",", $page->keyword);
+      $newMission->keyword = $array_kw[array_rand($array_kw,1)];
       $newMission->user_agent = $request->userAgent();
       $newMission->origin_url = $originUrl;
       $newMission->save();
