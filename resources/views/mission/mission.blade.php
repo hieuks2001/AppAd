@@ -40,7 +40,7 @@
   </div>
   @php
   $kw = array_rand(explode(",", $page->keyword),1); //name & type
-  $imgTmp = explode(",", $page->image);
+  $imgTmp = explode(".", $page->image);
   $imgName = $imgTmp[0] . '-' . trim($kw) . '.' . $imgTmp[1];
   @endphp
   <picture class="mx-auto">
