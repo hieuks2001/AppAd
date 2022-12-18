@@ -41,9 +41,8 @@
   @php
   $kw = array_rand(explode(",", $page->keyword),1); //name & type
   $imgTmp = explode(",", $page->image);
-  $imgName = $imgTmp[0] . '-' . $kw . '.' . $imgTmp[1];
+  $imgName = $imgTmp[0] . '-' . trim($kw) . '.' . $imgTmp[1];
   @endphp
-  {{ var_dump($kw) }}
   <picture class="mx-auto">
     <source media="(max-width: 799px)" srcset="{{config('app.img_url')}}/images/small/{{$imgName}}" />
     <source media="(min-width: 800px)" srcset="{{config('app.img_url')}}/images/large/{{$imgName}}" />
