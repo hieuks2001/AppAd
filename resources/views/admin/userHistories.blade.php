@@ -20,10 +20,11 @@ return "$sortType=$sortNew";
 <div class="mb-10 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
   <div class="flex items-center justify-between">
     <div>
-      <h3 class="text-2xl font-bold text-slate-800">Lịch sử giao dịch {{$type === 'traffic' ? 'memtraffic' : 'nhiemvu'}}
+      {{-- <h3 class="text-2xl font-bold text-slate-800">Lịch sử giao dịch {{$type === 'traffic' ? 'memtraffic' : 'nhiemvu'}} --}}
+      <h3 class="text-2xl font-bold text-slate-800">Lịch sử giao dịch
       </h3>
-      <a href="{{url('management/user/transactions')}}?type={{$type === 'traffic' ? 'mission' : 'traffic'}}"
-        class="btn">Chuyển sang {{$type === 'traffic' ? 'nhiemvu' : 'memtraffic'}}</a>
+      {{-- <a href="{{url('management/user/transactions')}}?type={{$type === 'traffic' ? 'mission' : 'traffic'}}"
+        class="btn">Chuyển sang {{$type === 'traffic' ? 'nhiemvu' : 'memtraffic'}}</a> --}}
     </div>
     <div class="form-control">
       <form action="{{action('DashboardController@showUsersTransactions')}}" method="get">

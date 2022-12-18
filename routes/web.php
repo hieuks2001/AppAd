@@ -63,7 +63,7 @@ Route::group(['middleware' => ['checkLogin']], function () {
 Route::group(['middleware' => ['checkAdmin']], function () {
   Route::get('management/traffic', 'DashboardController@managementTraffic');
   Route::get('management/users', 'DashboardController@managementUsers');
-  Route::get('management/missions', 'DashboardController@managementMissions');
+  // Route::get('management/missions', 'DashboardController@managementMissions');
 
   // Manager Mission
   Route::post('management/mission/search', 'DashboardController@searchMission');
@@ -77,12 +77,12 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::post('management/traffic/{id}/del', 'DashboardController@delApproveTraffic');
 
   // Manager User
-  Route::post('admin/users/{id}', 'DashboardController@postChangeUserType');
-  Route::post('management/usertypes', 'DashboardController@postCreateUserType');
-  Route::post('management/usertypes/edit', 'DashboardController@editUserType');
-  Route::post('management/user/search', 'DashboardController@searchUser');
+  // Route::post('admin/users/{id}', 'DashboardController@postChangeUserType');
+  // Route::post('management/usertypes', 'DashboardController@postCreateUserType');
+  // Route::post('management/usertypes/edit', 'DashboardController@editUserType');
+  // Route::post('management/user/search', 'DashboardController@searchUser');
   Route::post('management/userTraffic/search', 'DashboardController@searchUserTraffic');
-  Route::post('management/user/{id}', 'DashboardController@postUnblockUser');
+  // Route::post('management/user/{id}', 'DashboardController@postUnblockUser');
   Route::post('management/user/{id}/change_password', 'DashboardController@changePassword');
   Route::post('management/user/{id}/change_wallet', 'DashboardController@addMoneyForUser');
   Route::get('management/user/{id}/transaction', 'DashboardController@showUserTransactions');

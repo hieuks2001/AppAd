@@ -52,8 +52,8 @@
       <li><a class="menu-item" href="{{ URL::to('management/traffic') }}">Quản lý traffic</a></li>
       <li><a class="menu-item" href="{{ URL::to('management/users') }}">Quản lý người dùng</a></li>
       <li><a class="menu-item" href="{{ URL::to('management/pages') }}">Quản lý loại trang</a></li>
-      <li><a class="menu-item" href="{{ URL::to('management/missions') }}">Nhiệm vụ đã hoàn thành</a></li>
-      <li><a class="menu-item" href="{{ URL::to('management/setting') }}">Cài đặt</a></li>
+      {{-- <li><a class="menu-item" href="{{ URL::to('management/missions') }}">Nhiệm vụ đã hoàn thành</a></li> --}}
+      {{-- <li><a class="menu-item" href="{{ URL::to('management/setting') }}">Cài đặt</a></li> --}}
       <li><a class="menu-item" href="{{ url('management/user/transactions') }}">Lịch sử giao dịch</a></li>
     </ul>
   </div>

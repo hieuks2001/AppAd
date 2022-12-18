@@ -62,23 +62,23 @@ class DashboardController extends Controller
     return view('admin.traffic', compact(['pages', 'notApprovedPages']));
   }
 
-  public function managementMissions()
-  {
-    $missions = Page::join("missions", "missions.page_id", "=", "pages.id")
-      ->where([
-        ['pages.status', "=", PageStatusConstants::APPROVED],
-        ['missions.status', "=", MissionStatusConstants::COMPLETED],
-      ])
-      ->orderBy("pages.price_per_traffic", "DESC")
-      ->simplePaginate(
-        $perPage = 20,
-        $columns = [
-          "missions.id", "missions.ip", "missions.origin_url", "missions.updated_at", "missions.reward",
-          "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
-        ]
-      );
-    return view('admin.missions')->with('missions', $missions);
-  }
+  // public function managementMissions()
+  // {
+  //   $missions = Page::join("missions", "missions.page_id", "=", "pages.id")
+  //     ->where([
+  //       ['pages.status', "=", PageStatusConstants::APPROVED],
+  //       ['missions.status', "=", MissionStatusConstants::COMPLETED],
+  //     ])
+  //     ->orderBy("pages.price_per_traffic", "DESC")
+  //     ->simplePaginate(
+  //       $perPage = 20,
+  //       $columns = [
+  //         "missions.id", "missions.ip", "missions.origin_url", "missions.updated_at", "missions.reward",
+  //         "pages.url", "pages.price_per_traffic", "pages.hold_percentage"
+  //       ]
+  //     );
+  //   return view('admin.missions')->with('missions', $missions);
+  // }
 
   public function searchMission(Request $request)
   {
@@ -283,210 +283,213 @@ class DashboardController extends Controller
 
   public function managementUsers()
   {
-    $userTypes = UserType::get();
-    $users = UserMission::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
+    // $userTypes = UserType::get();
+    // $users = UserMission::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
     $usersTraffic = User::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
-    return view('admin.users', compact(['userTypes', 'users', 'usersTraffic']));
+    // return view('admin.users', compact(['userTypes', 'users', 'usersTraffic']));
+    return view('admin.users', compact(['usersTraffic']));
+
   }
 
-  public function searchUser(Request $request)
-  {
-    $sdt = $request->data;
-    $users = UserMission::where('username', 'LIKE', "%{$sdt}%")->simplePaginate(10);
-    $usersTraffic = User::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
-    return view('admin.users', compact(['users', 'usersTraffic']));
-  }
+  // public function searchUser(Request $request)
+  // {
+  //   $sdt = $request->data;
+  //   $users = UserMission::where('username', 'LIKE', "%{$sdt}%")->simplePaginate(10);
+  //   $usersTraffic = User::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
+  //   return view('admin.users', compact(['users', 'usersTraffic']));
+  // }
 
   public function searchUserTraffic(Request $request)
   {
     $sdt = $request->data;
     $usersTraffic = User::where('username', 'LIKE', "%{$sdt}%")->simplePaginate(10);
-    $users = UserMission::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
-    return view('admin.users', compact(['users', 'usersTraffic']));
+    // $users = UserMission::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
+    // return view('admin.users', compact(['users', 'usersTraffic']));
+    return view('admin.users', compact(['usersTraffic']));
   }
 
-  public function postCreateUserType(Request $request)
-  {
-    // dd(json_decode($request->mission_need, true));
-    // validate data
-    $validated = $request->validate([
-      'name' => 'required|max:255',
-      'mission_need' => 'required',
-      'page_weight' => 'required'
-    ]);
-    $name = $validated['name'];
-    $missionNeed = json_decode($validated['mission_need'], true);
-    $pageWeight = json_decode($validated['page_weight'], true);
+  // public function postCreateUserType(Request $request)
+  // {
+  //   // dd(json_decode($request->mission_need, true));
+  //   // validate data
+  //   $validated = $request->validate([
+  //     'name' => 'required|max:255',
+  //     'mission_need' => 'required',
+  //     'page_weight' => 'required'
+  //   ]);
+  //   $name = $validated['name'];
+  //   $missionNeed = json_decode($validated['mission_need'], true);
+  //   $pageWeight = json_decode($validated['page_weight'], true);
 
-    foreach ($pageWeight as $key => $value) {
-      $pageType = PageType::where('id', $key)->get();
-      if (!$pageType->first()) {
-        return redirect()->to('/management/users')->with("error", "Page type not correct id");
-      }
-    }
-    foreach ($missionNeed as $key => $value) {
-      if ($value < 0) {
-        return redirect()->to('/management/users')->with("error", "Mission need must greater than zero");
-      }
-      $pageType = PageType::where('id', $key)->get();
-      if (!$pageType->first()) {
-        return redirect()->to('/management/users')->with("error", "Page type not correct id");
-      }
-    }
-    $userType = new UserType();
-    $userType->name = $name;
-    $userType->mission_need = $missionNeed;
-    $userType->page_weight = $pageWeight;
+  //   foreach ($pageWeight as $key => $value) {
+  //     $pageType = PageType::where('id', $key)->get();
+  //     if (!$pageType->first()) {
+  //       return redirect()->to('/management/users')->with("error", "Page type not correct id");
+  //     }
+  //   }
+  //   foreach ($missionNeed as $key => $value) {
+  //     if ($value < 0) {
+  //       return redirect()->to('/management/users')->with("error", "Mission need must greater than zero");
+  //     }
+  //     $pageType = PageType::where('id', $key)->get();
+  //     if (!$pageType->first()) {
+  //       return redirect()->to('/management/users')->with("error", "Page type not correct id");
+  //     }
+  //   }
+  //   $userType = new UserType();
+  //   $userType->name = $name;
+  //   $userType->mission_need = $missionNeed;
+  //   $userType->page_weight = $pageWeight;
 
-    $userType->save();
+  //   $userType->save();
 
-    return redirect()->to('/management/users');
-  }
-  public function editUserType(Request $request)
-  {
-    // dd(json_decode($request->mission_need, true));
-    // validate data
-    $validated = $request->validate([
-      'id' => 'required',
-      'name' => 'required',
-      'mission_need' => 'required',
-      'page_weight' => 'required'
-    ]);
-    $name = $validated['name'];
-    $missionNeed = json_decode($validated['mission_need'], true);
-    $pageWeight = json_decode($validated['page_weight'], true);
+  //   return redirect()->to('/management/users');
+  // }
+  // public function editUserType(Request $request)
+  // {
+  //   // dd(json_decode($request->mission_need, true));
+  //   // validate data
+  //   $validated = $request->validate([
+  //     'id' => 'required',
+  //     'name' => 'required',
+  //     'mission_need' => 'required',
+  //     'page_weight' => 'required'
+  //   ]);
+  //   $name = $validated['name'];
+  //   $missionNeed = json_decode($validated['mission_need'], true);
+  //   $pageWeight = json_decode($validated['page_weight'], true);
 
-    $userType = UserType::where('id', $validated['id']);
-    if (!$userType->get()->first()) {
-      return redirect()->to('/management/users')->with("error", "User type not correct id");
-    }
+  //   $userType = UserType::where('id', $validated['id']);
+  //   if (!$userType->get()->first()) {
+  //     return redirect()->to('/management/users')->with("error", "User type not correct id");
+  //   }
 
-    foreach ($pageWeight as $key => $value) {
-      $pageType = PageType::where('id', $key);
-      if (!$pageType->get()->first()) {
-        return redirect()->to('/management/users')->with("error", "Page type not correct id");
-      }
-    }
+  //   foreach ($pageWeight as $key => $value) {
+  //     $pageType = PageType::where('id', $key);
+  //     if (!$pageType->get()->first()) {
+  //       return redirect()->to('/management/users')->with("error", "Page type not correct id");
+  //     }
+  //   }
 
-    foreach ($missionNeed as $key => $value) {
-      if ($value < 0) {
-        return redirect()->to('/management/users')->with("error", "Mission need must greater than zero");
-      }
-      $pageType = PageType::where('id', $key)->get();
-      if (!$pageType->first()) {
-        return redirect()->to('/management/users')->with("error", "Page type not correct id");
-      }
-    }
+  //   foreach ($missionNeed as $key => $value) {
+  //     if ($value < 0) {
+  //       return redirect()->to('/management/users')->with("error", "Mission need must greater than zero");
+  //     }
+  //     $pageType = PageType::where('id', $key)->get();
+  //     if (!$pageType->first()) {
+  //       return redirect()->to('/management/users')->with("error", "Page type not correct id");
+  //     }
+  //   }
 
-    $userType->update([
-      'name' => $name,
-      'mission_need' => $missionNeed,
-      'page_weight' => $pageWeight,
-    ]);
+  //   $userType->update([
+  //     'name' => $name,
+  //     'mission_need' => $missionNeed,
+  //     'page_weight' => $pageWeight,
+  //   ]);
 
-    return redirect()->to('/management/users');
-  }
+  //   return redirect()->to('/management/users');
+  // }
 
-  public function postChangeUserType(Request $request, $id)
-  {
-    // Edit user user_type
-    $userTypeID = $request['user_type_id'];
+  // public function postChangeUserType(Request $request, $id)
+  // {
+  //   // Edit user user_type
+  //   $userTypeID = $request['user_type_id'];
 
-    // $user = User::where('id', $id)->first();
-    $user = UserMission::where('id', $id)->first();
-    if ($user) {
-      $type = UserType::where('id', $userTypeID)
-        ->get('id')
-        ->first();
-      if ($type) {
-        // $user->user_type_id = $type->id;
-        // $user->mission_count = $type->mission_need;
-        // $user->save();
-        UserMission::where('id', $id)->update(['user_type_id' => $type->id]);
-      }
-    }
-    return redirect()->to('/management/users');
-  }
+  //   // $user = User::where('id', $id)->first();
+  //   $user = UserMission::where('id', $id)->first();
+  //   if ($user) {
+  //     $type = UserType::where('id', $userTypeID)
+  //       ->get('id')
+  //       ->first();
+  //     if ($type) {
+  //       // $user->user_type_id = $type->id;
+  //       // $user->mission_count = $type->mission_need;
+  //       // $user->save();
+  //       UserMission::where('id', $id)->update(['user_type_id' => $type->id]);
+  //     }
+  //   }
+  //   return redirect()->to('/management/users');
+  // }
 
-  public function postUnblockUser(Request $request, $id)
-  {
-    $user = User::where('id', $id)->first();
-    if ($user and $user->status == 0) {
-      $user->status = 1;
-      $user->save();
-    }
-    return redirect()->to('/management/users');
-  }
+  // public function postUnblockUser(Request $request, $id)
+  // {
+  //   $user = User::where('id', $id)->first();
+  //   if ($user and $user->status == 0) {
+  //     $user->status = 1;
+  //     $user->save();
+  //   }
+  //   return redirect()->to('/management/users');
+  // }
 
-  public function registerManual(Request $request) //only admin
-  {
-    if (!isset($request->name)) {
-      return Redirect::to('/management/users');
-    }
-    if (!isset($request->password)) {
-      return Redirect::to('/management/users')->with('error', 'Không đầy đủ thông tin cần thiết!');
-    }
-    $checkUser = UserMission::where('username', $request->name);
-    if ($checkUser->count() != 0) {
-      return Redirect::to('/management/users')->with('error', 'Tên tài khoản đã có người sử dụng!');
-    }
-    $request->validate([
-      'name' => 'required',
-      'phone' => 'required|digits:10',
-      'password' => 'required'
-    ], [
-      'phone.digits' => 'SĐT không phù hợp'
-    ]);
-    $input = $request->all();
-    DB::transaction(function () use ($input) {
-      $type =  UserType::where('is_default', 1)->get('id')->first();
-      $user = new UserMission();
-      $user->username = $input['name'];
-      $user->phone_number = $input['phone'];
-      $user->password = bcrypt($input['password']);
-      $user->is_admin = 0;
-      $user->status = 1; // Set status to inactive / unverfied
-      $user->user_type_id = $type->id;
-      $user->wallet = 0;
-      $user->verified = 1;
-      $user->commission = 0;
-      $user->save();
-    });
+  // public function registerManual(Request $request) //only admin
+  // {
+  //   if (!isset($request->name)) {
+  //     return Redirect::to('/management/users');
+  //   }
+  //   if (!isset($request->password)) {
+  //     return Redirect::to('/management/users')->with('error', 'Không đầy đủ thông tin cần thiết!');
+  //   }
+  //   $checkUser = UserMission::where('username', $request->name);
+  //   if ($checkUser->count() != 0) {
+  //     return Redirect::to('/management/users')->with('error', 'Tên tài khoản đã có người sử dụng!');
+  //   }
+  //   $request->validate([
+  //     'name' => 'required',
+  //     'phone' => 'required|digits:10',
+  //     'password' => 'required'
+  //   ], [
+  //     'phone.digits' => 'SĐT không phù hợp'
+  //   ]);
+  //   $input = $request->all();
+  //   DB::transaction(function () use ($input) {
+  //     $type =  UserType::where('is_default', 1)->get('id')->first();
+  //     $user = new UserMission();
+  //     $user->username = $input['name'];
+  //     $user->phone_number = $input['phone'];
+  //     $user->password = bcrypt($input['password']);
+  //     $user->is_admin = 0;
+  //     $user->status = 1; // Set status to inactive / unverfied
+  //     $user->user_type_id = $type->id;
+  //     $user->wallet = 0;
+  //     $user->verified = 1;
+  //     $user->commission = 0;
+  //     $user->save();
+  //   });
 
-    // Send otp sms
-    return Redirect::to('/management/users')->with('message', 'Đăng ký thành công!');
-  }
+  //   // Send otp sms
+  //   return Redirect::to('/management/users')->with('message', 'Đăng ký thành công!');
+  // }
 
-  public function managementSettings()
-  {
-    $settings = Setting::all();
-    return view('admin.setting', compact(['settings']));
-  }
+  // public function managementSettings()
+  // {
+  //   $settings = Setting::all();
+  //   return view('admin.setting', compact(['settings']));
+  // }
 
-  public function changeSettingValue(Request $request)
-  {
-    $validated = $request->validate([
-      "minimum_reward" => "required|numeric",
-      "delay_day_week" => "required|numeric",
-      "delay_day_month" => "required|numeric",
-      "commission_rate_1" => "required|numeric",
-      "commission_rate_2" => "required|numeric",
-      "max_ref_user_per_day_week" => "required|numeric",
-      "max_ref_user_per_day_month" => "required|numeric",
-      "ref_user_required_week" => "required|numeric",
-      "ref_user_required_month" => "required|numeric",
-    ]);
-    foreach ($validated as $key => $value) {
-      $setting = Setting::where("name", $key)->first();
-      if (!$setting) {
-        continue;
-      }
-      $setting->update([
-        "value" => $value
-      ]);
-    }
-    return redirect()->to('/management/setting');
-  }
+  // public function changeSettingValue(Request $request)
+  // {
+  //   $validated = $request->validate([
+  //     "minimum_reward" => "required|numeric",
+  //     "delay_day_week" => "required|numeric",
+  //     "delay_day_month" => "required|numeric",
+  //     "commission_rate_1" => "required|numeric",
+  //     "commission_rate_2" => "required|numeric",
+  //     "max_ref_user_per_day_week" => "required|numeric",
+  //     "max_ref_user_per_day_month" => "required|numeric",
+  //     "ref_user_required_week" => "required|numeric",
+  //     "ref_user_required_month" => "required|numeric",
+  //   ]);
+  //   foreach ($validated as $key => $value) {
+  //     $setting = Setting::where("name", $key)->first();
+  //     if (!$setting) {
+  //       continue;
+  //     }
+  //     $setting->update([
+  //       "value" => $value
+  //     ]);
+  //   }
+  //   return redirect()->to('/management/setting');
+  // }
 
   public function getPageTypes(Request $request)
   {
@@ -553,7 +556,8 @@ class DashboardController extends Controller
     ], [
       'pwd.required' => "Vui lòng nhập mật khẩu"
     ]);
-    $table = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+    // $table = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+    $table = 'user_traffics';
     $user  = DB::table($table)->where("id", $id);
     if (!empty($user->get())) {
       $user->update(['password' => bcrypt($request['pwd'])]);
@@ -570,7 +574,8 @@ class DashboardController extends Controller
       'amount.required' => "Vui lòng nhập số tiền",
       'amount.numeric' => "Vui lòng nhập đúng định dạng"
     ]);
-    $table = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+    // $table = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+    $table = 'user_traffics';
     $user = DB::table($table)->where('id', $id);
     $logData = array();
     $logData['type'] = $request["amount"] < 0 ? TransactionTypeConstants::ADMIN_MINUS : TransactionTypeConstants::ADMIN_ADD;
@@ -599,8 +604,11 @@ class DashboardController extends Controller
 
   public function showUserTransactions(Request $request, $id)
   {
-    $logTable = $request->query('type') === 'traffic' ? 'log_traffic_transactions' : 'log_mission_transactions';
-    $userTable = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+    // $logTable = $request->query('type') === 'traffic' ? 'log_traffic_transactions' : 'log_mission_transactions';
+    // $userTable = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+
+    $logTable = 'log_traffic_transactions';
+    $userTable = 'user_traffics';
 
     $user = DB::table($userTable)->where('id', $id)->first();
     if (!$user) {
@@ -619,8 +627,11 @@ class DashboardController extends Controller
   public function showUsersTransactions(Request $request)
   {
     $type = $request->query('type') === 'traffic' ? 'traffic' : 'mission';
-    $logTable = $request->query('type') === 'traffic' ? 'log_traffic_transactions' : 'log_mission_transactions';
-    $userTable = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+    // $logTable = $request->query('type') === 'traffic' ? 'log_traffic_transactions' : 'log_mission_transactions';
+    // $userTable = $request->query('type') === 'traffic' ? 'user_traffics' : 'user_missions';
+
+    $logTable = 'log_traffic_transactions';
+    $userTable = 'user_traffics';
 
     $username = $request->has('username') ? $request->query('username') : "";
     $fromDay = $request->has('from') ? $request->query('from') : "";
