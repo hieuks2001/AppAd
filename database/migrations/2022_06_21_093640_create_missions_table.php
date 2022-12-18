@@ -17,6 +17,7 @@ class CreateMissionsTable extends Migration
       $table->uuid('id')->primary()->unique();
       $table->uuid('page_id');
       $table->uuid('user_id')->nullable();
+      $table->string('keyword')->nullable();
       $table->decimal('reward', 14, 5)->nullable();
       $table->string('ip')->default('');
       $table->string('user_agent')->default('');
