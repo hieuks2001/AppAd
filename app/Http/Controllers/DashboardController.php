@@ -144,7 +144,7 @@ class DashboardController extends Controller
         <p class="mb-3">
           <b>Bước 1:</b>Truy cập công cụ tìm kiếm: <b>>>Google.com</b>
         <p class="mb-3">
-          <b>Bước 2:</b> Tìm kiếm từ khoá <b>>> <span style="color: red;">' . $kw . '</span></b>
+          <b>Bước 2:</b> Tìm kiếm từ khoá <b>>> <span style="color: red;">' . trim($kw) . '</span></b>
         <p class="mb-3"><b>Bước 3:</b> Truy cập vào trang web như hướng dẫn:
           <img class="mx-auto my-3 w-full object-contain" src="' . $base64 . '" style="max-width: 450px" />
         <p class="mb-3"><b>Bước 3:</b> Lướt thật chậm từ trên xuống dưới giống
@@ -159,9 +159,9 @@ class DashboardController extends Controller
         </html>
         ');
           $browsershot->windowSize(env('IMG_SMALL_W'), env('IMG_SMALL_H'))
-            ->save(public_path('images/small/') . $pageImgName[0] . '-' . $kw . '.' . $pageImgName[1]);
+            ->save(public_path('images/small/') . $pageImgName[0] . '-' . trim($kw) . '.' . $pageImgName[1]);
           $browsershot->windowSize(env('IMG_LARGE_W'), env('IMG_LARGE_H'))
-            ->save(public_path('images/large/') . $pageImgName[0] . '-' . $kw . '.' . $pageImgName[1]);
+            ->save(public_path('images/large/') . $pageImgName[0] . '-' . trim($kw) . '.' . $pageImgName[1]);
         }
         $log = new LogTrafficTransaction();
         $log->user_id = $page->user_id;
