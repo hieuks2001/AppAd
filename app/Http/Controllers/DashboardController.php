@@ -126,9 +126,11 @@ class DashboardController extends Controller
     if ($user->wallet >= $page->price) {
       DB::transaction(function () use ($page, $user, $base64) {
         $page->status = PageStatusConstants::APPROVED;
-        $pageImgName = $page->image;
+        $pageImgName = explode(".", $page->image);
         $reward = ($page->price - ($page->price * $page->hold_percentage / 100)) / $page->traffic_sum;
-        $browsershot = Browsershot::html('
+        $array_keyword = explode(",", $page->keyword);
+        foreach ($array_keyword as $kw) {
+          $browsershot = Browsershot::html('
         <!doctype html>
         <html>
         <head>
@@ -142,24 +144,25 @@ class DashboardController extends Controller
         <p class="mb-3">
           <b>Bước 1:</b>Truy cập công cụ tìm kiếm: <b>>>Google.com</b>
         <p class="mb-3">
-          <b>Bước 2:</b> Tìm kiếm từ khoá <b>>> <span style="color: red;">'. $page->keyword .'</span></b>
+          <b>Bước 2:</b> Tìm kiếm từ khoá <b>>> <span style="color: red;">' . $kw . '</span></b>
         <p class="mb-3"><b>Bước 3:</b> Truy cập vào trang web như hướng dẫn:
-          <img class="mx-auto my-3 w-full object-contain" src="'. $base64 .'" style="max-width: 450px" />
+          <img class="mx-auto my-3 w-full object-contain" src="' . $base64 . '" style="max-width: 450px" />
         <p class="mb-3"><b>Bước 3:</b> Lướt thật chậm từ trên xuống dưới giống
           như đang đọc nội dung bài viết rồi
-          ấn vào nút <b>Nhận mã ngay</b> và đợi '. $page->onsite .'s kết thúc
+          ấn vào nút <b>Nhận mã ngay</b> và đợi ' . $page->onsite . 's kết thúc
         </p>
         <p><b>Bước 4:</b> Copy mã và nhập vào ô ở phía dưới và bấm
           vào nút "<b>Hoàn thành nhiệm
-            vụ</b>" và nhận <b>'. $reward .'</b> VND</p>
+            vụ</b>" và nhận <b>' . $reward . '</b> VND</p>
         </div>
         </body>
         </html>
         ');
-        $browsershot->windowSize(env('IMG_SMALL_W'), env('IMG_SMALL_H'))
-                    ->save(public_path('images/small/') . $pageImgName);
-        $browsershot->windowSize(env('IMG_LARGE_W'), env('IMG_LARGE_H'))
-                    ->save(public_path('images/large/') . $pageImgName);
+          $browsershot->windowSize(env('IMG_SMALL_W'), env('IMG_SMALL_H'))
+            ->save(public_path('images/small/') . $pageImgName[0] . '-' . $kw . '.' . $pageImgName[1]);
+          $browsershot->windowSize(env('IMG_LARGE_W'), env('IMG_LARGE_H'))
+            ->save(public_path('images/large/') . $pageImgName[0] . '-' . $kw . '.' . $pageImgName[1]);
+        }
         $log = new LogTrafficTransaction();
         $log->user_id = $page->user_id;
         $log->amount  = $page->price;
@@ -413,66 +416,6 @@ class DashboardController extends Controller
       $user->save();
     }
     return redirect()->to('/management/users');
-  }
-
-  public function postApproveTrafficTransaction(Request $rq, $id)
-  {
-    $transaction = LogTrafficTransaction::where([
-      'id' => $id,
-      'status' => TransactionStatusConstants::PENDING,
-    ]);
-    if (!$transaction) {
-      return;
-    }
-    DB::transaction(function () use ($transaction) {
-      $rs = DB::table('user_traffics')->where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
-      $transaction->status = TransactionStatusConstants::APPROVED;
-    });
-    return;
-  }
-
-  public function postCancelTrafficTransaction(Request $rq, $id)
-  {
-    $transaction = LogTrafficTransaction::where([
-      'id' => $id,
-      'status' => TransactionStatusConstants::PENDING,
-    ]);
-    if (!$transaction) {
-      return;
-    }
-    $transaction->status = TransactionStatusConstants::CANCELED;
-    $transaction->save();
-    return;
-  }
-
-  public function postApproveMissionTransaction(Request $rq, $id)
-  {
-    $transaction = LogMissionTransaction::where([
-      'id' => $id,
-      'status' => TransactionStatusConstants::PENDING,
-    ]);
-    if (!$transaction) {
-      return;
-    }
-    DB::transaction(function () use ($transaction) {
-      $rs = UserMission::where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
-      $transaction->status = TransactionStatusConstants::APPROVED;
-    });
-    return;
-  }
-
-  public function postCancelMissionTransaction(Request $rq, $id)
-  {
-    $transaction = LogMissionTransaction::where([
-      'id' => $id,
-      'status' => TransactionStatusConstants::PENDING,
-    ]);
-    if (!$transaction) {
-      return;
-    }
-    $transaction->status = TransactionStatusConstants::CANCELED;
-    $transaction->save();
-    return;
   }
 
   public function registerManual(Request $request) //only admin
