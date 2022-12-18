@@ -38,10 +38,16 @@
       </svg>
     </label>
   </div>
+  @php
+  $kw = array_rand(explode(",", $page->keyword),1); //name & type
+  $imgTmp = explode(",", $page->image);
+  $imgName = $imgTmp[0] . '-' . $kw . '.' . $imgTmp[1];
+  @endphp
+  {{ var_dump($kw) }}
   <picture class="mx-auto">
-    <source media="(max-width: 799px)" srcset="{{config('app.img_url')}}/images/small/{{$page->image}}" />
-    <source media="(min-width: 800px)" srcset="{{config('app.img_url')}}/images/large/{{$page->image}}" />
-    <img src="{{config('app.img_url')}}/images/large/{{$page->image}}" alt="">
+    <source media="(max-width: 799px)" srcset="{{config('app.img_url')}}/images/small/{{$imgName}}" />
+    <source media="(min-width: 800px)" srcset="{{config('app.img_url')}}/images/large/{{$imgName}}" />
+    <img src="{{config('app.img_url')}}/images/large/{{$imgName}}" alt="">
   </picture>
   @if ($errors->all())
   @if ($errors->all()[0] !== "Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại")
