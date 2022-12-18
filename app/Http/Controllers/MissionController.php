@@ -316,6 +316,7 @@ class MissionController extends Controller
       }
       if (!in_array(false, (array) json_decode($result->get('keys')->first()->keys))) {
         //already return code
+        Log::info(!in_array(false, (array) json_decode($result->get('keys')->first()->keys)));
         if ($path != "/") { //completed countdown and return code
           $code = Uuid::uuid5(Uuid::uuid6(), $key[5] . $key[10] . $key[25] . $key[28])->toString();
           $result->update(["code" => $code]);

@@ -115,7 +115,8 @@
     <div class="rounded-2xl p-5 text-center shadow-2xl">
       <input type="text" name="url" placeholder="Nhập url đích muốn chạy traffic"
         class="input input-bordered mb-5 w-full" required>
-      <input type="text" name="keyword" placeholder="Nhập từ khóa" class="input input-bordered mb-5 w-full" required>
+      <input type="text" name="keyword" placeholder="Nhập từ khóa. Ví dụ: memtraffic, traffic"
+        class="input input-bordered mb-5 w-full" required>
       <input type="text" name="traffic_per_day" placeholder="Nhập lượng Traffic mỗi ngày"
         class="input input-bordered mb-5 w-full" required>
       <input type="text" name="traffic_sum" id="traffic_sum" placeholder="Nhập tổng Traffic"

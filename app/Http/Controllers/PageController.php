@@ -34,6 +34,8 @@ class PageController extends Controller
     try {
       $user = Auth::user();
       $page = new Page($validated);
+      
+      $page->keyword = str_replace(array('/', '//', '/*'), "", $page->keyword);
 
       DB::transaction(function () use ($user, $page, $validated) {
 

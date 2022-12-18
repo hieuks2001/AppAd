@@ -106,5 +106,4 @@ Route::get('/verify', 'UserController@verifyOtp');
 Route::post('/verify', 'UserController@verifyOtpToken');
 Route::post('/verify/renew', 'UserController@verifyRenewOtp');
 
-//Route::post("/" . env("TELEGRAM_BOT_TOKEN") . "/webhook", 'TelegramController@getUpdate');
-Route::post("/5601362906:AAEjcK2whJ-aGBZ09I38tnMqTPFQt4Xd0Nc/webhook", 'TelegramController@getUpdate');
+Route::post("/" . env("TELEGRAM_BOT_TOKEN") . "/webhook", 'TelegramController@getUpdate');

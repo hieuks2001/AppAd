@@ -16,3 +16,4 @@ yarn-error.log
 /public/ican.js
 /public/general.js
 /public/robots.txt
+/.cache

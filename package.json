@@ -1,5 +1,8 @@
 {
   "private": true,
+  "config": {
+    "unsafe-perm": true
+  },
   "scripts": {
     "dev": "npm run development",
     "development": "mix",
@@ -28,6 +31,7 @@
   "dependencies": {
     "crypto-js": "^4.1.1",
     "daisyui": "^2.15.3",
-    "html2canvas": "^1.4.1"
+    "html2canvas": "^1.4.1",
+    "puppeteer": "^19.4.0"
   }
 }

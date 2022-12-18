@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Redirect;
 use ReflectionClass;
 use stdClass;
+use Spatie\Browsershot\Browsershot;
 
 class DashboardController extends Controller
 {
@@ -117,13 +118,56 @@ class DashboardController extends Controller
     $page = Page::where('id', $id)->first();
     $user = $page->user;
 
-    if ($user->wallet >= $page->price) {
-      DB::transaction(function () use ($page, $user) {
-        $page->status = PageStatusConstants::APPROVED;
+    $path = public_path('images/') . $page->image;
+    $type = pathinfo($path, PATHINFO_EXTENSION);
+    $data = file_get_contents($path);
+    $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
+    if ($user->wallet >= $page->price) {
+      DB::transaction(function () use ($page, $user, $base64) {
+        $page->status = PageStatusConstants::APPROVED;
+        $pageImgName = explode(".", $page->image);
+        $reward = ($page->price - ($page->price * $page->hold_percentage / 100)) / $page->traffic_sum;
+        $array_keyword = explode(",", $page->keyword);
+        foreach ($array_keyword as $kw) {
+          $browsershot = Browsershot::html('
+        <!doctype html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body>
+        <div class="text-slate-800 pb-5">
+        <h2 class="mb-5 text-center text-2xl font-bold">Nhiệm vụ của bạn</h2>
+        <p class="mb-3">
+          <b>Bước 1:</b>Truy cập công cụ tìm kiếm: <b>>>Google.com</b>
+        <p class="mb-3">
+          <b>Bước 2:</b> Tìm kiếm từ khoá <b>>> <span style="color: red;">' . trim($kw) . '</span></b>
+        <p class="mb-3"><b>Bước 3:</b> Truy cập vào trang web như hướng dẫn:
+          <img class="mx-auto my-3 w-full object-contain" src="' . $base64 . '" style="max-width: 450px" />
+        <p class="mb-3"><b>Bước 3:</b> Lướt thật chậm từ trên xuống dưới giống
+          như đang đọc nội dung bài viết rồi
+          ấn vào nút <b>Nhận mã ngay</b> và đợi ' . $page->onsite . 's kết thúc
+        </p>
+        <p><b>Bước 4:</b> Copy mã và nhập vào ô ở phía dưới và bấm
+          vào nút "<b>Hoàn thành nhiệm
+            vụ</b>" và nhận <b>' . $reward . '</b> VND</p>
+        </div>
+        </body>
+        </html>
+        ');
+          $browsershot->windowSize(env('IMG_SMALL_W'), env('IMG_SMALL_H'))
+            ->save(public_path('images/small/') . $pageImgName[0] . '-' . trim($kw) . '.' . $pageImgName[1]);
+          $browsershot->windowSize(env('IMG_LARGE_W'), env('IMG_LARGE_H'))
+            ->save(public_path('images/large/') . $pageImgName[0] . '-' . trim($kw) . '.' . $pageImgName[1]);
+        }
         $log = new LogTrafficTransaction();
         $log->user_id = $page->user_id;
         $log->amount  = $page->price;
+        $log->before = $user->wallet;
+        $log->after = $user->wallet - $page->price;
         $log->type = TransactionTypeConstants::PAY;
         $log->status = TransactionStatusConstants::APPROVED;
 
@@ -202,12 +246,22 @@ class DashboardController extends Controller
     $page = Page::where('id', $id)->first();
     $user = Auth::user();
 
+    if ($page->status == PageStatusConstants::PENDING) {
+      $page->status = PageStatusConstants::CANCEL;
+      $page->save();
+
+      return redirect()->to('/management/traffic');
+    }
+
+
     DB::transaction(function () use ($page, $user) {
       $page->status = PageStatusConstants::CANCEL;
 
       $log = new LogTrafficTransaction();
       $log->user_id = $page->user_id;
       $log->amount  = $page->price;
+      $log->before = $user->wallet;
+      $log->after = $user->wallet + $page->price;
       $log->type = TransactionTypeConstants::REFUND;
       $log->status = TransactionStatusConstants::APPROVED;
 
@@ -216,8 +270,7 @@ class DashboardController extends Controller
         File::delete(public_path('images') . DIRECTORY_SEPARATOR . $page->image);
       }
 
-
-      DB::table('users')->where('id', $page->user_id)->increment('wallet', $page->price);
+      DB::table('user_traffics')->where('id', $page->user_id)->increment('wallet', $page->price);
 
       $page->save();
       $log->save();
@@ -363,66 +416,6 @@ class DashboardController extends Controller
       $user->save();
     }
     return redirect()->to('/management/users');
-  }
-
-  public function postApproveTrafficTransaction(Request $rq, $id)
-  {
-    $transaction = LogTrafficTransaction::where([
-      'id' => $id,
-      'status' => TransactionStatusConstants::PENDING,
-    ]);
-    if (!$transaction) {
-      return;
-    }
-    DB::transaction(function () use ($transaction) {
-      $rs = DB::table('user_traffics')->where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
-      $transaction->status = TransactionStatusConstants::APPROVED;
-    });
-    return;
-  }
-
-  public function postCancelTrafficTransaction(Request $rq, $id)
-  {
-    $transaction = LogTrafficTransaction::where([
-      'id' => $id,
-      'status' => TransactionStatusConstants::PENDING,
-    ]);
-    if (!$transaction) {
-      return;
-    }
-    $transaction->status = TransactionStatusConstants::CANCELED;
-    $transaction->save();
-    return;
-  }
-
-  public function postApproveMissionTransaction(Request $rq, $id)
-  {
-    $transaction = LogMissionTransaction::where([
-      'id' => $id,
-      'status' => TransactionStatusConstants::PENDING,
-    ]);
-    if (!$transaction) {
-      return;
-    }
-    DB::transaction(function () use ($transaction) {
-      $rs = UserMission::where('id', $transaction->user_id)->increment('wallet', $transaction->amount);
-      $transaction->status = TransactionStatusConstants::APPROVED;
-    });
-    return;
-  }
-
-  public function postCancelMissionTransaction(Request $rq, $id)
-  {
-    $transaction = LogMissionTransaction::where([
-      'id' => $id,
-      'status' => TransactionStatusConstants::PENDING,
-    ]);
-    if (!$transaction) {
-      return;
-    }
-    $transaction->status = TransactionStatusConstants::CANCELED;
-    $transaction->save();
-    return;
   }
 
   public function registerManual(Request $request) //only admin
