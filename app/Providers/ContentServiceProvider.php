@@ -64,6 +64,7 @@ class ContentServiceProvider extends ServiceProvider
       $boughtPage = (clone $trafficQuery)->where("status", PageStatusConstants::APPROVED)->pluck("id");
       $traffic = [];
       $traffic["bought"] = count($boughtPage);
+      $traffic["balance"] = $user->wallet;
       $traffic["sum"] = (clone $trafficQuery)->count();
       $traffic["totalCharge"] = (clone $trafficQuery)->where("status", PageStatusConstants::APPROVED)->sum("price");
       $traffic["remaining"] = $traffic["totalCharge"]  - Mission::whereIn("page_id", $boughtPage)->where("status", MissionStatusConstants::COMPLETED)->sum("reward");
