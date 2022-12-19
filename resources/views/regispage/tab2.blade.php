@@ -52,6 +52,33 @@
   <a class="btn btn-outline btn-sm {{!$pages->hasMorePages() ? 'btn-disabled' : ''}}"
     href="{{$pages->nextPageUrl()}}">Next</a>
 </div>
+<code hidden>
+  &#x3C;div style=&#x22;width: 100%; display: flex; justify-content: center&#x22;&#x3E;
+    &#x3C;button
+      id=&#x22;getCode&#x22;
+      style=&#x22;
+        margin-left: 10px;
+        display: block;
+        padding: 10px 20px;
+        outline: none;
+        border: 0;
+        background-color: red;
+        color: white;
+        font-weight: bold;
+        border-radius: 10px;
+      &#x22;
+    &#x3E;
+      L&#x1EA5;y m&#xE3;
+    &#x3C;/button&#x3E;
+  &#x3C;/div&#x3E;
+  &#x3C;script&#x3E;
+    var value = &#x27;__code__&#x27;;
+  &#x3C;/script&#x3E;
+  &#x3C;script&#x3E;
+    const URL_API = &#x27;{{config("app.url")}}&#x27;;
+  &#x3C;/script&#x3E;
+  &#x3C;script src=&#x22;{{ asset('js/ican.js') }}&#x22;&#x3E;&#x3C;/script&#x3E;
+</code>
 <script>
   function copyCode(pageId) {
     navigator.clipboard.writeText(document.getElementsByTagName("code")[0].textContent.replace('__code__',pageId))
