@@ -2,7 +2,7 @@
 @section('management-users')
 <div class="mb-10 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
   <div class="flex items-center justify-between">
-    <h3 class="text-2xl font-bold text-slate-800">Loại người dùng (nhiemvu.app)</h3>
+    <h3 class="text-2xl font-bold text-slate-800">Loại người dùng</h3>
     <div class="flex">
       <label for="modal-create--user_type" class="btn modal-button btn-accent gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -112,7 +112,7 @@
 </div> --}}
 <div class="overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
   <div class="flex items-center justify-between">
-    <h3 class="text-2xl font-bold text-slate-800">nhiemvu.app</h3>
+    <h3 class="text-2xl font-bold text-slate-800">Người dùng</h3>
     <div class="flex">
       <label for="modal-create--user_traffic" class="btn modal-button btn-accent gap-2 mr-3">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -136,6 +136,8 @@
         <th>ID</th>
         <th>SĐT</th>
         <th>Loại</th>
+        <th></th>
+        <th></th>
         <th></th>
         <th></th>
         <th></th>
