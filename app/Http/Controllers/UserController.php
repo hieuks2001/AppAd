@@ -265,7 +265,7 @@ class UserController extends Controller
     // // }
     if ($user) {
       if ($user->is_admin) {
-        return Redirect::to('/management/traffic');
+        return Redirect::to('/management/users');
       }
       return view("dashboard.index");
     } else {

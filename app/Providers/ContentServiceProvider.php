@@ -91,7 +91,7 @@ class ContentServiceProvider extends ServiceProvider
       $view->with('onsite', $onsite);
     });
     view()->composer('admin.users', function ($view) {
-      $types = UserType::all()->sortBy('name');
+      $types = UserType::get();
       $pageTypes = PageType::all()->sortBy('name');
       $view->with(['user_types' => $types, "page_types" => $pageTypes]);
     });

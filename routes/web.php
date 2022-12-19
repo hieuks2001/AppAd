@@ -57,18 +57,29 @@ Route::group(['middleware' => ['checkDomain']], function () {
 
 // Admin dashboard
 Route::group(['middleware' => ['checkAdmin']], function () {
-  Route::get('management/traffic', 'DashboardController@managementTraffic');
   Route::get('management/users', 'DashboardController@managementUsers');
+  Route::get('management/missions', 'DashboardController@managementMissions');
 
-  // Manager Traffic
-  Route::get('management/traffic/{id}', 'DashboardController@getApproveTraffic');
-  Route::post('management/traffic/{id}', 'DashboardController@postApproveTraffic');
-  Route::post('management/traffic/{id}/edit', 'DashboardController@postEditTraffic');
-  Route::post('management/traffic/{id}/del', 'DashboardController@delApproveTraffic');
+  // Manager Mission
+  Route::post('management/mission/search', 'DashboardController@searchMission');
 
   // Manager User
   Route::post('admin/users/{id}', 'DashboardController@postChangeUserType');
   Route::post('management/usertypes', 'DashboardController@postCreateUserType');
+  Route::post('management/usertypes/edit', 'DashboardController@editUserType');
+  Route::post('management/user/search', 'DashboardController@searchUser');
+  Route::post('management/userTraffic/search', 'DashboardController@searchUserTraffic');
+  Route::post('management/user/{id}', 'DashboardController@postUnblockUser');
+  Route::post('management/user/{id}/change_password', 'DashboardController@changePassword');
+  Route::post('management/user/{id}/change_wallet', 'DashboardController@addMoneyForUser');
+  Route::get('management/user/{id}/transaction', 'DashboardController@showUserTransactions');
+  Route::get('management/user/transactions', 'DashboardController@showUsersTransactions');
+
+  Route::post('management/user-register', 'DashboardController@registerManual');
+
+  // Manager Seting
+  Route::post('/management/setting', 'DashboardController@changeSettingValue');
+  Route::get('/management/setting', 'DashboardController@managementSettings');
 });
 
 // Verify user
