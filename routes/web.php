@@ -68,7 +68,6 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::post('management/usertypes', 'DashboardController@postCreateUserType');
   Route::post('management/usertypes/edit', 'DashboardController@editUserType');
   Route::post('management/user/search', 'DashboardController@searchUser');
-  Route::post('management/userTraffic/search', 'DashboardController@searchUserTraffic');
   Route::post('management/user/{id}', 'DashboardController@postUnblockUser');
   Route::post('management/user/{id}/change_password', 'DashboardController@changePassword');
   Route::post('management/user/{id}/change_wallet', 'DashboardController@addMoneyForUser');
@@ -76,6 +75,7 @@ Route::group(['middleware' => ['checkAdmin']], function () {
   Route::get('management/user/transactions', 'DashboardController@showUsersTransactions');
 
   Route::post('management/user-register', 'DashboardController@registerManual');
+  Route::get('management/errors', 'DashboardController@viewErrors');
 
   // Manager Seting
   Route::post('/management/setting', 'DashboardController@changeSettingValue');

@@ -392,4 +392,9 @@ class DashboardController extends Controller
     }
     return redirect()->to('/management/setting');
   }
+
+  public function viewErrors()
+  {
+    return view("admin.tableErrors");
+  }
 }

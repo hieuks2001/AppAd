@@ -53,6 +53,7 @@
       <li><a class="menu-item" href="{{ URL::to('management/missions') }}">Nhiệm vụ đã hoàn thành</a></li>
       <li><a class="menu-item" href="{{ URL::to('management/setting') }}">Cài đặt</a></li>
       <li><a class="menu-item" href="{{ URL::to('management/user/transactions') }}">Lịch sử giao dịch</a></li>
+      <li><a class="menu-item" href="{{ URL::to('management/errors') }}">Bảng mã lỗi</a></li>
     </ul>
   </div>
 </div>
