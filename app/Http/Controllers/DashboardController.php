@@ -268,6 +268,11 @@ class DashboardController extends Controller
 
     if (!empty($user->get())) {
       $userData = $user->first();
+      if ($logData['type'] == TransactionTypeConstants::ADMIN_MINUS &&
+          $logData['amount'] > $userData->wallet
+      ){
+        return Redirect::back()->with(['message' => 'Lỗi không đủ tiền trong ví tài khoản!']);
+      }
       $logData['before'] = $userData->wallet;
       $logData['user_id'] = $userData->id;
       $user->increment('wallet', $request['amount']);
