@@ -9,6 +9,7 @@
       <th class="bg-slate-200">Onsite (giây)</th>
       <th class="bg-slate-200">Mỗi ngày</th>
       <th class="bg-slate-200">Tổng</th>
+      <th class="bg-slate-200">Còn lại</th>
       <th class="bg-slate-200">Số tiền</th>
       <th class="bg-slate-200">Trạng thái</th>
       <th class="bg-slate-200">Mã nhúng</th>
@@ -21,6 +22,7 @@
       <td class="bg-white">{{$value->onsite}}</td>
       <td class="bg-white">{{$value->traffic_per_day}}</td>
       <td class="bg-white">{{$value->traffic_sum}}</td>
+      <td class="bg-white">{{$value->traffic_remain}}</td>
       <td class="bg-white">{{number_format($value->price, 5)}}</td>
       @switch($value->status)
       @case (0)

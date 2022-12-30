@@ -24,6 +24,8 @@ $page;
         <th>Loại site</th>
         <th>Đã trả (VND)</th>
         <th>Traffic còn lại</th>
+        <th></th>
+        <th></th>
       </tr>
     <tbody>
       @foreach ($pages as $key => $value)
@@ -36,6 +38,19 @@ $page;
         <td>{{ $value->pageType->name }}</td>
         <td>{{ number_format($value->price, 5) }}</td>
         <td>{{ $value->traffic_remain }}</td>
+        <td>
+          <label for="page_modal--edit" class="btn btn-square btn-outline btn-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </label>
+        </td>
+        <td>
+          <label for="offsite-modal" class="block btn btn-error btn-block btn-sm py-2"
+            onclick="onOffsite('{{$value->id}}')">Dừng</label>
+        </td>
       </tr>
       @endforeach
     </tbody>
@@ -119,6 +134,21 @@ $page;
     </div>
   </div>
 </div>
+<input type="checkbox" id="offsite-modal" class="modal-toggle" />
+<div class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box">
+    <label for="offsite-modal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <h3 class="font-bold text-lg">Bạn có chắc chắn làm điều này?</h3>
+    <p class="py-4">Bạn đang dừng traffic đang chạy, hành động này sẽ hoàn lại tiền theo số lượng traffic còn lại</p>
+    <form id="form-offsite-modal" class="mb-0" method="post">
+      @csrf
+      <input type="text" placeholder="Lý do (Nếu có)" name="note" class="input input-bordered w-full" />
+      <div class="modal-action">
+        <label for="offsite-modal"><button class="btn">Dừng</button></label>
+      </div>
+    </form>
+  </div>
+</div>
 <input type="checkbox" id="modal-approve--traffic" class="modal-toggle" />
 <div class="modal modal-bottom sm:modal-middle text-slate-800">
   <div class="modal-box relative">
@@ -191,6 +221,11 @@ $page;
     function onReject(pageId) {
       const form = document.getElementById('form-reject-modal');
       form.action = `/management/traffic/${pageId}/del`
+      console.log(form);
+    }
+    function onOffsite(pageId) {
+      const form = document.getElementById('form-offsite-modal');
+      form.action = `/management/traffic/${pageId}/off`
       console.log(form);
     }
 </script>

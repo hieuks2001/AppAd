@@ -279,6 +279,34 @@ class DashboardController extends Controller
     return redirect()->to('/management/traffic');
   }
 
+  public function offApprovedTraffic(Request $request, $id)
+  {
+    $page = Page::where('id', $id)->first();
+    $user = Auth::user();
+    DB::transaction(function () use ($request, $page, $user) {
+      $page->status = PageStatusConstants::CANCEL;
+      $page->note = $request->note;
+      $refund = $page->traffic_remain * $page->price_per_traffic;
+      $log = new LogTrafficTransaction();
+      $log->user_id = $page->user_id;
+      $log->amount  = $refund;
+      $log->before = $user->wallet;
+      $log->after = $user->wallet + $refund;
+      $log->type = TransactionTypeConstants::REFUND;
+      $log->status = TransactionStatusConstants::APPROVED;
+
+      // Delete image file
+      if (!empty($page->image)) {
+        File::delete(public_path('images') . DIRECTORY_SEPARATOR . $page->image);
+      }
+      DB::table('user_traffics')->where('id', $page->user_id)->increment('wallet', $refund);
+
+      $page->save();
+      $log->save();
+    });
+    return redirect()->to('/management/traffic');
+  }
+
   // Management User - UserType
 
   public function managementUsers()
@@ -288,7 +316,6 @@ class DashboardController extends Controller
     $usersTraffic = User::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
     // return view('admin.users', compact(['userTypes', 'users', 'usersTraffic']));
     return view('admin.users', compact(['usersTraffic']));
-
   }
 
   // public function searchUser(Request $request)
@@ -583,9 +610,10 @@ class DashboardController extends Controller
 
     if (!empty($user->get())) {
       $userData = $user->first();
-      if ($logData['type'] == TransactionTypeConstants::ADMIN_MINUS &&
-          $logData['amount'] > $userData->wallet
-      ){
+      if (
+        $logData['type'] == TransactionTypeConstants::ADMIN_MINUS &&
+        $logData['amount'] > $userData->wallet
+      ) {
         return Redirect::back()->with(['message' => 'Lỗi không đủ tiền trong ví tài khoản!']);
       }
       $logData['before'] = $userData->wallet;
