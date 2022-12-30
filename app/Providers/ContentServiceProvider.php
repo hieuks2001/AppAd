@@ -66,8 +66,10 @@ class ContentServiceProvider extends ServiceProvider
       $traffic["bought"] = count($boughtPage);
       $traffic["balance"] = $user->wallet;
       $traffic["sum"] = (clone $trafficQuery)->count();
-      $traffic["totalCharge"] = (clone $trafficQuery)->where("status", PageStatusConstants::APPROVED)->sum("price");
-      $traffic["remaining"] = $traffic["totalCharge"]  - Mission::whereIn("page_id", $boughtPage)->where("status", MissionStatusConstants::COMPLETED)->sum("reward");
+      // $traffic["totalCharge"] = (clone $trafficQuery)->where("status", PageStatusConstants::APPROVED)->sum("price");
+      $traffic["totalCharge"] = (clone $trafficQuery)->where("status", PageStatusConstants::APPROVED)->sum("traffic_sum");
+      // $traffic["remaining"] = $traffic["totalCharge"]  - Mission::whereIn("page_id", $boughtPage)->where("status", MissionStatusConstants::COMPLETED)->sum("reward");
+      $traffic["remaining"] = (clone $trafficQuery)->where("status", PageStatusConstants::APPROVED)->sum("traffic_remain");
       $view->with('traffic', $traffic);
     });
     view()->composer('box.patternBox3', function ($view) {

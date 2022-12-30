@@ -7,14 +7,15 @@
   </div>
   <div class="bg-red-500 p-5 rounded-xl">
     <div class="ui purple inverted">
-      <h2 class="text-3xl font-bold"><span id="totalCharge"></span> <span class="text-xl">VND</span></h2>
-      <b>Tổng tiền traffic đang trả</b>
+      <h2 class="text-3xl font-bold">{{$traffic['totalCharge']}}</h2>
+      <b>Tổng Traffic đã mua</b>
     </div>
   </div>
   <div class="bg-green-400 p-5 rounded-xl">
     <div class="ui pink inverted">
-      <h2 class="text-3xl font-bold"><span id="remaining"></span> <span class="text-xl">VND</span></h2>
-      <b>Còn lại</b>
+      {{-- <h2 class="text-3xl font-bold"><span id="remaining"></span> <span class="text-xl">VND</span></h2> --}}
+      <h2 class="text-3xl font-bold">{{$traffic["remaining"]}}</h2>
+      <b>Traffic còn lại</b>
     </div>
   </div>
   <div class="bg-yellow-400 p-5 rounded-xl">
@@ -26,11 +27,9 @@
 </div>
 <script>
   const money = {
-    "totalCharge" : {!! json_encode($traffic["totalCharge"], JSON_HEX_TAG) !!},
-    "remaining" : {!! json_encode($traffic["remaining"], JSON_HEX_TAG) !!},
     "balance" : {!! json_encode($traffic["balance"], JSON_HEX_TAG) !!},
   }
-  for (const element of ["totalCharge","remaining","balance"]) {
+  for (const element of ["balance"]) {
     document.getElementById(element).textContent = Intl.NumberFormat("vi").format(money[element])
   }
 </script>
