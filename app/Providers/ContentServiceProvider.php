@@ -97,6 +97,11 @@ class ContentServiceProvider extends ServiceProvider
       $priority = new ReflectionClass(PagePriorityConstants::class);
       $view->with(['priority' => $priority->getConstants(), 'onsite' => $onsite]);
     });
+    view()->composer('admin.editTrafficApproved', function ($view) {
+      $onsite = PageType::all()->sortBy('name');
+      $priority = new ReflectionClass(PagePriorityConstants::class);
+      $view->with(['priority' => $priority->getConstants(), 'onsite' => $onsite]);
+    });
     view()->composer('admin.users', function ($view) {
       $types = UserType::get();
       $pageTypes = PageType::all()->sortBy('name');

@@ -39,7 +39,7 @@ $page;
         <td>{{ number_format($value->price, 5) }}</td>
         <td>{{ $value->traffic_remain }}</td>
         <td>
-          <label for="page_modal--edit" class="btn btn-square btn-outline btn-sm">
+          <label for="modal-approve--traffic" class="btn btn-square btn-outline btn-sm" onclick="onClick({{ $value }})">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
