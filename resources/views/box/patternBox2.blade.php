@@ -1,4 +1,4 @@
-<div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-center md:text-start">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-5 text-center md:text-start">
   <div class="bg-blue-500 p-5 rounded-xl">
     <div class="ui inverted">
       <h2 class="text-3xl font-bold">{{$traffic["sum"]}}</h2>

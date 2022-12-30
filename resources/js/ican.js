@@ -66,7 +66,7 @@ async function getCode(k, d) {
 }
 let bodyHeight = 0;
 const getCodeBtn = document.getElementById("getCode");
-window.addEventListener("DOMContentLoaded", async () => {
+(async () => {
   const result = await getCode(localStorage.getItem("publicKey"), null).catch(
     (e) => {
       handleError(e);
@@ -106,8 +106,7 @@ window.addEventListener("DOMContentLoaded", async () => {
       // getCodeBtn.disabled = true;
     }
   }
-});
-
+})();
 function decodeGetTimes(onsite, key) {
   return [
     0,
@@ -220,6 +219,7 @@ function run(onsite, key) {
                 }
               };
               if (once === 1) {
+                getCodeBtn.textContent="Vui lòng chờ giây lát"
                 getCode(key, cd + 1).then((x) => x);
                 countdown();
                 buttonDiv.style.display = "none";

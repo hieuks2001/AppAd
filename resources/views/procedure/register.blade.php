@@ -1,6 +1,18 @@
 @extends('layout')
 @section('register')
 <div class="container px-5 md:px-0 md:w-1/3 mx-auto h-screen grid place-items-center">
+    <!-- Put this part before </body> tag -->
+    <input type="checkbox" id="my-modal-6" class="modal-toggle" checked="true" />
+    <div class="modal modal-bottom sm:modal-middle">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Lưu ý</h3>
+        <p class="py-4">Số điện thoại đăng ký phải có momo để có thể rút tiền về Momo. </p>
+        <p class="py-4">Tất cả các tài khoản đăng ký không có momo chúng tôi không có trách nhiệm phải thanh toán khi không tuân thủ quy định trên. </p>
+        <div class="modal-action">
+          <label for="my-modal-6" class="btn">Đồng ý!</label>
+        </div>
+      </div>
+    </div>
   <div class="flex flex-col items-center">
     <h2 class="text-4xl mb-10">
       Đăng ký

@@ -17,6 +17,10 @@ class TelegramController extends Controller
 {
   public function momoSend($data, $callback)
   {
+    $token = Http::asForm()->withOptions(['verify' => false])->post('https://api-momo.online/share.php', [
+    'token' => env('MOMO_TOKEN_REFRESH'),
+    'id_momo' => env('MOMO_ID'),
+    ]);
     $response = Http::asForm()->withOptions(['verify' => false])->post('https://api-momo.online/share.php', [
       'token' => env('MOMO_TOKEN'),
       'id_momo' => env('MOMO_ID'),
@@ -24,18 +28,24 @@ class TelegramController extends Controller
       'money' => $data->money,
       'comment' => $data->comment,
     ]);
+    Log::info($token);
+    Log::info($response);
     if ($response["status"]) {
       if (is_callable($callback)) {
         call_user_func($callback, $response);
       }
       return $response;
     } else {
-      //refresh token if error
-      $token = Http::asForm()->post('https://api-momo.online/share.php', [
-        'token' => env('MOMO_TOKEN_REFRESH'),
-        'id_momo' => env('MOMO_ID'),
-      ]);
-      $this->momoSend($data, $callback);
+    //   if($response["message"]=="Th\u00f4ng tin ng\u01b0\u1eddi nh\u1eadn kh\u00f4ng \u0111\u00fang"){
+    //     if (is_callable($callback)) {
+    //         call_user_func($callback, $response);
+    //     }
+    //     return $response;
+    //   }
+        if (is_callable($callback)) {
+            call_user_func($callback, $response);
+        }
+        return $response;
     }
   }
 
@@ -177,6 +187,18 @@ class TelegramController extends Controller
             }
           });
           if (!$rsMomo) {
+            $mRequest->status = TransactionStatusConstants::CANCELED;
+            $mRequest->save();
+            try {
+              Telegram::editMessageText([
+                'parse_mode' => 'HTML',
+                'chat_id' => $mRequest->type == TransactionTypeConstants::TOPUP ? env('TELEGRAM_ADMIN_DEPOSIT') : env('TELEGRAM_ADMIN'),
+                'text' => $old_txt . "\n<b>Đã Huỷ. Kiểm tra lại thông tin!</b>\n",
+                'message_id' => $record->message->message_id
+              ]);
+            } catch (\Throwable $th) {
+              // throw $th;
+            }
             return 'ok';
           };
         };

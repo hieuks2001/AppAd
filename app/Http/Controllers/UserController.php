@@ -56,7 +56,7 @@ class UserController extends Controller
       ]
     ];
     $response = Http::withBody(json_encode($data), 'application/json')
-      ->post($url);
+        ->post($url);
     return $response->successful();
   }
 
@@ -115,9 +115,9 @@ class UserController extends Controller
       $user->phone_number = $input['username'];
       $user->password = bcrypt($input['password']);
       $user->is_admin = 0;
-      $user->status = 0; // Set status to inactive / unverfied
+      $user->status = 1; // Set status to inactive / unverfied
       $user->wallet = 0;
-      $user->verified = 0;
+      $user->verified = 1;
       $user->save();
 
       $otp = new Otp();
@@ -130,8 +130,10 @@ class UserController extends Controller
     });
 
     // Send otp sms
-    $this->sendOTP($input['username'], $otp->otp);
-    return Redirect::to('/login')->with('message', 'Đăng ký thành công! Vui lòng đăng nhập lại và xác minh mã OTP để kích hoạt tài khoản!');
+    // $this->sendOTP($input['username'], $otp->otp);
+    // $this->sendOTP($input['username'], $otp->otp);
+    // return Redirect::to('/login')->with('message', 'Đăng ký thành công! Vui lòng đăng nhập lại và xác minh mã OTP để kích hoạt tài khoản!');
+    return Redirect::to('/login')->with('message', 'Đăng ký thành công!');
   }
 
   public function changePassword(Request $request)
@@ -237,6 +239,7 @@ class UserController extends Controller
     $otp->user = 'traffic';
     $otp->user_id = $user->id;
     $otp->save();
+    $this->sendOTP($user->username, $otp->otp);
     $this->sendOTP($user->username, $otp->otp);
     return Redirect::to('/verify');
   }
@@ -495,11 +498,11 @@ class UserController extends Controller
   {
     $user = Auth::user();
     $request->validate([
-      'amount' => 'required|numeric|min:5000',
+      'amount' => 'required|numeric|min:20000',
     ], [
       'amount.required' => "Vui lòng nhập số tiền",
       'amount.numeric' => "Số tiền chỉ bao gồm các số",
-      'amount.min' => "Số tiền rút phải lớn hơn 23000 VND",
+      'amount.min' => "Số tiền rút phải lớn hơn 20000 VND",
     ]);
     $amount = $request->amount;
     $wallet = $user->wallet;

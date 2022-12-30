@@ -30,8 +30,8 @@ class Kernel extends ConsoleKernel
   protected function schedule(Schedule $schedule)
   {
     // $schedule->command('inspire')->hourly();
-    $schedule->command('code:clear')->daily()->timezone("Asia/Ho_Chi_Minh")->at('00:00');
-    $schedule->command('log:clear')->daily()->timezone("Asia/Ho_Chi_Minh")->at('00:00');
+    $schedule->command('code:clear')->dailyAt('00:05');
+    $schedule->command('log:clear')->dailyAt('00:10');
   }
 
   /**
