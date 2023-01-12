@@ -227,7 +227,7 @@ function run(onsite, key) {
                 if (cd === -1) {
                   clearInterval(timer);
                   getCodeBtn.textContent =
-                    "Click link bất kỳ trong trang để nhận code";
+                    "Click link bất kỳ có link khác ở hiện tại trong trang để nhận code";
                 }
               }
               once++;

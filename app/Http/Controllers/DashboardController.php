@@ -244,7 +244,7 @@ class DashboardController extends Controller
   public function delApproveTraffic($id)
   {
     $page = Page::where('id', $id)->first();
-    $user = Auth::user();
+    $user = $page->user;
 
     if ($page->status == PageStatusConstants::PENDING) {
       $page->status = PageStatusConstants::CANCEL;
@@ -282,7 +282,7 @@ class DashboardController extends Controller
   public function offApprovedTraffic(Request $request, $id)
   {
     $page = Page::where('id', $id)->first();
-    $user = Auth::user();
+    $user = $page->user;
     DB::transaction(function () use ($request, $page, $user) {
       $page->status = PageStatusConstants::CANCEL;
       $page->note = $request->note;
@@ -589,7 +589,7 @@ class DashboardController extends Controller
     if (!empty($user->get())) {
       $user->update(['password' => bcrypt($request['pwd'])]);
       # code...
-      return Redirect::back()->with(['message' => 'Đặt lại mật khẩu của người dùng thành công']);
+      return Redirect::to('/management/users')->with(['message' => 'Đặt lại mật khẩu của người dùng thành công']);
     }
   }
 
