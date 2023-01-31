@@ -123,6 +123,10 @@ class DashboardController extends Controller
     $data = file_get_contents($path);
     $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
+    if ($page->status == PageStatusConstants::APPROVED) {
+        return redirect()->to('/management/traffic')->with("error", "Trang đã được duyệt!.");
+    }
+
     if ($user->wallet >= $page->price) {
       DB::transaction(function () use ($page, $user, $base64) {
         $page->status = PageStatusConstants::APPROVED;

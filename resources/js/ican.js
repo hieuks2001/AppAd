@@ -209,7 +209,7 @@ function run(onsite, key) {
           once++;
           window.onscroll = debounce(() => {
             var scrollTop = Math.floor(window.pageYOffset);
-            if (scrollTop >= Math.floor(bodyHeight)) {
+            if (scrollTop >= Math.floor(bodyHeight*0.9)) {
               window.onblur = () => {
                 clearInterval(timer);
               };
@@ -245,22 +245,20 @@ function run(onsite, key) {
   }
   countdown();
   stop(cd, timer, disabledFocusedSite, () => {
-    countdown();
+    if(!disabledFocusedSite || cd > decodeGetTimes(onsite, key)[3]) {
+        countdown();
+    }
   });
 }
 
 function stop(cd, interval, status, resume) {
-  if (cd) {
     window.addEventListener("focus", () => {
-      if (!status) {
         resume();
-      }
     });
     window.addEventListener("blur", () => {
       if (interval) clearInterval(interval);
       disabledFocusedSite = true;
     });
-  }
 }
 
 function debounce(func, wait, immediate) {

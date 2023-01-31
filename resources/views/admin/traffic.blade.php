@@ -101,9 +101,9 @@ $page;
           <label for="modal-approve--traffic" class="btn btn-info btn-block btn-sm"
             onclick="onClick({{ $value }})">Sửa</label>
           @if (!empty($value->image))
-          <form class="mb-0" action="{{ action('DashboardController@postApproveTraffic', $value->id) }}" method="post">
+          <form class="mb-0" action="{{ action('DashboardController@postApproveTraffic', $value->id) }}" method="post" onsubmit="document.getElementById('btn-approve-{{$value->id}}').disabled = true;">
             @csrf
-            <button class="btn btn-success btn-block btn-sm">Duyệt</button>
+            <button id="btn-approve-{{$value->id}}" class="btn btn-success btn-block btn-sm">Duyệt</button>
           </form>
           @endif
           <label for="reject-modal" class="block btn btn-error btn-block btn-sm py-2"
