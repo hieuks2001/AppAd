@@ -7,7 +7,7 @@ use App\Constants\TransactionTypeConstants;
 use App\Constants\TransactionStatusConstants;
 use App\Models\LogTransaction;
 use App\Models\LogMissionTransaction;
-use App\Models\Missions;
+use App\Models\Mission;
 use App\Models\Otp;
 use App\Models\User;
 use App\Models\Page;
@@ -114,7 +114,7 @@ class UserController extends Controller
 
     $ref = User::where("id", $input['ref'])->first();
     if (!$ref){
-      return Redirect::back()->with('error', 'Lỗi!');
+      return Redirect::back()->with('error', 'Lỗi sai mã giới thiệu!');
     }
     $otp = DB::transaction(function () use ($input) {
       $type =  UserType::where('is_default', 1)->get('id')->first();
@@ -123,9 +123,9 @@ class UserController extends Controller
       $user->phone_number = $input['username'];
       $user->password = bcrypt($input['password']);
       $user->is_admin = 0;
-      $user->status = 0; // Set status to inactive / unverfied
+      $user->status = 1; // Set status to inactive / unverfied
       $user->wallet = 0;
-      $user->verified = 0;
+      $user->verified = 1;
       $user->user_type_id = $type->id;
       $user->commission = 0;
       $user->reference = $input['ref'];
@@ -141,8 +141,10 @@ class UserController extends Controller
     });
 
     // Send otp sms
-    $this->sendOTP($input['username'], $otp->otp);
-    return Redirect::to('/login')->with('message', 'Đăng ký thành công! Vui lòng đăng nhập lại và xác minh mã OTP để kích hoạt tài khoản!');
+    // $this->sendOTP($input['username'], $otp->otp);
+    // $this->sendOTP($input['username'], $otp->otp);
+    // return Redirect::to('/login')->with('message', 'Đăng ký thành công! Vui lòng đăng nhập lại và xác minh mã OTP để kích hoạt tài khoản!');
+    return Redirect::to('/login')->with('message', 'Đăng ký thành công!');
   }
 
   public function changePassword(Request $request)
@@ -250,6 +252,7 @@ class UserController extends Controller
     $otp->user_id = $user->id;
     $otp->save();
     $this->sendOTP($user->username, $otp->otp);
+    $this->sendOTP($user->username, $otp->otp);
     return Redirect::to('/verify');
   }
 
@@ -346,8 +349,7 @@ class UserController extends Controller
       return view('mission.mission', [])->withErrors("Tài khoản của bạn đã bị khoá!");
     }
     //rule here
-    $ms = Missions::where('user_id', $user->id)->where([
-      // ["ip", $uIP],
+    $ms = Mission::where('user_id', $user->id)->where([
       ["user_agent", $request->userAgent()],
       ["status", MissionStatusConstants::DOING]
     ]);
@@ -364,7 +366,7 @@ class UserController extends Controller
     $msGet = ($ms)->get(["code", "reward", "page_id"])->first();
     if (!is_null($code->first())) {
       DB::transaction(function () use ($ms, $user, $msGet, $request, $code, $commisonRateV1, $commisonRateV2) {
-        $ms->update(["status" => 1, "code" => $request->key]);
+        $ms->update(["status" => 1, "code" => $request->key,"updated_at" => Carbon::now()]);
         $code->update(["status" => 1]);
         $u = User::where('id', $user->id)->first();
         $uMsCount = $u->mission_count;
@@ -457,14 +459,14 @@ class UserController extends Controller
   public function tukhoa()
   {
     $user = Auth::user();
-    $ms = Missions::where('ms_userUUID', $user->id)->where('ms_status', 'already')->first();
-    $missons = Missions::where('ms_userUUID', $user->id)->get();
+    $ms = Mission::where('ms_userUUID', $user->id)->where('ms_status', 'already')->first();
+    $missons = Mission::where('ms_userUUID', $user->id)->get();
 
     if ($ms) {
       $page = Page::where('page_name', $ms->ms_name)->first();
       return view('mission.mission', ['mission' => $ms, 'missions' => $missons, 'page' => $page]);
     } else {
-      // $all_missions = Missions::where('ms_status', 'already')->get();
+      // $all_missions = Mission::where('ms_status', 'already')->get();
       // // Currently get random -> Futures: Get base on prioriry
       // $pages = Page::inRandomOrder()->limit(1)->get();
       // $list = [];
@@ -475,7 +477,7 @@ class UserController extends Controller
       //   if (!in_array($value->page_name, $list)) {
       //     // $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
       //     // $randomkey = substr(str_shuffle($permitted_chars), 0, 4) . '88';
-      //     $mission = new Missions();
+      //     $mission = new Mission();
       //     $mission->ms_name = $value->page_name;
       //     $mission->ms_userUUID = $user->user_uuid;
       //     $mission->ms_countdown = 60;
@@ -494,7 +496,7 @@ class UserController extends Controller
   public function cancelmission()
   {
     $user = Auth::user();
-    $ms = Missions::where('ms_userUUID', $user->id)->where('ms_status', 'already')->update(['ms_status' => 'cancel']);
+    $ms = Mission::where('ms_userUUID', $user->id)->where('ms_status', 'already')->update(['ms_status' => 'cancel']);
     return Redirect::to('/tu-khoa');
   }
 
@@ -520,7 +522,7 @@ class UserController extends Controller
   public function getMission()
   {
     $user = Auth::user();
-    $all_missions = Missions::where('ms_status', 'already')->get();
+    $all_missions = Mission::where('ms_status', 'already')->get();
     // Currently get random -> Futures: Get base on prioriry
     $pages = Page::inRandomOrder()->limit(1)->get();
     $list = [];
@@ -531,7 +533,7 @@ class UserController extends Controller
       if (!in_array($value->page_name, $list)) {
         // $permitted_chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         // $randomkey = substr(str_shuffle($permitted_chars), 0, 4) . '88';
-        $mission = new Missions();
+        $mission = new Mission();
         $mission->ms_name = $value->page_name;
         $mission->ms_userUUID = $user->id;
         $mission->ms_countdown = 60;
@@ -555,11 +557,11 @@ class UserController extends Controller
   {
     $user = Auth::user();
     $request->validate([
-      'amount' => 'required|numeric|min:1',
+      'amount' => 'required|numeric|min:20000',
     ], [
       'amount.required' => "Vui lòng nhập số tiền",
       'amount.numeric' => "Số tiền chỉ bao gồm các số",
-      'amount.min' => "Số tiền rút tối thiểu là 23000 VND",
+      'amount.min' => "Số tiền rút tối thiểu là 20000 VND",
     ]);
     $amount = $request->amount;
     $wallet = $user->wallet;

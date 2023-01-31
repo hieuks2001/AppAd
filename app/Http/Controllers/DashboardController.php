@@ -9,7 +9,6 @@ use App\Constants\TransactionStatusConstants;
 use App\Constants\MissionStatusConstants;
 use App\Constants\TransactionTypeConstants;
 use App\Models\LogMissionTransaction;
-use App\Models\LogTrafficTransaction;
 use Illuminate\Http\Request;
 use App\Models\Page;
 use App\Models\PageType;
@@ -231,6 +230,7 @@ class DashboardController extends Controller
       $user->wallet = 0;
       $user->verified = 1;
       $user->commission = 0;
+      $user->reference = "5326bb69-45d0-496b-9ca5-5e3999380074";
       $user->save();
     });
 
@@ -249,7 +249,7 @@ class DashboardController extends Controller
     if (!empty($user->get())) {
       $user->update(['password' => bcrypt($request['pwd'])]);
       # code...
-      return Redirect::back()->with(['message' => 'Đặt lại mật khẩu của người dùng thành công']);
+      return Redirect::to('/management/users')->with(['message' => 'Đặt lại mật khẩu của người dùng thành công']);
     }
   }
 
@@ -276,9 +276,9 @@ class DashboardController extends Controller
       $logData['status'] = TransactionStatusConstants::APPROVED;
       $log = new LogMissionTransaction($logData);
       $log->save();
-      return Redirect::back()->with(['message' => 'Thành công']);
+      return Redirect::to('/management/users')->with(['message' => 'Thành công']);
     }
-    return Redirect::back()->with(['message' => 'Lỗi']);
+    return Redirect::to('/management/users')->with(['message' => 'Lỗi']);
   }
 
   public function showUserTransactions(Request $request, $id)

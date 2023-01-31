@@ -11,7 +11,7 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Log;
 class HandleUserReferenceWeekly extends Command
 {
   /**
@@ -66,14 +66,12 @@ class HandleUserReferenceWeekly extends Command
     $delayDay = Setting::where("name", "delay_day_week")->first();
     $maxUserPerDay = Setting::where("name", "max_ref_user_per_day_week")->first();
     $requiredRefUser = Setting::where("name", "ref_user_required_week")->first();
-    echo ("From $start to $end");
+    Log::info("From $start to $end");
     User::chunkById(200, function ($users) use ($start, $end, $minimumReward, $delayDay, $maxUserPerDay, $requiredRefUser) {
       // Loop each user in 200 users
       foreach ($users as $user) {
-        echo "\n====================================================================\n";
-        $this->line("Checking $user->username");
         if (checkUserReference($user->id, $start, $end, (int)$requiredRefUser->value, (float)$minimumReward->value, (int)$delayDay->value, (int)$maxUserPerDay->value)) {
-          $this->info("User $user->username dat du dieu kien an tron theo tuan (week) - Tien hanh an tron");
+          Log::info("User $user->username dat du dieu kien an tron theo tuan (week) - Tien hanh an tron");
           $lv1Referrer = User::where("id", $user->reference)->first();
           if (!$lv1Referrer) {
             continue;
@@ -93,7 +91,7 @@ class HandleUserReferenceWeekly extends Command
           $noti->content = "Bạn đạt đủ điều kiện ăn trọn tiền hoa hồng của cấp dưới từ $start đến $end";
           $noti->save();
         } else {
-          $this->error("User $user->username khong du dieu kien an tron theo tuan (week)");
+          Log::info("User $user->username khong du dieu kien an tron theo tuan (week)");
           $this->giveCommission($user->id);
         }
       }

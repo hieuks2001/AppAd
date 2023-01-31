@@ -9,7 +9,7 @@
     <!-- head -->
     <thead>
       <tr>
-        <th>Username</th>
+        <!--<th>Username</th>-->
         <th>SĐT</th>
         <th>Ngày được mời</th>
         <th>Trạng thái</th>
@@ -17,8 +17,8 @@
     <tbody>
       @foreach ($users as $key => $value)
         <tr>
-          <td>{{ $value->username }}</td>
-          <td>{{ $value->phone_number }}</td>
+          <!--<td>{{  substr($value->phone_number,0,6) }}</td>-->
+          <td>{{ substr($value->phone_number,0,6) }}</td>
           <td>{{ $value->created_at }}</td>
           <td>{{
             $value->status == 1 ? "Đang hoạt động" : "Khoá"

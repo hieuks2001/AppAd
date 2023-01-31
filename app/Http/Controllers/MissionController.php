@@ -8,7 +8,6 @@ use App\Constants\PageStatusConstants;
 use App\Constants\TransactionTypeConstants;
 use App\Models\LogTransaction;
 use App\Models\Mission;
-use App\Models\Missions;
 use App\Models\Page;
 use App\Models\PageType;
 use App\Models\Setting;
@@ -147,11 +146,9 @@ class MissionController extends Controller
       ->where('status', MissionStatusConstants::DOING)
       ->orderBy('created_at', 'desc')->first();
     if ($mission) {
+      Log::info($mission->page_id);
       $page = Page::where('id', $mission->page_id)
         ->where('status', PageStatusConstants::APPROVED)->first();
-      // if ($mission->ip !== $uIP || $mission->user_agent !== $uAgent) {
-      //   return view('mission.mission', ['mission' => $mission, 'page' => $page])->withErrors("Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại");
-      // }
       if ($this->isMissionExpried($mission)) {
         $this->setMissionStatusCancel($mission);
         return view('mission.mission')->withErrors("Nhiệm vụ bị quá hạn và đã huỷ, vui lòng nhận nhiệm vụ mới!");
@@ -199,11 +196,9 @@ class MissionController extends Controller
       $pageTypeId = $this->GetRandomWeightedElement($pageType);
       $pageQuery = Page::query();
       // Get all id of page_type have mission_need <= current user page_type
-      // $pageTypeIdArr = PageType::where('mission_need', '<=', $pageType->mission_need)->pluck('id');
       // Add conditions
       $pageQuery->where('traffic_remain', '>', 0)
         ->where('status', PageStatusConstants::APPROVED)
-        // ->whereIn('page_type_id', $pageTypeIdArr);
         ->where('page_type_id', $pageTypeId)
         ->whereNotIn('priority', $excludePriority);
 
@@ -236,7 +231,9 @@ class MissionController extends Controller
         if ($pageWithTypeCount < $uMissionNeed[$pageTypeId]){
           unset($pageType[$pageTypeId]); // remove this page type id
           // If page count <= mission need for this page type id => move to next page type
-          next($types); // Page loai 1 pick by default (orderBy name asc) => Move to next page type
+          if(key($types) != count($types)-1){
+            next($types);
+          }; // Page loai 1 pick by default (orderBy name asc) => Move to next page type
           $pageType[current($types)] = $originalPageWeight[current($types)];
           $excludePriority = array();
           continue;
@@ -254,7 +251,6 @@ class MissionController extends Controller
         $mission = Mission::where('page_id', $page->id)
           ->where('user_id', $user->id)
           ->where('status', MissionStatusConstants::COMPLETED)
-          // ->where('ip', $rqIp)
           ->whereDate('updated_at',  Carbon::today())
           ->orderBy('updated_at', 'desc')->first();
 
@@ -275,7 +271,6 @@ class MissionController extends Controller
 
       if (!$pickedPage) {
         array_push($excludePriority, $pages[0]->priority);
-        // unset($pageType[$pageTypeId]);
       }
     }
 
@@ -294,7 +289,6 @@ class MissionController extends Controller
       $newMission->page_id = $pickedPage->id;
       $newMission->user_id = $user->id;
       // Reward = (price - 10% ) / traffic_sum
-      // $newMission->reward = ($pickedPage->price - ($pickedPage->price * $pickedPage->hold_percentage / 100)) / $pickedPage->traffic_sum;
       //===================
       $reward = ($pickedPage->price - ($pickedPage->price * $pickedPage->hold_percentage / 100)) / $pickedPage->traffic_sum;
       $lv1 = User::where('id', $user->reference)->first();
@@ -315,7 +309,7 @@ class MissionController extends Controller
       $newMission->status = MissionStatusConstants::DOING;
       $newMission->ip = $rqIp;
       $array_kw = explode(",", $pickedPage->keyword);
-      $newMission->keyword = $array_kw[array_rand($array_kw,1)];
+      $newMission->keyword = trim($array_kw[array_rand($array_kw,1)]);
       $newMission->user_agent = $request->userAgent();
       $newMission->origin_url = $originUrl;
       $newMission->save();

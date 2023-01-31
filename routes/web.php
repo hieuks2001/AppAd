@@ -97,11 +97,11 @@ Route::group(['middleware' => ['checkLogin']], function () {
 });
 
 // Testing
-Route::get('/ms/gen', 'DevController@createTestMissison');
-// Route::get('/ms/user', 'DevController@createUserTest');
-Route::get('/ms/user', 'DevController@UpdateUserType');
-Route::get('/ms/get', 'DevController@getMission');
-Route::get('/ms/done', 'DevController@completeMission');
+// Route::get('/ms/gen', 'DevController@createTestMissison');
+// // Route::get('/ms/user', 'DevController@createUserTest');
+// Route::get('/ms/user', 'DevController@UpdateUserType');
+// Route::get('/ms/get', 'DevController@getMission');
+// Route::get('/ms/done', 'DevController@completeMission');
 
 // Route::get('/dev/ms', 'DevController@createLogMonth');
 // Route::get('/dev/clearms', 'DevController@clearMission');
@@ -110,6 +110,6 @@ Route::get('/ms/done', 'DevController@completeMission');
 // Route::get('/dev/testuser2', 'DevController@createUserWeek');
 // Route::get('/dev/ms2', 'DevController@createLogWeek');
 
-Route::post('/mstest/missiontoday_newuser', 'DevController@missionTodayNewUser');
-Route::post('/mstest/missiontoday_olduser_do_mission', 'DevController@missionTodayOldUserDoMission');
-Route::post('/mstest/mission_checkweek', 'DevController@checkUserUpdateWeek');
+// Route::post('/mstest/missiontoday_newuser', 'DevController@missionTodayNewUser');
+// Route::post('/mstest/missiontoday_olduser_do_mission', 'DevController@missionTodayOldUserDoMission');
+// Route::post('/mstest/mission_checkweek', 'DevController@checkUserUpdateWeek');

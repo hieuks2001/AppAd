@@ -73,14 +73,12 @@ class HandleUserReferenceMonthly extends Command
     $minimumReward = Setting::where("name", "minimum_reward")->first();
     $delayDay = Setting::where("name", "delay_day_month")->first();
     $maxUserPerDay = Setting::where("name", "max_ref_user_per_day_month")->first();
-    $this->info("Checking from $start to $end");
+    Log::info("Checking from $start to $end");
     $requiredRefUserWeek = Setting::where("name", "ref_user_required_week")->first();
     $requiredRefUserMonth = Setting::where("name", "ref_user_required_month")->first();
     User::chunkById(200, function ($users) use ($dates, $minimumReward, $delayDay, $maxUserPerDay, $requiredRefUserMonth, $requiredRefUserWeek) {
       // Loop each user in 200 users
       foreach ($users as $user) {
-        echo "\n====================================================================\n";
-        $this->line("Checking $user->username");
         $count = 0;
         $refRequired = 0;
         for ($i = 1; $i <= count($dates); $i++) {
@@ -89,7 +87,7 @@ class HandleUserReferenceMonthly extends Command
           if ($refRequired >= (int)$requiredRefUserMonth->value){
             $refRequired = (int)$requiredRefUserMonth->value;
           } else {
-            $refRequired = (int)$requiredRefUserWeek * $i;
+            $refRequired = (int)$requiredRefUserWeek->value * $i;
           }
 
           if (checkUserReference($user->id, current($week), end($week), $refRequired, (float)$minimumReward->value, (int)$delayDay->value, (int)$maxUserPerDay->value)) {
@@ -98,7 +96,7 @@ class HandleUserReferenceMonthly extends Command
         }
         if ($count >= 4) {
           // echo "\nUser $user->username dat du dieu kien tach line theo thang - Tien hanh tach line.\n";
-          $this->info("User $user->username dat du dieu kien tach line theo thang - Tien hanh tach line.");
+          Log::info("User $user->username dat du dieu kien tach line theo thang - Tien hanh tach line.");
           // Create notification
           $noti = new Notification();
           $noti->user_id = $user->id;
@@ -106,7 +104,7 @@ class HandleUserReferenceMonthly extends Command
           $noti->save();
           $this->removeReference($user->id);
         } else {
-          $this->error("User $user->username khong du dieu kien tach line theo thang.");
+          Log::info("User $user->username khong du dieu kien tach line theo thang.");
         }
       }
     }, $column = "id");
@@ -121,7 +119,7 @@ class HandleUserReferenceMonthly extends Command
 
     $u->reference = null;
     $u->save();
-    $this->info("$u->username da tach line xong.");
+    Log::info("$u->username da tach line xong.");
     return;
   }
 }

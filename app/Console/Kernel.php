@@ -3,6 +3,8 @@
 namespace App\Console;
 
 use App\Console\Commands\UsersResetMissionCount;
+use App\Console\Commands\HandleUserReferenceMonthly;
+use App\Console\Commands\HandleUserReferenceWeekly;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -15,6 +17,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         UsersResetMissionCount::class,
+        HandleUserReferenceMonthly::class,
+        UsersResetMissionCount::class,
     ];
 
     /**
@@ -26,7 +30,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('mission:reset')->daily()->timezone("Asia/Ho_Chi_Minh")->at('00:00');
+        $schedule->command('user:update-week')->weeklyOn(7, '00:10')->timezone('Asia/Ho_Chi_Minh');
+        $schedule->command('user:update-month')->monthlyOn(1, '00:15')->timezone('Asia/Ho_Chi_Minh');
+        $schedule->command('mission:reset')->dailyAt('00:05')->timezone('Asia/Ho_Chi_Minh');
     }
 
     /**

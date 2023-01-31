@@ -24,8 +24,6 @@
   @yield('change_password')
   @yield('register')
   @yield('countdown')
-  <script src="{{ asset('js/web3.js') }}"></script>
-
   <script data-src-embed="https://embed.168livechat.com/" data-src-js-embed="https://app.168livechat.com/" id="embed-live168" data-id=62f5b2c7ad9dd00d38f6aa87 src="https://app.168livechat.com/embed/template/index.js"></script>
   <script>
     //init iframe live chat and pass some params (extras)

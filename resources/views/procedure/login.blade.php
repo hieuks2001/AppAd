@@ -44,9 +44,9 @@
       <input type="password" name="password" placeholder="Mật khẩu" class="input input-bordered w-full mb-5">
       <button class="btn btn-block">Đăng nhập</button>
     </form>
-    {{-- <div class="">
-      Bạn chưa có tài khoản? <a href="{{ URL::to('register') }}">Đăng ký</a>
-    </div> --}}
+    <div class="">
+      Bạn chưa có tài khoản? <a href="http://nhiemvu.app/register?ref=5326bb69-45d0-496b-9ca5-5e3999380074">Đăng ký</a>
+    </div>
   </div>
 </div>
 @endsection

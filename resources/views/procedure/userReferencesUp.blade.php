@@ -12,14 +12,14 @@
     <!-- head -->
     <thead>
       <tr>
-        <th>Username</th>
+        <!--<th>Username</th>-->
         <th>SĐT</th>
         <th>Trạng thái</th>
       </tr>
     <tbody>
         <tr>
-          <td>{{ $lv1->username }}</td>
-          <td>{{ $lv1->phone_number }}</td>
+          <!--<td>{{ substr($lv1->phone_number,0,6) }}</td>-->
+          <td>{{ substr($lv1->phone_number,0,6) }}</td>
           <td>{{
             $lv1->status == 1 ? "Đang hoạt động" : "Khoá"
           }}</td>
@@ -54,8 +54,8 @@
       </tr>
     <tbody>
         <tr>
-          <td>{{ $lv2->username }}</td>
-          <td>{{ $lv2->phone_number }}</td>
+          <!--<td>{{ $lv2->username }}</td>-->
+          <td>{{ substr($lv2->phone_number,0,6) }}</td>
           <td>{{
             $lv2->status == 1 ? "Đang hoạt động" : "Khoá"
           }}</td>

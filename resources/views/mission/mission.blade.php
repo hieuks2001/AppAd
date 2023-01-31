@@ -43,9 +43,9 @@
   $imgName = $imgTmp[0] . '-' . trim($mission->keyword) . '.' . $imgTmp[1];
   @endphp
   <picture class="mx-auto">
-    <source media="(max-width: 799px)" srcset="{{config('app.img_url')}}/images/small/{{$imgName}}" />
-    <source media="(min-width: 800px)" srcset="{{config('app.img_url')}}/images/large/{{$imgName}}" />
-    <img src="{{config('app.img_url')}}/images/large/{{$imgName}}" alt="">
+    <source media="(max-width: 799px)" srcset="{{config('app.img_url')}}/images/small/{{rawurlencode($imgName)}}" />
+    <source media="(min-width: 800px)" srcset="{{config('app.img_url')}}/images/large/{{rawurlencode($imgName)}}" />
+    <img src="{{config('app.img_url')}}/images/small/{{rawurlencode($imgName)}}" alt="">
   </picture>
   @if ($errors->all())
   @if ($errors->all()[0] !== "Nhiệm vụ bị quá hạn, vui lòng hủy và nhận lại")
@@ -76,7 +76,7 @@
 <script>
   document.getElementById("btn-copy-kw").addEventListener("change",(e)=>{
         if (e.currentTarget.checked) {
-          navigator.clipboard.writeText({!!json_encode($page->keyword)!!})
+          navigator.clipboard.writeText({!!json_encode(trim($mission->keyword))!!})
         } else {
           document.getElementById("btn-copy-kw").checked = true
         }
