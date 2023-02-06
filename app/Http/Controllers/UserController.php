@@ -354,7 +354,7 @@ class UserController extends Controller
       ["status", MissionStatusConstants::DOING]
     ]);
     if (!$ms->count()) { //not found
-      return Redirect::to('/tu-khoa')->withErrors('Lỗi');
+      return Redirect::to('/tu-khoa')->withErrors('Hết hạn, vui lòng nhận lại nhiệm vụ mới');
     }
     $code = Code::where([
       ["code", $request->key],
@@ -401,16 +401,26 @@ class UserController extends Controller
             $lv2 = User::where('id', $lv1->reference)->first();
             if ($lv2) {
               $lv2Commission = $oldReward * (int)$commisonRateV2->value / 100; // (Get 1%)
+              $lv1Commissionlv2 = $lv2Commission * (int)$commisonRateV1->value / 100; //(Get 30% from % lv2)
+              $lv2CommissionReal = $lv2Commission - $lv1Commissionlv2;
               $reward -= $lv2Commission;
               //
               $logLV2 = new LogTransaction([
-                'amount' => $lv2Commission,
+                'amount' => $lv2CommissionReal,
                 'user_id' => $lv2->id,
                 'from_user_id' => $user->id,
                 'type' => TransactionTypeConstants::COMMISSION,
                 'status' => 0, // pending -> update later on weekend?
               ]);
+              $logLV1reward = new LogTransaction([
+                'amount' => $lv1Commissionlv2,
+                'user_id' => $lv1->id,
+                'from_user_id' => $lv2->id,
+                'type' => TransactionTypeConstants::COMMISSION,
+                'status' => 0, // pending -> Update later on weekend?
+              ]);
               $logLV2->save();
+              $logLV1reward->save();
             }
           }
         }

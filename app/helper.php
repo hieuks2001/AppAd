@@ -5,7 +5,7 @@ use App\Models\LogTransaction;
 use App\Models\User;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Log;
 if (!function_exists('checkUserReference')) {
 
   function checkUserReference($userId, $fromDate, $toDate, $userCount, $minimumReward = 20, $delayDays = 1, $maxUserPerDay = 2)

@@ -54,7 +54,6 @@
       </tr>
     <tbody>
         <tr>
-          <!--<td>{{ $lv2->username }}</td>-->
           <td>{{ substr($lv2->phone_number,0,6) }}</td>
           <td>{{
             $lv2->status == 1 ? "Đang hoạt động" : "Khoá"
