@@ -74,7 +74,7 @@ class DashboardController extends Controller
   public function managementUsers()
   {
     $userTypes = UserType::get();
-    $users = User::where([['status', 1], ['is_admin', 0]])->simplePaginate(10);
+    $users = User::where([['is_admin', 0]])->simplePaginate(10);
     return view('admin.users', compact(['userTypes', 'users']));
   }
 
@@ -193,6 +193,15 @@ class DashboardController extends Controller
     $user = User::where('id', $id)->first();
     if ($user and $user->status == 0) {
       $user->status = 1;
+      $user->save();
+    }
+    return redirect()->to('/management/users');
+  }
+  public function postBlockUser(Request $request, $id)
+  {
+    $user = User::where('id', $id)->first();
+    if ($user and $user->status == 1) {
+      $user->status = 0;
       $user->save();
     }
     return redirect()->to('/management/users');

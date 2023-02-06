@@ -163,13 +163,16 @@
         <td>
           @if ($value->status)
           <!-- volume on icon -->
-          <svg class="swap-on fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-            viewBox="0 0 20 20" fill="currentColor">
-            <path
+          <label for="modal-change--block" class="btn btn-square btn-outline btn-sm"
+            onclick="onBlockUser('{{$value->id}}')">
+            <svg class="swap-on fill-current w-6 h-6" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+              viewBox="0 0 20 20" fill="currentColor">
+              <path
               d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z" />
-          </svg>
+            </svg>
+          </label>
           @else
-          <form class="mb-0" action="{{action('DashboardController@postUnblockUser',$value->id)}}" method="post">
+          <form class="mb-0 btn btn-square btn-outline btn-sm" action="{{action('DashboardController@postUnblockUser',$value->id)}}" method="post">
             @csrf
             <button type="submit">
               <!-- volume off icon -->
@@ -225,6 +228,20 @@
       href="{{$users->previousPageUrl()}}">Previous</a>
     <a class="btn btn-outline btn-sm {{!$users->hasMorePages() ? 'btn-disabled' : ''}}"
       href="{{$users->nextPageUrl()}}">Next</a>
+  </div>
+</div>
+<input type="checkbox" id="modal-change--block" class="modal-toggle" />
+<div class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box">
+    <label for="modal-change--block" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <h3 class="font-bold text-lg">Bạn có chắc chắn làm điều này?</h3>
+    <p class="py-4" id="modal-change--block__label"></p>
+    <div class="modal-action">
+      <form id="form-modal-change--block" class="mb-0" method="post">
+        @csrf
+        <label for="modal-change--block"><button class="btn">Khoá</button></label>
+      </form>
+    </div>
   </div>
 </div>
 <!-- Modal change password -->
@@ -500,6 +517,16 @@
       labelFormChangePwd.textContent = user.username
       console.log(`management/user/${user.id}/change_password`);
       formChangePwd.action = `/management/user/${user.id}/change_password?type=${type}`
+    }
+    const formChangeBlock = document.getElementById("form-modal-change--block");
+    const labelFormChangeBlock = document.getElementById("modal-change--block__label");
+    function onBlockUser(uid) {
+      // const data = type === 'traffic' ? usersTraffic.data : users.data
+      const data = users.data
+      console.log(uid);
+      const user = data.find(ele=>ele.id===uid)
+      labelFormChangeBlock.innerHTML = `Bạn có chắc muỗn khoá tài khoản của người dùng <b>${user.username}</b>`
+      formChangeBlock.action = `/management/user/${user.id}/block`
     }
     function handleEditChange(ele) {
       if ("mission_need" in ele.dataset) {
