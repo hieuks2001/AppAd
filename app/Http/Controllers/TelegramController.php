@@ -150,12 +150,12 @@ class TelegramController extends Controller
       }
 
       if (!$mRequest) {
-        echo "Không tìm thấy yêu cầu ! id " . $data->id_request . " từ " . $data->from;
+        Log::info("Không tìm thấy yêu cầu ! id " . $data->id_request . " từ " . $data->from);
         return 'ok';
       }
 
       if ($mRequest->status == TransactionStatusConstants::APPROVED || $mRequest->status == TransactionStatusConstants::CANCELED) {
-        echo "Yêu cầu đã được duyệt rồi! id " . $data->id_request . " từ " . $data->from;
+        Log::info("Yêu cầu đã được duyệt rồi! id " . $data->id_request . " từ " . $data->from);
         return 'ok';
       }
 
@@ -167,7 +167,7 @@ class TelegramController extends Controller
           $targetUser->increment("wallet", $mRequest->amount);
         } else if ($mRequest->type == TransactionTypeConstants::WITHDRAW) {
           if (($targetUser)->first()->wallet < $mRequest->amount) {
-            echo "Người dùng không đủ VND cho yêu cầu này! id " . $data->id_request . " từ " . $data->from;
+            Log::info("Người dùng không đủ VND cho yêu cầu này! id " . $data->id_request . " từ " . $data->from);
             return 'ok';
           }
           // momo
@@ -179,21 +179,16 @@ class TelegramController extends Controller
           $rsMomo = $this->momoSend($body, function ($result) use ($targetUser, $mRequest) {
             if (!$result["error"]) { //thanh cong
               $targetUser->decrement("wallet", $mRequest->amount);
-              return true;
-            } else {
-              //momo error
-              echo "Lỗi chuyển tiền" . $result["message"];
-              return false;
             }
           });
-          if (!$rsMomo) {
+          if ($rsMomo["error"]) {
             $mRequest->status = TransactionStatusConstants::CANCELED;
             $mRequest->save();
             try {
               Telegram::editMessageText([
                 'parse_mode' => 'HTML',
                 'chat_id' => $mRequest->type == TransactionTypeConstants::TOPUP ? env('TELEGRAM_ADMIN_DEPOSIT') : env('TELEGRAM_ADMIN'),
-                'text' => $old_txt . "\n<b>Đã Huỷ. Kiểm tra lại thông tin!</b>\n",
+                'text' => $old_txt . "\n<b>Đã Huỷ. ". $rsMomo["message"] ."!</b>\n",
                 'message_id' => $record->message->message_id
               ]);
             } catch (\Throwable $th) {

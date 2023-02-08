@@ -67,11 +67,14 @@ async function getCode(k, d) {
 let bodyHeight = 0;
 const getCodeBtn = document.getElementById("getCode");
 (async () => {
+    getCodeBtn.textContent="Vui lòng chờ giây lát";
   const result = await getCode(localStorage.getItem("publicKey"), null).catch(
     (e) => {
       handleError(e);
     }
-  );
+  ).finally(()=>{
+      getCodeBtn.textContent="Lấy mã";
+  });
   if (result?.code) {
     getCodeBtn.textContent = result.code;
     getCodeBtn.title = "Click để sao chép code";
