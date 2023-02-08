@@ -31,6 +31,7 @@ Route::get('/logout', 'UserController@logout');
 Route::group(['middleware' => ['checkLogin']], function () {
   Route::get('/withdraw', 'UserController@withdrawView');
   Route::post('/withdraw', 'UserController@withdraw');
+  Route::get('/balance', 'UserController@balance');
 });
 
 // Missions

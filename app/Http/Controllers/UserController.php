@@ -623,4 +623,14 @@ class UserController extends Controller
 
     return view("usdt.withdraw");
   }
+
+  public function balance()
+  {
+    $user = Auth::user();
+    $transactions = LogMissionTransaction::where("user_id",$user->id)
+                    ->orWhere("from_user_id",$user->id)
+                    ->orderBy('updated_at','desc')
+                    ->simplePaginate(10);
+    return view("procedure.balance",["transactions" => $transactions]);
+  }
 }

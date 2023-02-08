@@ -44,6 +44,7 @@
       @yield('mission')
       @yield('regispage')
       @yield('usdt')
+      @yield('balance')
       @yield('ref')
     </div>
   </div>
@@ -57,6 +58,7 @@
       {{-- <li><a class="menu-item" href="{{ URL::to('deposit') }}">Nạp tiền</a></li> --}}
       <li><a class="menu-item" href="{{ URL::to('withdraw') }}">Rút tiền</a></li>
       <li><a class="menu-item" href="{{ URL::to('ref') }}">Mã giới thiệu</a></li>
+      <li><a class="menu-item" href="{{ URL::to('balance') }}">Biến động số dư</a></li>
       <li><a class="menu-item" href="{{ URL::to('user-ref-up') }}">Cấp trên</a></li>
       <li><a class="menu-item" href="{{ URL::to('user-ref') }}">Cấp dưới</a></li>
     </ul>
