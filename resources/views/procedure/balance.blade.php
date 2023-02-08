@@ -19,6 +19,7 @@
       <tr>
         <td>@switch($value->type)
           @case('commission')
+          @if ($value->from_user_id==Auth::user()->id)
           Trả cho cấp trên (@switch($value->status)
           @case(1)
           Bạn mất
@@ -29,6 +30,19 @@
           @default
           Hệ thống tạm giữ
           @endswitch)
+          @else
+          Bạn được nhận từ cấp dưới(@switch($value->status)
+          @case(1)
+          Được nhận
+          @break
+          @case(-1)
+          Không được nhận
+          @break
+          @default
+          Hệ thống tạm giữ
+          @endswitch)
+          @endif
+
           @break
           @case('reward')
           Nhận thưởng nhiệm vụ
