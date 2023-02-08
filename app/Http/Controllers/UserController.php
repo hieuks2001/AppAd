@@ -566,12 +566,13 @@ class UserController extends Controller
   public function withdraw(Request $request)
   {
     $user = Auth::user();
+    $min_withdraw = Setting::where("name", "minimum_withdraw")->first();
     $request->validate([
-      'amount' => 'required|numeric|min:20000',
+      'amount' => 'required|numeric|min:' . $min_withdraw->value,
     ], [
       'amount.required' => "Vui lòng nhập số tiền",
       'amount.numeric' => "Số tiền chỉ bao gồm các số",
-      'amount.min' => "Số tiền rút tối thiểu là 20000 VND",
+      'amount.min' => "Số tiền rút tối thiểu là ".$min_withdraw->value." VND",
     ]);
     $amount = $request->amount;
     $wallet = $user->wallet;

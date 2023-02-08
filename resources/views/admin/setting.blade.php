@@ -11,6 +11,7 @@ $labels["max_ref_user_per_day_week"] = "Số lượng User được mời tối 
 $labels["max_ref_user_per_day_month"] = "Số lượng User được mời tối đa mỗi ngày (Tách line tháng)";
 $labels["ref_user_required_week"] = "Số lượng người dùng yêu cầu (Ăn trọn theo tuần)";
 $labels["ref_user_required_month"] = "Số lượng người dùng yêu cầu (Tách line tháng)";
+$labels["minimum_withdraw"] = "Mức rút tối thiểu";
 
 @endphp
 <div class="flex justify-center">

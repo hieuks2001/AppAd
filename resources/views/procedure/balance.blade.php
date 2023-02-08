@@ -2,7 +2,7 @@
 @section('balance')
 <div class="mb-10 overflow-x-auto rounded-2xl bg-white p-5 drop-shadow-2xl">
   <div class="flex items-center justify-between">
-    <h3 class="text-2xl font-bold text-slate-800">Danh sách cấp dưới của bạn</h3>
+    <h3 class="text-2xl font-bold text-slate-800">Danh sách biến động</h3>
   </div>
   <br />
   <table class="table w-full">

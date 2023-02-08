@@ -137,7 +137,6 @@ class HandleUserReferenceWeekly extends Command
     // Begin transaction for money!!!
     foreach ($pendingCommision as $value) {
       DB::transaction(function () use ($value) {
-        // echo ("User_id >>>> " . $value->user_id . " >>>> " . $value->amount . "\n");
         $u = DB::table("user_missions")->where("id", $value->user_id)->first();
         DB::table("user_missions")->where("id", $value->user_id)->increment("wallet", $value->amount); // ->user_id mean referrer
         $value->before = $u->wallet;

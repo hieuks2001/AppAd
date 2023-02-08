@@ -381,6 +381,7 @@ class DashboardController extends Controller
   {
     $validated = $request->validate([
       "minimum_reward" => "required|numeric",
+      "minimum_withdraw" => "required|numeric",
       "delay_day_week" => "required|numeric",
       "delay_day_month" => "required|numeric",
       "commission_rate_1" => "required|numeric",
