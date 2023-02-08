@@ -20,6 +20,11 @@ class SettingSeeder extends Seeder
     );
     $minimumReward->save();
 
+    $minimumWithdraw = new Setting(
+      ["name" => "minimum_withdraw", "value" => "100000"] //0.3*23000
+    );
+    $minimumWithdraw->save();
+
     $delayDayWeek = new Setting(
       ["name" => "delay_day_week", "value" => "1"]
     );
