@@ -32,6 +32,7 @@ class Kernel extends ConsoleKernel
     // $schedule->command('inspire')->hourly();
     $schedule->command('code:clear')->dailyAt('00:05')->timezone('Asia/Ho_Chi_Minh');
     $schedule->command('log:clear')->dailyAt('00:10')->timezone('Asia/Ho_Chi_Minh');
+    $schedule->command('telegram:report')->dailyAt('00:2')->timezone('Asia/Ho_Chi_Minh');
   }
 
   /**
