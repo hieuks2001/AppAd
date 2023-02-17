@@ -165,6 +165,7 @@ class MissionController extends Controller
     $originUrl = $request->headers->get('origin');
     $pageType = $this->UpdateUserType();
     $excludePriority = [];
+    $excludePage = array();
     $user = Auth::user();
     $uType = $user->userType;
     $uMissionNeed = $uType->mission_need;
@@ -216,8 +217,10 @@ class MissionController extends Controller
           [
             'page_type_id' => $pageTypeId,
             'status' => PageStatusConstants::APPROVED,
-          ]
-        )->where('traffic_remain', '>', 0)->count(); // Count pages available with current pageTypeId
+          ])
+          ->where('traffic_remain', '>', 0)
+          ->whereNotIn('id', $excludePage)->count(); // Count pages available with current pageTypeId
+
         if (!array_key_exists($pageTypeId, $uMissionNeed) && array_key_exists($pageTypeId, $pageType)){
           // Travelled from all page types => only have 1 page type as last.
           if ($pageWithTypeCount <= 0){
@@ -248,6 +251,20 @@ class MissionController extends Controller
       $now = Carbon::now();
 
       foreach ($pages as $page) {
+
+        // Check traffic_per_day
+        $max_traffic = $page->traffic_per_day;
+        // Count completed - on doing page's missions from missions table
+        $count = Mission::where("page_id", $page->id)
+          ->where("status", ">=" , "0")
+          ->whereDate('created_at', Carbon::today())
+          ->count();
+
+        if ($count >= $max_traffic){
+          array_push($excludePage, $page->id);
+          continue; // applied to current foreach loop ($pages as $page)
+        }
+
         $mission = Mission::where('page_id', $page->id)
           ->where('user_id', $user->id)
           ->where('status', MissionStatusConstants::COMPLETED)
