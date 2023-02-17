@@ -47,8 +47,8 @@ class TelegramReportDaily extends Command
       $transactions = LogMissionTransaction::whereBetween('updated_at',[$start,$end])->where('type','withdraw');
       $approved = clone $transactions;
       $not_approved = clone $transactions;
-      $transactionsApproved = $approved->where('status',1)->selectRaw('sum(amount) as sum_amount, count(*) as total')->get();
-      $transactionsNotApproved = $not_approved->where('status',0)->selectRaw('count(*) as total')->get();
+      $transactionsApproved = $approved->where('status',1)->selectRaw('sum(amount) as sum_amount, count(*) as total')->first();
+      $transactionsNotApproved = $not_approved->where('status',0)->selectRaw('count(*) as total')->first();
       $text = "Báo cáo từ nhiemvu.app \n"
       . "Tổng số yêu cầu đã duyệt: $transactionsApproved->total\n"
       . "Tổng số tiền đã duyệt: $transactionsApproved->sum_amount\n";

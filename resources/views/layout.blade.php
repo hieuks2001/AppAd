@@ -24,18 +24,19 @@
   @yield('change_password')
   @yield('register')
   @yield('countdown')
-  <script data-src-embed="https://embed.168livechat.com/" data-src-js-embed="https://app.168livechat.com/" id="embed-live168" data-id=62f5b2c7ad9dd00d38f6aa87 src="https://app.168livechat.com/embed/template/index.js"></script>
-  <script>
-    //init iframe live chat and pass some params (extras)
-      window.Live168API.init({
-        webId: "62f5b2c7ad9dd00d38f6aa87",
-        extras: {
-          userId: {{Auth::check() ? Auth::user()->username : "null"}},
-          domain: window.location.hostname,
-          ref: document.referrer,
-        },
-      });
-  </script>
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/63e4d5fd4742512879125f1a/1goqu7qbe';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+    </script>
+    <!--End of Tawk.to Script-->
   @stack('scripts')
 </body>
 
