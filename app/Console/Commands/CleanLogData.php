@@ -46,7 +46,8 @@ class CleanLogData extends Command
       foreach ($data as $item) {
         $item->delete();
       }
-
+      
+      $now = Carbon::now()->subMonth(1);
       $data = LogMissionTransaction::whereDate('created_at', '<', $now )->cursor();
       foreach ($data as $item) {
         $item->delete();

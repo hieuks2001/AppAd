@@ -169,33 +169,34 @@ class TelegramController extends Controller
           if (($targetUser)->first()->wallet < $mRequest->amount) {
             Log::info("Người dùng không đủ VND cho yêu cầu này! id " . $data->id_request . " từ " . $data->from);
             return 'ok';
-          }
-          // momo
-          $body = new \stdClass();
-          $body->phone = $targetUser->first()->phone_number;
-          $body->money = $mRequest->amount;
-          $from_site = $data->from == 'traffic' ? 'memtraffic.com' : 'nhiemvu.app';
-          $body->comment = "Rút tiền từ " . $from_site;
-          $rsMomo = $this->momoSend($body, function ($result) use ($targetUser, $mRequest) {
-            if (!$result["error"]) { //thanh cong
-              $targetUser->decrement("wallet", $mRequest->amount);
-            }
-          });
-          if ($rsMomo["error"]) {
-            $mRequest->status = TransactionStatusConstants::CANCELED;
-            $mRequest->save();
-            try {
-              Telegram::editMessageText([
-                'parse_mode' => 'HTML',
-                'chat_id' => $mRequest->type == TransactionTypeConstants::TOPUP ? env('TELEGRAM_ADMIN_DEPOSIT') : env('TELEGRAM_ADMIN'),
-                'text' => $old_txt . "\n<b>Đã Huỷ. ". $rsMomo["message"] ."!</b>\n",
-                'message_id' => $record->message->message_id
-              ]);
-            } catch (\Throwable $th) {
-              // throw $th;
-            }
-            return 'ok';
-          };
+          } 
+          $targetUser->decrement("wallet", $mRequest->amount); //remove momo
+        //   // momo
+        //   $body = new \stdClass();
+        //   $body->phone = $targetUser->first()->phone_number;
+        //   $body->money = $mRequest->amount;
+        //   $from_site = $data->from == 'traffic' ? 'memtraffic.com' : 'nhiemvu.app';
+        //   $body->comment = "Rút tiền từ " . $from_site;
+        //   $rsMomo = $this->momoSend($body, function ($result) use ($targetUser, $mRequest) {
+        //     if (!$result["error"]) { //thanh cong
+        //       $targetUser->decrement("wallet", $mRequest->amount);
+        //     }
+        //   });
+        //   if ($rsMomo["error"]) {
+        //     $mRequest->status = TransactionStatusConstants::CANCELED;
+        //     $mRequest->save();
+        //     try {
+        //       Telegram::editMessageText([
+        //         'parse_mode' => 'HTML',
+        //         'chat_id' => $mRequest->type == TransactionTypeConstants::TOPUP ? env('TELEGRAM_ADMIN_DEPOSIT') : env('TELEGRAM_ADMIN'),
+        //         'text' => $old_txt . "\n<b>Đã Huỷ. ". $rsMomo["message"] ."!</b>\n",
+        //         'message_id' => $record->message->message_id
+        //       ]);
+        //     } catch (\Throwable $th) {
+        //       // throw $th;
+        //     }
+        //     return 'ok';
+        //   };
         };
         $mRequest->status = TransactionStatusConstants::APPROVED;
         $mRequest->save();

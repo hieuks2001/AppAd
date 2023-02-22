@@ -27,7 +27,7 @@ class StoreOrderPageTraffic extends FormRequest
   {
     return [
       'url' => 'required|url',
-      'keyword' => ["required", "regex:/((\w(\s)?)+(,)?(\s)?)+/", "not_regex:/[!@#$%^&*()_+\-=\[\]{};':\"\\|.<>\/?]/"],
+      'keyword' => ["required", "regex:/(([a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễếệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]*(\s)?)+([.,])?(\s)?)+/", "not_regex:/[!@#$%^&*()_+\-=\[\]{};':\"\\|<>\/?]/"],
       'traffic_per_day' => 'required|integer|min:30',
       'traffic_sum' => 'required|integer|gt:traffic_per_day',
       'page_type' => 'required|uuid',
