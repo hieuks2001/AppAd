@@ -353,12 +353,14 @@ class UserController extends Controller
       ["user_agent", $request->userAgent()],
       ["status", MissionStatusConstants::DOING]
     ]);
+    $temp = clone $ms;
     if (!$ms->count()) { //not found
       return Redirect::to('/tu-khoa')->withErrors('Hết hạn, vui lòng nhận lại nhiệm vụ mới');
     }
     $code = Code::where([
       ["code", $request->key],
-      ["status", 0]
+      ["status", 0],
+      ["pageId", $temp->first()->page_id]
     ]);
 
     $commisonRateV1 = Setting::where("name", "commission_rate_1")->first();

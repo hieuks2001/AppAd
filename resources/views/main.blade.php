@@ -64,6 +64,7 @@
     </ul>
   </div>
 </div>
+
 <script>
   let menu = document.querySelectorAll('.menu-item');
         if (window.location.href.endsWith("/")) {
