@@ -10,7 +10,7 @@ class Code extends Model
     //
     use Uuids;
     protected $fillable = [
-      'keys', 'code'
+      'keys', 'code', 'pageId'
     ];
     //
     protected $table = 'codes';

@@ -17,6 +17,7 @@ class CreateCodesTable extends Migration
           $table->uuid("id")->primary()->unique();
           $table->json('keys');
           $table->string('code')->default('');
+          $table->string('pageId')->default('');
           $table->tinyInteger('status')->default(0);
           $table->timestamps();
         });

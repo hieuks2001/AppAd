@@ -290,12 +290,13 @@ class MissionController extends Controller
       $result = Code::where([
         ["id", $key],
         ["status", 0],
+        ["pageId", $pageId]
       ]);
       if (!($result->first()) and (is_int($time))) {
         $page = Page::where([
           ["id", $pageId],
           ["status", PageStatusConstants::APPROVED],
-        ])->get(["onsite"])->first();
+        ])->get(["onsite","id"])->first();
         if ($page->onsite != ($time + 3)) {
           return response()->json(["error" => "Error"]);
         }
@@ -307,6 +308,7 @@ class MissionController extends Controller
           hexdec($key[25] . $key[28]) => false,
           0 => false,
         ]);
+        $newCode->pageId = $page->id;
         $newCode->save();
         return response()->json(["success" => "Success"]);
       };

@@ -134,7 +134,8 @@ class DashboardController extends Controller
         $reward = ($page->price - ($page->price * $page->hold_percentage / 100)) / $page->traffic_sum;
         $array_keyword = explode(",", $page->keyword);
         foreach ($array_keyword as $kw) {
-          $browsershot = Browsershot::html('
+          if (!empty($kw)) {
+            $browsershot = Browsershot::html('
         <!doctype html>
         <html>
         <head>
@@ -166,6 +167,7 @@ class DashboardController extends Controller
             ->save(public_path('images/small/') . $pageImgName[0] . '-' . trim($kw) . '.' . $pageImgName[1]);
           $browsershot->windowSize(env('IMG_LARGE_W'), env('IMG_LARGE_H'))
             ->save(public_path('images/large/') . $pageImgName[0] . '-' . trim($kw) . '.' . $pageImgName[1]);
+          }
         }
         $log = new LogTrafficTransaction();
         $log->user_id = $page->user_id;
