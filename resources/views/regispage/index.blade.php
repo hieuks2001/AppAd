@@ -3,7 +3,6 @@
 @include('box.patternBox2')
 <br />
 <div class="container mx-auto md:w-2/5" style="margin-top:5%">
-
   @if ($errors->all())
   @foreach ($errors->all() as $err)
   <div class="alert alert-error mb-5 shadow-lg">

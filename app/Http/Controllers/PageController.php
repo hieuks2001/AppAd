@@ -35,7 +35,17 @@ class PageController extends Controller
     try {
       $user = Auth::user();
       $page = new Page($validated);
-
+      $pages_exist = Page::selectRaw('pages.*')
+      ->join('missions', 'missions.page_id', '=', 'pages.id')
+      ->where('url',$page->url)
+      ->where('pages.status', PageStatusConstants::APPROVED)
+      ->where('missions.status', MissionStatusConstants::COMPLETED)
+      ->where('pages.user_id', Auth::user()->id)
+      ->groupBy('pages.id')
+      ->havingRaw('count(missions.id) < pages.traffic_sum')->get();
+      if ($pages_exist->count()>0){
+        return redirect()->back()->withErrors("$page->url chưa chạy xong!");
+      }
       $page->keyword = str_replace(array('/', '//', '/*'), "", $page->keyword);
 
       DB::transaction(function () use ($user, $page, $validated) {
@@ -62,7 +72,7 @@ class PageController extends Controller
       return redirect()->back()->with(['message' => 'Thêm thành công!', "pageId" => $page->id]);
     } catch (\Throwable $th) {
       // *TODO: Add transaction here: Rollback usdt
-      return redirect()->back()->with('error', 'Thêm thất bại!');
+      return redirect()->back()->withErrors('error', 'Thêm thất bại!');
     }
   }
   public function regispageTab1()
