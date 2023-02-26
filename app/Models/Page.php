@@ -37,10 +37,9 @@ class Page extends Model
   ];
 
   protected $hidden = [
-    'status', 'traffic_sum', 'traffic_remain',
-    'page_type_id', 'hold_percentage', 'price',
+    'traffic_sum', 'hold_percentage', 'price',
     'price_per_traffic', 'traffic_per_day', 'timeout',
-    'user_id', 'created_at', 'updated_at', 'priority', 'note'
+    'user_id', 'created_at', 'updated_at', 'note'
   ];
 
   public function user()

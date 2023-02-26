@@ -12,7 +12,7 @@
     <tbody>
       <tr>
         <td>#1</td>
-        <td>Traffic của site chưa sẵn sàng (chưa được duyệt)</td>
+        <td>Traffic của site chưa sẵn sàng (chưa được duyệt) hoặc đã chạy hết</td>
       </tr>
       <tr>
         <td>#2</td>

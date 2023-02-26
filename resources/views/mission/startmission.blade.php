@@ -28,7 +28,7 @@
 <br>
 <br>
 <div class="flex justify-center">
-    <form action="{{ URL::to('tu-khoa') }}" method="post">
+    <form action="{{ URL::to('tu-khoa') }}" method="post" onsubmit="document.querySelector('button').disabled=true;document.querySelector('button').textContent='Đang xử lý'">
         @csrf
         <button type="submit" class="btn btn-success text-xl">Làm nhiệm vụ</button>
     </form>

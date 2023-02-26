@@ -35,7 +35,7 @@ class DashboardController extends Controller
         ['pages.status', "=", PageStatusConstants::APPROVED],
         ['missions.status', "=", MissionStatusConstants::COMPLETED],
       ])
-      ->orderBy("pages.price_per_traffic", "DESC")
+      ->orderBy("missions.updated_at", "DESC")
       ->simplePaginate(
         $perPage = 20,
         $columns = [
@@ -58,7 +58,7 @@ class DashboardController extends Controller
         $query->where('url', 'LIKE', "%{$key}%");
         $query->orWhere('origin_url', 'LIKE', "%{$key}%");
       })
-      ->orderBy("pages.price_per_traffic", "DESC")
+      ->orderBy("missions.updated_at", "DESC")
       ->simplePaginate(
         $perPage = 20,
         $columns = [
@@ -193,6 +193,7 @@ class DashboardController extends Controller
     $user = User::where('id', $id)->first();
     if ($user and $user->status == 0) {
       $user->status = 1;
+      $user->mission_attempts = 0;
       $user->save();
     }
     return redirect()->to('/management/users');
@@ -277,6 +278,12 @@ class DashboardController extends Controller
 
     if (!empty($user->get())) {
       $userData = $user->first();
+      if (
+        $logData['type'] == TransactionTypeConstants::ADMIN_MINUS &&
+        $logData['amount'] > $userData->wallet
+      ) {
+        return Redirect::to('/management/users')->with(['message' => 'Lỗi không đủ tiền trong ví tài khoản!']);
+      }
       $logData['before'] = $userData->wallet;
       $logData['user_id'] = $userData->id;
       $user->increment('wallet', $request['amount']);

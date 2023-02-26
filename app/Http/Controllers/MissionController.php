@@ -146,7 +146,6 @@ class MissionController extends Controller
       ->where('status', MissionStatusConstants::DOING)
       ->orderBy('created_at', 'desc')->first();
     if ($mission) {
-      Log::info($mission->page_id);
       $page = Page::where('id', $mission->page_id)
         ->where('status', PageStatusConstants::APPROVED)->first();
       if ($this->isMissionExpried($mission)) {
@@ -159,8 +158,8 @@ class MissionController extends Controller
     }
   }
 
-  public function postMission(Request $request)
-  {
+    public function postMission(Request $request)
+    {
     // Update UserType
     $originUrl = $request->headers->get('origin');
     $pageType = $this->UpdateUserType();
@@ -191,17 +190,13 @@ class MissionController extends Controller
 
     // NO MISSION CURRENTLY DOING
     $pickedPage = null;
-
+    $pageTemp = Page::where('traffic_remain', '>', 0)->where('status', PageStatusConstants::APPROVED);
+    Log::info("pageTemp");
+    Log::info((clone $pageTemp)->get());
     while (count($pageType) > 0 and !$pickedPage) {
       // Get random page type id base on weights
       $pageTypeId = $this->GetRandomWeightedElement($pageType);
-      $pageQuery = Page::query();
-      // Get all id of page_type have mission_need <= current user page_type
-      // Add conditions
-      $pageQuery->where('traffic_remain', '>', 0)
-        ->where('status', PageStatusConstants::APPROVED)
-        ->where('page_type_id', $pageTypeId)
-        ->whereNotIn('priority', $excludePriority);
+      $pageQuery = (clone $pageTemp)->where('page_type_id', $pageTypeId)->whereNotIn('priority', $excludePriority);
 
       // Query pages by Priority (HIGH -> MEDIUM -> LOW)
       $pages = (clone $pageQuery)->where('priority', PagePriorityConstants::HIGH)->get();
@@ -299,6 +294,9 @@ class MissionController extends Controller
     DB::transaction(function () use ($pickedPage, $user, $request, $rqIp, $originUrl) {
       // Refresh data
       $pickedPage = $pickedPage->refresh();
+      if ($pickedPage->traffic_remain <= 0) {
+        throw new Exception("Rollback ");
+      }
       $commisonRateV1 = Setting::where("name", "commission_rate_1")->first();
       $commisonRateV2 = Setting::where("name", "commission_rate_2")->first();
 
@@ -336,6 +334,7 @@ class MissionController extends Controller
 
     return Redirect::to('/tu-khoa');
   }
+
 
 
   public function cancelMission()

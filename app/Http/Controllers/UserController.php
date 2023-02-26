@@ -338,10 +338,9 @@ class UserController extends Controller
   {
     $user = Auth::user();
     $request->validate([
-      'key' => 'required|uuid',
+      'key' => 'required',
     ],[
-      "key.required" => "Vui lòng nhập mã",
-      "key.uuid" => "Sai mã",
+      "key.required" => "Vui lòng nhập mã"
     ]);
     $uIP = $this->getUserIpAddr();
     if ($user->status == 0) {
@@ -353,20 +352,19 @@ class UserController extends Controller
       ["user_agent", $request->userAgent()],
       ["status", MissionStatusConstants::DOING]
     ]);
-    $temp = clone $ms;
     if (!$ms->count()) { //not found
       return Redirect::to('/tu-khoa')->withErrors('Hết hạn, vui lòng nhận lại nhiệm vụ mới');
     }
     $code = Code::where([
       ["code", $request->key],
       ["status", 0],
-      ["pageId", $temp->first()->page_id]
+      ["pageId", (clone $ms)->first()->page_id]
     ]);
 
     $commisonRateV1 = Setting::where("name", "commission_rate_1")->first();
     $commisonRateV2 = Setting::where("name", "commission_rate_2")->first();
-    $msGet = ($ms)->get(["code", "reward", "page_id"])->first();
-    if (!is_null($code->first())) {
+    $msGet = (clone $ms)->get(["code", "reward", "page_id"])->first();
+    if ((clone $code)->first()) {
       DB::transaction(function () use ($ms, $user, $msGet, $request, $code, $commisonRateV1, $commisonRateV2) {
         $ms->update(["status" => 1, "code" => $request->key,"updated_at" => Carbon::now()]);
         $code->update(["status" => 1]);
@@ -465,7 +463,7 @@ class UserController extends Controller
       });
       return Redirect::to('/tu-khoa')->withErrors('Sai mã!');
     }
-    return Redirect::to('/tu-khoa')->withErrors('Sai mã!');
+    return Redirect::to('/tu-khoa');
   }
 
   public function tukhoa()

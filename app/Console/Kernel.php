@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('user:update-week')->weeklyOn(7, '00:10')->timezone('Asia/Ho_Chi_Minh');
         $schedule->command('user:update-month')->monthlyOn(1, '00:15')->timezone('Asia/Ho_Chi_Minh');
         $schedule->command('mission:reset')->dailyAt('00:05')->timezone('Asia/Ho_Chi_Minh');
-        $schedule->command('telegram:report')->dailyAt('23:59')->timezone('Asia/Ho_Chi_Minh');
+        $schedule->command('telegram:report')->dailyAt('23:55')->timezone('Asia/Ho_Chi_Minh');
     }
 
     /**
