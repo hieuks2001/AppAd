@@ -259,6 +259,7 @@ class MissionController extends Controller
     $page = Page::where([
       ["id", $pageId],
       ["status", PageStatusConstants::APPROVED],
+      ["traffic_remain", ">",0]
     ])->get(["onsite"])->first();
     if (empty($page)) {
       return response()->json(["error" => "Traffic của site chưa sẵn sàng"]);
@@ -292,38 +293,40 @@ class MissionController extends Controller
         ["status", 0],
         ["pageId", $pageId]
       ]);
-      if (!($result->first()) and (is_int($time))) {
+      $temp = clone $result;
+      if (!($temp->first()) and (is_int($time))) {
         $page = Page::where([
           ["id", $pageId],
           ["status", PageStatusConstants::APPROVED],
-        ])->get(["onsite","id"])->first();
-        if ($page->onsite != ($time + 3)) {
+        ])->get(["onsite","id"]);
+        if ($page->first()->onsite != ($time + 3)) {
           return response()->json(["error" => "Error"]);
         }
-        $newCode = new Code();
-        $newCode->id = $key;
-        $newCode->keys = json_encode([
-          $page->onsite - 3 => true, //time start countdown
+        $temp_keys = json_encode([
+          $page->first()->onsite - 3 => true, //time start countdown
           hexdec($key[5] . $key[10]) => false,
           hexdec($key[25] . $key[28]) => false,
           0 => false,
         ]);
-        $newCode->pageId = $page->id;
+        $newCode = new Code();
+        $newCode->id = $key;
+        $newCode->keys = $temp_keys;
+        $newCode->pageId = $page->first()->id;
         $newCode->save();
         return response()->json(["success" => "Success"]);
       };
 
-      if ($result->first()->code) {
-        return response()->json(["code" => $result->first()->code]);
+      if ($temp->first()->code) {
+        return response()->json(["code" => $temp->first()->code]);
       }
-      if (!in_array(false, (array) json_decode($result->get('keys')->first()->keys))) {
+      if (!in_array(false, (array) json_decode($temp->get('keys')->first()->keys))) {
         //already return code
         if ($path != "/") { //completed countdown and return code
           $code = Uuid::uuid5(Uuid::uuid6(), $key[5] . $key[10] . $key[25] . $key[28])->toString();
           $result->update(["code" => $code]);
           return response()->json(["code" => $code]);
         }
-        return response()->json(["code" => $result->code]);
+        return response()->json(["code" => $temp->code]);
       }
 
       if (is_int($time)) {

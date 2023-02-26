@@ -101,7 +101,7 @@ $page;
           <label for="modal-approve--traffic" class="btn btn-info btn-block btn-sm"
             onclick="onClick({{ $value }})">Sửa</label>
           @if (!empty($value->image))
-          <form class="mb-0" action="{{ action('DashboardController@postApproveTraffic', $value->id) }}" method="post" onsubmit="document.getElementById('btn-approve-{{$value->id}}').disabled = true;">
+          <form class="mb-0" action="{{ action('DashboardController@postApproveTraffic', $value->id) }}" method="post" onsubmit="document.getElementById('btn-approve-{{$value->id}}').disabled = true;document.getElementById('btn-approve-{{$value->id}}').textContent='Đang xử lý'">
             @csrf
             <button id="btn-approve-{{$value->id}}" class="btn btn-success btn-block btn-sm">Duyệt</button>
           </form>
