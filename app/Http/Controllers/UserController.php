@@ -389,24 +389,23 @@ class UserController extends Controller
           $oldReward = $reward;
           $reward -= $lv1Commission;
           //
-          $logLV1 = new LogTransaction([
-            'amount' => $lv1Commission,
-            'user_id' => $lv1->id,
-            'from_user_id' => $user->id,
-            'type' => TransactionTypeConstants::COMMISSION,
-            'status' => 0, // pending -> Update later on weekend?
-          ]);
-          $logLV1->save();
           if ($lv1->reference) {
-            $lv2 = User::where('id', $lv1->reference)->first();
+              $lv1Commissionlv2 = $lv1Commission * (int)$commisonRateV1->value / 100;
+              $logLV1 = new LogTransaction([
+                'amount' => $lv1Commission - $lv1Commissionlv2,
+                'user_id' => $lv1->id,
+                'from_user_id' => $user->id,
+                'type' => TransactionTypeConstants::COMMISSION,
+                'status' => 0, // pending -> Update later on weekend?
+              ]);
+              $logLV1->save();
+              $lv2 = User::where('id', $lv1->reference)->first();
             if ($lv2) {
               $lv2Commission = $oldReward * (int)$commisonRateV2->value / 100; // (Get 1%)
-              $lv1Commissionlv2 = $lv2Commission * (int)$commisonRateV1->value / 100; //(Get 30% from % lv2)
-              $lv2CommissionReal = $lv2Commission - $lv1Commissionlv2;
               $reward -= $lv2Commission;
               //
               $logLV2 = new LogTransaction([
-                'amount' => $lv2CommissionReal,
+                'amount' => $lv2Commission,
                 'user_id' => $lv2->id,
                 'from_user_id' => $user->id,
                 'type' => TransactionTypeConstants::COMMISSION,
@@ -414,14 +413,24 @@ class UserController extends Controller
               ]);
               $logLV1reward = new LogTransaction([
                 'amount' => $lv1Commissionlv2,
-                'user_id' => $lv1->id,
-                'from_user_id' => $lv2->id,
+                'user_id' => $lv2->id,
+                'from_user_id' => $lv1->id,
                 'type' => TransactionTypeConstants::COMMISSION,
                 'status' => 0, // pending -> Update later on weekend?
               ]);
+              
               $logLV2->save();
               $logLV1reward->save();
             }
+          } else {
+            $logLV1 = new LogTransaction([
+                'amount' => $lv1Commission,
+                'user_id' => $lv1->id,
+                'from_user_id' => $user->id,
+                'type' => TransactionTypeConstants::COMMISSION,
+                'status' => 0, // pending -> Update later on weekend?
+            ]);
+            $logLV1->save();
           }
         }
         // Create log
