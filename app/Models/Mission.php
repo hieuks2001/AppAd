@@ -32,4 +32,8 @@ class Mission extends Model
 
   // Set incrementing to False -> Custom primary key -> Not return 0 when using Eloquent Laravel model
   public $incrementing = false;
+  public function page()
+  {
+    return $this->belongsTo(Page::class, 'page_id', 'id');
+  }
 }

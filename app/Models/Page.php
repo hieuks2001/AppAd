@@ -45,4 +45,9 @@ class Page extends Model
     {
         return $this->belongsTo('App\Models\PageType');
     }
+
+    public function missions()
+    {
+        return $this->hasMany('App\Models\Mission');
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreOrderPageTraffic;
 use App\Models\Page;
+use App\Models\Mission;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use ReflectionClass;
@@ -34,7 +35,7 @@ class PageController extends Controller
     try {
       $user = Auth::user();
       $page = new Page($validated);
-      
+
       $page->keyword = str_replace(array('/', '//', '/*'), "", $page->keyword);
 
       DB::transaction(function () use ($user, $page, $validated) {
@@ -123,9 +124,14 @@ class PageController extends Controller
   public function regispageTab4()
   {
     // Completed Traffic order (Approved page)
-    $pages = Page::where('status', PageStatusConstants::APPROVED)
-      ->where('user_id', Auth::user()->id)
-      ->where('traffic_remain', 0)->simplePaginate(10);
+    $pages = Page::selectRaw('pages.*, count(missions.id) as total_mission')
+    ->join('missions', 'missions.page_id', '=', 'pages.id')
+    ->where('pages.status', PageStatusConstants::APPROVED)
+    ->where('missions.status', MissionStatusConstants::COMPLETED)
+    ->where('pages.user_id', Auth::user()->id)
+    ->groupBy('pages.id')
+    ->havingRaw('count(missions.id) >= pages.traffic_sum')
+    ->simplePaginate(10);
     return view('regispage.tab4')->with('pages', $pages);
   }
   public function regispageTab5()
