@@ -256,12 +256,14 @@ class MissionController extends Controller
   public function pageInit(Request $request)
   {
     $pageId = $request->id;
-    $page = Page::where([
-      ["id", $pageId],
-      ["status", PageStatusConstants::APPROVED],
-      ["traffic_remain", ">",0]
-    ])->get(["onsite"])->first();
-    if (empty($page)) {
+    $page = Page::selectRaw('pages.*, count(missions.id) as total_mission')
+    ->join('missions', 'missions.page_id', '=', 'pages.id')
+    ->where('pages.id', $pageId)
+    ->where('pages.status', PageStatusConstants::APPROVED)
+    ->where('missions.status', MissionStatusConstants::COMPLETED)
+    ->groupBy('pages.id')
+    ->havingRaw('count(missions.id) < pages.traffic_sum')->get(["pages.onsite"])->first();
+    if (!$page) {
       return response()->json(["error" => "Traffic của site chưa sẵn sàng"]);
     }
     $uuid = Uuid::uuid5(Uuid::uuid6(), $request->userAgent() . $pageId)->toString();

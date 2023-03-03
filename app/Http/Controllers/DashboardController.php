@@ -12,6 +12,7 @@ use App\Models\LogMissionTransaction;
 use App\Models\LogTrafficTransaction;
 use Illuminate\Http\Request;
 use App\Models\Page;
+use App\Models\Mission;
 use App\Models\PageType;
 use App\Models\Setting;
 use App\Models\User;
@@ -284,12 +285,34 @@ class DashboardController extends Controller
 
     return redirect()->to('/management/traffic');
   }
-
+  public function setMissionStatusCancel(Mission $mission,$page)
+  {
+    DB::transaction(function () use ($mission,$page) {
+      $mission->status = MissionStatusConstants::CANCEL;
+      $mission->save();
+      if ($page->total_mission < $page->traffic_sum) {
+        $page->traffic_remain += 1;
+        $page->save();
+      }
+    });
+    return true;
+  }
   public function offApprovedTraffic(Request $request, $id)
   {
-    $page = Page::where('id', $id)->first();
+    $page = Page::selectRaw('pages.*, count(missions.id) as total_mission')
+    ->join('missions', 'missions.page_id', '=', 'pages.id')
+    ->where('pages.id', $id)
+    ->where('pages.status', PageStatusConstants::APPROVED)
+    ->where('missions.status', MissionStatusConstants::COMPLETED)
+    ->groupBy('pages.id')
+    ->havingRaw('count(missions.id) < pages.traffic_sum')->first();
+    $mission = Mission::where('status', MissionStatusConstants::DOING)->where('page_id',$id)->get();
+    foreach( $mission as $ms) {
+        $this->setMissionStatusCancel($ms,$page);
+    }
     $user = $page->user;
     DB::transaction(function () use ($request, $page, $user) {
+      $page->refresh();
       $page->status = PageStatusConstants::CANCEL;
       $page->note = $request->note;
       $refund = $page->traffic_remain * $page->price_per_traffic;

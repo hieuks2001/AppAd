@@ -35,16 +35,22 @@ class PageController extends Controller
     try {
       $user = Auth::user();
       $page = new Page($validated);
+      $page_new_url = str_ireplace('www.', '', parse_url($page->url, PHP_URL_HOST));
       $pages_exist = Page::selectRaw('pages.*')
       ->join('missions', 'missions.page_id', '=', 'pages.id')
-      ->where('url',$page->url)
+      ->where('url','LIKE','%'.$page_new_url.'%')
       ->where('pages.status', PageStatusConstants::APPROVED)
       ->where('missions.status', MissionStatusConstants::COMPLETED)
       ->where('pages.user_id', Auth::user()->id)
       ->groupBy('pages.id')
       ->havingRaw('count(missions.id) < pages.traffic_sum')->get();
-      if ($pages_exist->count()>0){
-        return redirect()->back()->withErrors("$page->url chưa chạy xong!");
+      if ($pages_exist->isNotEmpty()){
+          foreach ($pages_exist as $p) {
+            $page_exist_url = str_ireplace('www.', '', parse_url($p->url, PHP_URL_HOST));
+            if ($page_new_url == $page_exist_url) {
+                return redirect()->back()->withErrors("Bạn đang thêm $page_exist_url nhưng $page_new_url chưa chạy xong!");  
+            }
+          }
       }
       $page->keyword = str_replace(array('/', '//', '/*'), "", $page->keyword);
 
